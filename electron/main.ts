@@ -6,13 +6,32 @@ import {
   screen,
 } from "electron";
 import path from "path";
-import { isDev } from "./config";
+import { isDev } from "./setup/config";
 import { appConfig } from "./ElectronStore/Configuration";
-import AppUpdater from "./AutoUpdate";
+import AppUpdater from "./setup/AutoUpdate";
+
+import DatabaseMigration from "./types/DatabaseMigration";
+import DBMigrations from "./database";
+import * as DBFunctions from "./database/functions";
+
+import "./database/functions/init";
+
+(async function init() {
+  const versionsToPatch: any = await DBMigrations;
+
+  for (const version of versionsToPatch) {
+    for (const change of version.default.changes) {
+      if (change.type === "create") DBFunctions.create(change);
+    }
+
+    DBFunctions.versionUpdate(version.default.version);
+  }
+})();
 
 async function createWindow() {
   const { width, height } = screen.getPrimaryDisplay().workAreaSize;
   const appBounds: any = appConfig.get("setting.appBounds");
+
   const BrowserWindowOptions: BrowserWindowConstructorOptions = {
     width: 1200,
     minWidth: 900,
@@ -30,13 +49,12 @@ async function createWindow() {
 
   if (appBounds !== undefined && appBounds !== null)
     Object.assign(BrowserWindowOptions, appBounds);
+
   const mainWindow = new BrowserWindow(BrowserWindowOptions);
 
   // auto updated
   if (!isDev) AppUpdater();
 
-  // and load the index.html of the app.
-  // win.loadFile("index.html");
   await mainWindow.loadURL(
     isDev
       ? "http://localhost:3000"
@@ -58,9 +76,7 @@ async function createWindow() {
   }, 1000);
 
   // Open the DevTools.
-  if (isDev) {
-    mainWindow.webContents.openDevTools();
-  }
+  // if (isDev) mainWindow.webContents.openDevTools();
 
   ipcMain.handle("versions", () => {
     return {
@@ -73,14 +89,10 @@ async function createWindow() {
   });
 }
 
-// This method will be called when Electron has finished
-// initialization and is ready to create browser windows.
-// Some APIs can only be used after this event occurs.
 app.whenReady().then(async () => {
-  // if dev
   if (isDev) {
     try {
-      const { installExt } = await import("./installDevTools");
+      const { installExt } = await import("./setup/installDevTools");
       await installExt();
     } catch (e) {
       console.log("Can not install extension!");
@@ -89,17 +101,12 @@ app.whenReady().then(async () => {
 
   createWindow();
   app.on("activate", function () {
-    // On macOS it's common to re-create a window in the app when the
-    // dock icon is clicked and there are no other windows open.
     if (BrowserWindow.getAllWindows().length === 0) createWindow();
   });
 });
 
-// Quit when all windows are closed, except on macOS. There, it's common
-// for applications and their menu bar to stay active until the user quits
-// explicitly with Cmd + Q.
 app.on("window-all-closed", () => {
-  if (process.platform !== "darwin") {
-    app.quit();
-  }
+  if (process.platform === "darwin") return;
+
+  app.quit();
 });

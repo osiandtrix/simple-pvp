@@ -1,22 +1,40 @@
 <template>
-  <h1>{{ counter }}</h1>
-  <v-btn @click="increment">+</v-btn>
-  <v-btn @click="decrement">-</v-btn>
+  <div>
+    <v-row>
+      <v-spacer></v-spacer>
+      <h1 class="mt-2">WELCOME</h1>
+      <v-spacer></v-spacer>
+    </v-row>
+    <v-row>
+      <v-spacer></v-spacer>
+      <h1>{{ counter }}</h1>
+      <v-spacer></v-spacer>
+    </v-row>
+    <v-row>
+      <v-spacer></v-spacer>
+      <v-btn @click="decrement">-</v-btn>
+      <v-btn @click="increment">+</v-btn>
+      <v-spacer></v-spacer>
+    </v-row>
+  </div>
 </template>
 
 <script lang="ts">
 export default {
   data() {
-    return {
-      counter: 0,
-    };
+    return {};
+  },
+  computed: {
+    counter(): number {
+      return this.$store.getters["counter"];
+    },
   },
   methods: {
     increment() {
-      this.counter++;
+      this.$store.dispatch("updateCounter", this.counter + 1);
     },
     decrement() {
-      this.counter--;
+      this.$store.dispatch("updateCounter", this.counter - 1);
     },
   },
 };
