@@ -1,5 +1,5 @@
 <template>
-  <h1>Hello</h1>
+  <h1>{{ counter }}</h1>
   <v-btn @click="increment">+</v-btn>
   <v-btn @click="decrement">-</v-btn>
 </template>
