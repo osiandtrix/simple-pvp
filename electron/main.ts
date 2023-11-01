@@ -9,8 +9,8 @@ import path from "path";
 import { isDev } from "./setup/config";
 import { appConfig } from "./ElectronStore/Configuration";
 import AppUpdater from "./setup/AutoUpdate";
+import listeners from "./listeners";
 
-import DatabaseMigration from "./types/DatabaseMigration";
 import DBMigrations from "./database";
 import * as DBFunctions from "./database/functions";
 
@@ -28,6 +28,10 @@ import "./database/functions/init";
   }
 })();
 
+for (const [functionName, func] of Object.entries(listeners)) {
+  ipcMain.on(functionName, func);
+}
+
 async function createWindow() {
   const { width, height } = screen.getPrimaryDisplay().workAreaSize;
   const appBounds: any = appConfig.get("setting.appBounds");
@@ -39,11 +43,11 @@ async function createWindow() {
     minHeight: 600,
 
     webPreferences: {
-      preload: __dirname + "/preload.js",
+      preload: __dirname + "/setup/preload.js",
       devTools: isDev,
     },
     show: false,
-    alwaysOnTop: true,
+    alwaysOnTop: false,
     frame: true,
   };
 

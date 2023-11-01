@@ -7,11 +7,13 @@
 </template>
 
 <script lang="ts">
-import Menu from "./components/Menu.vue";
+import Menu from "./components/Menu/Menu.vue";
+import Main from "./components/Main/Main.vue";
 
 export default {
   name: "App",
   components: {
+    Main,
     Menu,
   },
   data() {
