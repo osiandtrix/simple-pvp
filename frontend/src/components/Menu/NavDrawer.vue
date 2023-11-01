@@ -4,7 +4,7 @@
       <v-navigation-drawer v-model="drawer" temporary>
         <v-list density="compact" nav>
           <v-list-item
-            @click="() => updateActiveElement('home')"
+            @click="() => updateActiveElement('main')"
             prepend-icon="mdi-sword-cross"
             title="Home"
             value="home"
@@ -20,7 +20,8 @@
       </v-navigation-drawer>
 
       <v-main>
-        <component :is="activePage" />
+        <Main v-if="activePage === 'main'" />
+        <Settings v-if="activePage === 'settings'" />
       </v-main>
     </v-layout>
   </v-card>
@@ -31,6 +32,7 @@ import Main from "../Main/Main.vue";
 import Settings from "../Settings/Settings.vue";
 
 export default {
+  name: "navdrawer",
   data() {
     return {
       drawer: false,
@@ -50,7 +52,6 @@ export default {
   },
   props: {
     drawerHook: null,
-    Content: null,
   },
   watch: {
     drawerHook(val) {

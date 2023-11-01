@@ -38,29 +38,50 @@
         <v-spacer></v-spacer>
       </v-card-actions>
     </v-card>
+    <Warlist :keySet="!!setAPIKey" />
   </v-main>
 </template>
 
 <script lang="ts">
+import Warlist from "./Warlist.vue";
+
 export default {
   name: "main",
   data() {
     return {
+      maxLevel: this.savedMaxLevel,
       inCombat: false,
     };
   },
+  components: { Warlist },
+  mounted() {
+    this.maxLevel = this.savedMaxLevel;
+  },
+  watch: {
+    savedMaxLevel(val) {
+      this.maxLevel = val;
+    },
+  },
   computed: {
-    maxLevel() {
+    savedMaxLevel() {
       return this.$store.getters["settings/maxLevel"];
+    },
+    setAPIKey() {
+      return this.$store.getters["settings/apiKey"];
     },
   },
   methods: {
     enterCombat() {
+      console.log(this.$store.getters["settings/maxLevel"]);
       // emit event to electron
       this.inCombat = true;
     },
     saveMaxLevel() {
-      //
+      this.$store.dispatch("settings/saveMaxLevel", {
+        maxLevel: this.maxLevel,
+      });
+
+      this.$toast.success("");
     },
   },
 };
