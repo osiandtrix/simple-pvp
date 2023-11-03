@@ -1,15 +1,21 @@
-const fetchUserdata = (event: any) => {
-  event.reply(
-    "resolveUserdata",
-    global.db.prepare(`SELECT * FROM userdata`).all()[0]
-  );
-};
+import fetchUserdata from "./fetchUserdata";
+import fetchUsersettings from "./fetchUsersettings";
+import fetchWarEntries from "./fetchWarEntries";
+import updateSettings from "./updateSettings";
+import updateUserdata from "./updateUserdata";
+import updateWarlist from "./updateWarlist";
+import enterCombat from "./enterCombat";
+import setSpacebarKeybind from "./setSpacebarKeybind";
+import updateCurrentTarget from "./updateCurrentTarget";
 
-const fetchUsersettings = (event: any) => {
-  event.reply(
-    "resolveUsersettings",
-    global.db.prepare(`SELECT * FROM settings`).all()[0]
-  );
+export default {
+  fetchUserdata,
+  fetchUsersettings,
+  fetchWarEntries,
+  updateSettings,
+  updateUserdata,
+  updateWarlist,
+  enterCombat,
+  setSpacebarKeybind,
+  updateCurrentTarget,
 };
-
-export default { fetchUserdata, fetchUsersettings };

@@ -2,6 +2,7 @@ import {
   app,
   BrowserWindow,
   BrowserWindowConstructorOptions,
+  globalShortcut,
   ipcMain,
   screen,
 } from "electron";
@@ -10,11 +11,10 @@ import { isDev } from "./setup/config";
 import { appConfig } from "./ElectronStore/Configuration";
 import AppUpdater from "./setup/AutoUpdate";
 import listeners from "./listeners";
+import "./database/functions/init";
 
 import DBMigrations from "./database";
 import * as DBFunctions from "./database/functions";
-
-import "./database/functions/init";
 
 (async function init() {
   const versionsToPatch: any = await DBMigrations;
@@ -28,19 +28,23 @@ import "./database/functions/init";
   }
 })();
 
-for (const [functionName, func] of Object.entries(listeners)) {
-  ipcMain.on(functionName, func);
+// Register all listeners
+for (const [event, callback] of Object.entries(listeners)) {
+  ipcMain.on(event, callback);
 }
 
+let mainWindow: BrowserWindow;
 async function createWindow() {
   const { width, height } = screen.getPrimaryDisplay().workAreaSize;
   const appBounds: any = appConfig.get("setting.appBounds");
 
   const BrowserWindowOptions: BrowserWindowConstructorOptions = {
-    width: 1200,
-    minWidth: 900,
+    width: 500,
+    minWidth: 500,
     height: 750,
-    minHeight: 600,
+    minHeight: 200,
+    x: 100,
+    y: 50,
 
     webPreferences: {
       preload: __dirname + "/setup/preload.js",
@@ -54,7 +58,8 @@ async function createWindow() {
   if (appBounds !== undefined && appBounds !== null)
     Object.assign(BrowserWindowOptions, appBounds);
 
-  const mainWindow = new BrowserWindow(BrowserWindowOptions);
+  mainWindow = new BrowserWindow(BrowserWindowOptions);
+  global.mainWindow = mainWindow;
 
   // auto updated
   if (!isDev) AppUpdater();
@@ -113,4 +118,9 @@ app.on("window-all-closed", () => {
   if (process.platform === "darwin") return;
 
   app.quit();
+});
+
+app.on("will-quit", () => {
+  // Unregister all shortcuts.
+  globalShortcut.unregisterAll();
 });
