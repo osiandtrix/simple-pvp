@@ -1,25 +1,40 @@
+type userIdDB = {
+  userid: string;
+};
+
+type guildIdDB = {
+  guildid: string;
+};
+
+type userId = {
+  userId: string;
+};
+
+type guildId = {
+  guildId: string;
+};
+
+type State = guildId & userId;
+
 export default {
   namespaced: true,
-  state: async () => ({
+  state: {
     userId: null,
     guildId: null,
-  }),
+  },
   getters: {
-    userId: (state: any) => state.userId,
-    guildId: (state: any) => state.guildId,
+    userId: (state: State) => state.userId,
+    guildId: (state: State) => state.guildId,
   },
   mutations: {
-    UPDATE_USERDATA(
-      state: any,
-      { userId, guildId }: { userId: string; guildId: string }
-    ) {
-      state.userId = userId;
-      state.guildId = guildId;
+    UPDATE_USERDATA(state: State, { userid, guildid }: userIdDB & guildIdDB) {
+      if (userid) state.userId = userid;
+      if (guildid) state.guildId = guildid;
     },
-    SET_USERID(state: any, { userId }: { userId: string }) {
+    SET_USERID(state: State, { userId }: userId) {
       state.userId = userId;
     },
-    SET_GUILDID(state: any, { guildId }: { guildId: string }) {
+    SET_GUILDID(state: State, { guildId }: guildId) {
       state.guildId = guildId;
     },
   },
@@ -31,13 +46,13 @@ export default {
         commit("UPDATE_USERDATA", data);
       });
     },
-    setUserId({ commit }: any, data: { userId: string }) {
-      window.api.send("setUserId", data);
+    setUserId({ commit }: any, data: userId) {
+      window.api.send("updateUserdata", data);
 
       commit("SET_USERID", data);
     },
-    setGuildId({ commit }: any, data: { guildId: string }) {
-      window.api.send("setGuildId", data);
+    setGuildId({ commit }: any, data: guildId) {
+      window.api.send("updateUserdata", data);
 
       commit("SET_GUILDID", data);
     },

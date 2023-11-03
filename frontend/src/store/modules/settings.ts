@@ -1,3 +1,8 @@
+type State = {
+  maxLevel: number;
+  apiKey: string;
+};
+
 export default {
   namespaced: true,
   state: {
@@ -5,22 +10,22 @@ export default {
     apiKey: null,
   },
   getters: {
-    maxLevel: (state: any) => state.maxLevel,
-    apiKey: (state: any) => state.apiKey,
+    maxLevel: (state: State) => state.maxLevel,
+    apiKey: (state: State) => state.apiKey,
   },
   mutations: {
     UPDATE_USERSETTINGS(
-      state: any,
+      state: State,
       { maxLevel, api_key }: { maxLevel: string; api_key: string }
     ) {
-      state.maxLevel = maxLevel;
-      state.apiKey = api_key;
+      if (maxLevel) state.maxLevel = maxLevel;
+      if (api_key) state.apiKey = api_key;
     },
-    UPDATE_APIKEY(state: any, { api_key }: { api_key: string }) {
+    UPDATE_APIKEY(state: State, { api_key }: { api_key: string }) {
       state.apiKey = api_key;
     },
     UPDATE_MAXLEVEL(
-      state: any,
+      state: State,
       { maxLevel }: { maxLevel: string; api_key: string }
     ) {
       state.maxLevel = maxLevel;

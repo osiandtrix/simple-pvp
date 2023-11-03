@@ -5,6 +5,7 @@ import { loadFonts } from "./plugins/webfontloader";
 import store from "./store";
 import ToastPlugin from "vue-toast-notification";
 import "vue-toast-notification/dist/theme-bootstrap.css";
+import { Store } from "vuex/types/index.js";
 
 loadFonts();
 
@@ -14,7 +15,12 @@ createApp(App)
   .use(vuetify)
   .mount("#app")
   .$nextTick(() => {
-    store.dispatch("user/init");
-    store.dispatch("settings/init");
-    store.dispatch("wars/init");
+    init(store);
   });
+
+function init(store: Store<unknown>) {
+  store.dispatch("user/init");
+  store.dispatch("settings/init");
+  store.dispatch("wars/init");
+  store.dispatch("process/init");
+}

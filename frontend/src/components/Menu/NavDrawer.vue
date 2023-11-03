@@ -1,27 +1,32 @@
 <template>
   <v-card>
-    <v-layout style="height: 90vh">
-      <v-navigation-drawer v-model="drawer" temporary>
-        <v-list density="compact" nav>
-          <v-list-item
-            @click="() => updateActiveElement('main')"
-            prepend-icon="mdi-sword-cross"
-            title="Home"
-            value="home"
-          ></v-list-item>
+    <v-layout style="width: 100vw">
+      <v-navigation-drawer style="position: fixed" v-model="drawer" temporary>
+        <v-container
+          style="height: 90vh; margin-top: 8vh"
+          fill-height
+          class="pa-0"
+        >
+          <v-list density="compact" nav>
+            <v-list-item
+              @click="() => updateActiveElement('main')"
+              prepend-icon="mdi-sword-cross"
+              title="Home"
+              value="home"
+            ></v-list-item>
 
-          <v-list-item
-            @click="() => updateActiveElement('settings')"
-            prepend-icon="mdi-cog"
-            title="Settings"
-            value="settings"
-          ></v-list-item>
-        </v-list>
+            <v-list-item
+              @click="() => updateActiveElement('settings')"
+              prepend-icon="mdi-cog"
+              title="Settings"
+              value="settings"
+            ></v-list-item>
+          </v-list>
+        </v-container>
       </v-navigation-drawer>
 
       <v-main>
-        <Main v-if="activePage === 'main'" />
-        <Settings v-if="activePage === 'settings'" />
+        <component :is="activePage"></component>
       </v-main>
     </v-layout>
   </v-card>
@@ -30,6 +35,7 @@
 <script lang="ts">
 import Main from "../Main/Main.vue";
 import Settings from "../Settings/Settings.vue";
+import Profile from "../Profile/Profile.vue";
 
 export default {
   name: "navdrawer",
@@ -42,20 +48,33 @@ export default {
   components: {
     Main,
     Settings,
+    Profile,
   },
   methods: {
     updateActiveElement(val: string) {
       this.activePage = val;
       this.drawer = false;
-      this.$emit("updateDrawer", false);
     },
   },
   props: {
-    drawerHook: null,
+    forceReroute: {
+      type: String,
+      default: null,
+    },
+    drawerHook: {
+      type: Boolean,
+      default: null,
+    },
   },
   watch: {
     drawerHook(val) {
       this.drawer = val;
+    },
+    drawer(val) {
+      this.$emit("updateDrawer", val);
+    },
+    forceReroute(val) {
+      this.activePage = val;
     },
   },
 };
