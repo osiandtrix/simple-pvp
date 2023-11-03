@@ -18,7 +18,7 @@ export default {
       state: State,
       { maxLevel, api_key }: { maxLevel: string; api_key: string }
     ) {
-      if (maxLevel) state.maxLevel = maxLevel;
+      if (maxLevel) state.maxLevel = +maxLevel;
       if (api_key) state.apiKey = api_key;
     },
     UPDATE_APIKEY(state: State, { api_key }: { api_key: string }) {
@@ -28,7 +28,7 @@ export default {
       state: State,
       { maxLevel }: { maxLevel: string; api_key: string }
     ) {
-      state.maxLevel = maxLevel;
+      state.maxLevel = +maxLevel;
     },
   },
   actions: {

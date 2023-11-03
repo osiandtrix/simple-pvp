@@ -18,7 +18,7 @@ export default {
     apiLimit_Stamp: (state: State) => state.apiLimit_Stamp,
     inCombat: (state: State) => state.inCombat,
     resetIn: (state: State) =>
-      60 - (Math.ceil(new Date().getTime() / 1000) - state.apiLimit_Stamp),
+      60 - (getUNIXStamp() - (state.apiLimit_Stamp ?? 0)),
   },
   mutations: {
     UPDATE_INCOMBAT(state: State, val: boolean) {

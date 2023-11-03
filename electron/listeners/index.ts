@@ -1,12 +1,13 @@
-import fetchUserdata from "./fetchUserdata";
-import fetchUsersettings from "./fetchUsersettings";
-import fetchWarEntries from "./fetchWarEntries";
-import updateSettings from "./updateSettings";
-import updateUserdata from "./updateUserdata";
-import updateWarlist from "./updateWarlist";
-import enterCombat from "./enterCombat";
-import setSpacebarKeybind from "./setSpacebarKeybind";
-import updateCurrentTarget from "./updateCurrentTarget";
+import fetchUserdata from "./fetch/fetchUserdata";
+import fetchUsersettings from "./fetch/fetchUsersettings";
+import fetchWarEntries from "./fetch/fetchWarEntries";
+import updateSettings from "./update/updateSettings";
+import updateUserdata from "./update/updateUserdata";
+import updateWarlist from "./update/updateWarlist";
+import enterCombat from "./misc/enterCombat";
+import registerKeybinds from "./misc/registerKeybinds";
+import updateCurrentTarget from "./update/updateCurrentTarget";
+import unregisterKeybinds from "./misc/unregisterKeybinds";
 
 export default {
   fetchUserdata,
@@ -16,6 +17,7 @@ export default {
   updateUserdata,
   updateWarlist,
   enterCombat,
-  setSpacebarKeybind,
+  registerKeybinds,
   updateCurrentTarget,
+  unregisterKeybinds,
 };

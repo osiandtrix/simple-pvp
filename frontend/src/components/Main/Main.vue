@@ -1,19 +1,19 @@
 <template>
   <v-main style="height: 100vh; overflow: hidden">
-    <v-card class="pa-5">
+    <v-card class="px-5">
       <v-card-title>
-        <v-row>
-          <v-col cols="10">
-            <h1>Setup</h1>
+        <v-row class="mx-0">
+          <v-col cols="10" class="px-0 pb-0">
+            <h3 class="pt-4">Setup</h3>
           </v-col>
           <v-spacer></v-spacer>
-          <v-col>
+          <v-col class="px-0 pb-0">
             <v-tooltip activator="parent" location="left">
-              Spacebar Keybind
+              {{ keybindsActive ? "Unregister Keybinds" : "Register Keybinds" }}
             </v-tooltip>
             <v-switch
               :disabled="!inCombat"
-              v-model="spacebarKeybind"
+              v-model="keybindsActive"
               color="blue"
             >
             </v-switch>
@@ -21,13 +21,17 @@
         </v-row>
       </v-card-title>
 
+      <v-divider class="mb-3 mx-3" style="margin-top: -1.2rem"></v-divider>
+
       <div>
         <v-text-field
+          id="level-input"
           class="mx-3"
           label="Max Level"
           type="number"
           v-model="maxLevel"
           variant="solo"
+          hide-details="auto"
         ></v-text-field>
       </div>
 
@@ -36,6 +40,7 @@
         <v-btn
           :disabled="!maxLevel"
           @click="saveMaxLevel"
+          prepend-icon="mdi-database-check-outline"
           variant="outlined"
           color="green"
         >
@@ -61,14 +66,20 @@
         </v-btn>
         <v-spacer></v-spacer>
       </v-card-actions>
+
+      <v-divider class="mx-4 mt-2"></v-divider>
     </v-card>
-    <Warlist :keySet="!!setAPIKey" />
+
+    <EventLog v-if="inCombat" />
+    <Warlist v-else :keySet="!!setAPIKey" />
   </v-main>
 </template>
 
 <script lang="ts">
+import Event from "../../types/Event";
 import { mapGetters } from "vuex";
 import Warlist from "./Warlist.vue";
+import EventLog from "../EventLog/EventLog.vue";
 
 export default {
   name: "main",
@@ -76,24 +87,13 @@ export default {
     return {
       maxLevel: this.savedMaxLevel,
       combatWindow: null,
-      spacebarKeybind: false,
-      targetList: [],
+      keybindsActive: false,
       initiatingCombat: false,
     };
   },
-  components: { Warlist },
+  components: { Warlist, EventLog },
   mounted() {
-    window.api.receive("spacebar", () => {
-      if (this.apiLimitReached) return this.showAPILimitError();
-      this.$store.dispatch("wars/changeTargetIndex", 1);
-
-      window.api.send("updateCurrentTarget", this.currentTarget.user_id);
-
-      if (this.targets.length - this.targetIndex < 5) {
-        this.fetchTargets();
-        this.$store.dispatch("wars/getNextGuild");
-      }
-    });
+    window.api.receive("spacebar", this.handleSpaceBar);
 
     this.maxLevel = this.savedMaxLevel;
   },
@@ -101,13 +101,15 @@ export default {
     savedMaxLevel(val) {
       this.maxLevel = val;
     },
-    spacebarKeybind(val) {
-      window.api.send("setSpacebarKeybind", val);
+    keybindsActive(val) {
+      window.api.send(val ? "registerKeybinds" : "unregisterKeybinds");
     },
     inCombat(val) {
       if (val) return;
 
-      this.spacebarKeybind = val;
+      this.$store.dispatch("wars/reset");
+      this.$store.dispatch("wars/init");
+      this.keybindsActive = val;
     },
   },
   computed: {
@@ -121,6 +123,7 @@ export default {
       targetIndex: "wars/targetIndex",
       currentTarget: "wars/currentTarget",
       currentWar: "wars/currentWar",
+      activeGuildIndex: "wars/activeGuildIndex",
     }),
     apiLimitReached() {
       return this.$store.getters["process/apiLimit"] >= 40;
@@ -140,6 +143,31 @@ export default {
         setTimeout(resolve, ms);
       });
     },
+    newEvent(event: Event) {
+      this.$store.dispatch("events/push", event);
+    },
+    async handleSpaceBar() {
+      if (this.apiLimitReached) return this.showAPILimitError();
+      if (this.activeGuildIndex >= this.warlist.length)
+        return this.$toast.error("No More Targets");
+
+      this.$store.dispatch("wars/changeTargetIndex", 1);
+
+      if (!this.currentTarget) await this.fetchTargets();
+
+      this.newEvent({
+        userId: this.currentTarget.user_id,
+        userName: this.currentTarget.name,
+        type: "attack",
+      });
+
+      window.api.send("updateCurrentTarget", this.currentTarget.user_id);
+
+      if (this.targets.length - this.targetIndex >= 5) return;
+
+      this.$toast.info("Fetching new Targets...");
+      this.fetchTargets();
+    },
     showAPILimitError() {
       const secondsTillReset: number =
         60 -
@@ -151,36 +179,36 @@ export default {
       );
     },
     async fetchTargets() {
-      this.$store.dispatch("process/updateApiLimit");
+      const initialCount = this.targets.length === 0 ? -1 : this.targets.length;
 
-      return this.$store
-        .dispatch("wars/fetchTargets", {
-          guildId: this.currentGuild.id,
-          apiKey: this.setAPIKey,
-          maxLevel: this.maxLevel,
-        })
-        .catch(() => {
-          this.$store.dispatch("process/setApiLimit", 40);
-        });
+      while (this.targets.length <= initialCount || !this.currentTarget) {
+        this.$store.dispatch("process/updateApiLimit");
+        if (this.apiLimitReached) {
+          const resetIn = this.$store.getters["process/resetIn"];
+          this.$toast.warning(
+            `API Limit reached. Continuing Target generation in ${resetIn}s`
+          );
+
+          await this.sleep(resetIn * 1000);
+        }
+
+        await this.$store
+          .dispatch("wars/fetchTargets", {
+            guildId: this.currentGuild.id,
+            apiKey: this.setAPIKey,
+            maxLevel: this.maxLevel,
+          })
+          .then(() => {
+            this.$store.dispatch("wars/getNextGuild");
+          })
+          .catch(() => {
+            this.$store.dispatch("process/setApiLimit", 40);
+          });
+      }
     },
     async enterCombat() {
       this.initiatingCombat = true;
       await this.fetchTargets();
-
-      this.$store.dispatch("wars/getNextGuild");
-
-      while (!this.currentTarget) {
-        if (this.apiLimitReached)
-          await this.sleep(this.$store.getters["process/resetIn"] * 1000);
-
-        await this.fetchTargets();
-        this.$store.dispatch("wars/getNextGuild");
-
-        if (this.apiLimitReached)
-          this.$toast.warning(
-            "API Limit reached. Continuing Target generation in one minute"
-          );
-      }
 
       window.api.send(
         "enterCombat",

@@ -6,11 +6,12 @@
     </v-row>
     <v-card-title>
       <v-row class="py-2">
-        <div>Warlist</div>
+        <div class="pt-2 ml-4">Warlist</div>
         <v-spacer></v-spacer>
 
         <v-btn
           icon
+          size="small"
           :disabled="!keySet || !warlist || warlist.length <= 0"
           @click="shuffleWars"
         >
@@ -20,7 +21,13 @@
           </v-tooltip>
         </v-btn>
 
-        <v-btn icon class="mx-2" :disabled="!keySet" @click="updateWarData">
+        <v-btn
+          icon
+          size="small"
+          class="mx-2"
+          :disabled="!keySet"
+          @click="updateWarData"
+        >
           <v-icon>mdi-shield-refresh-outline</v-icon>
           <v-tooltip activator="parent" location="top">
             Update War Data

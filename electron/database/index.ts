@@ -19,6 +19,10 @@ const main = async (): Promise<Array<DatabaseMigration>> => {
       date TEXT 
     )`
     ).run();
+
+    db.prepare(
+      `INSERT INTO version VALUES('0000', '${new Date().getTime()}')`
+    ).run();
   }
 
   let currentVersion: number | null;

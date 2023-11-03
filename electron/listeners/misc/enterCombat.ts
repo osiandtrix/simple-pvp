@@ -16,8 +16,8 @@ const enterCombat = (event: any, target: any) => {
     global.combatWindow.on("close", () => {
       if (!global.combatWindow) return;
 
-      event.reply("setCombatState", false);
       global.combatWindow = null;
+      event.reply("setCombatState", false);
     });
 
     global.combatWindow.webContents.on("did-finish-load", async () => {

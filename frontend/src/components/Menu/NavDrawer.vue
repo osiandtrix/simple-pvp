@@ -3,7 +3,7 @@
     <v-layout style="width: 100vw">
       <v-navigation-drawer style="position: fixed" v-model="drawer" temporary>
         <v-container
-          style="height: 90vh; margin-top: 8vh"
+          style="height: 90vh; margin-top: 10vh"
           fill-height
           class="pa-0"
         >
@@ -52,8 +52,12 @@ export default {
   },
   methods: {
     updateActiveElement(val: string) {
-      this.activePage = val;
       this.drawer = false;
+
+      if (this.$store.getters["process/inCombat"])
+        return this.$toast.error("Cannot switch pages while in Combat");
+
+      this.activePage = val;
     },
   },
   props: {

@@ -20,11 +20,14 @@
           Save
         </v-btn>
       </v-card-actions>
+
+      <KeyboardButton button="1test" />
     </v-card>
   </v-main>
 </template>
 
 <script lang="ts">
+import KeyboardButton from "../misc/KeyboardButton.vue";
 import axios from "axios";
 
 export default {
@@ -33,6 +36,9 @@ export default {
     return {
       apiKey: null,
     };
+  },
+  components: {
+    KeyboardButton,
   },
   mounted() {
     this.apiKey = this.savedAPIKey;

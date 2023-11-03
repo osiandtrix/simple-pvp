@@ -537,6 +537,11 @@ json5@^2.1.2:
   resolved "https://registry.npmmirror.com/json5/-/json5-2.2.3.tgz#78cd6f1a19bdc12b73db5ad0c61efd66c1e29283"
   integrity sha512-XmOWe7eyHYH14cLdVPoyg+GOH3rYX++KpzrylJwSW98t3Nk+U8XOl8FWKOgwtzdb8lXGf6zYwDUzeHMWfxasyg==
 
+keyboard-css@^1.2.4:
+  version "1.2.4"
+  resolved "https://registry.yarnpkg.com/keyboard-css/-/keyboard-css-1.2.4.tgz#0249b4a505e513aeca830f812ca59b7e11fcd445"
+  integrity sha512-fhwBUfWZWAdaT9DoPVDsi/Rv6GBkIrv+82ahcuqUr0+e8NZABDh54lE3YI6Wxm5V1B0v4u0G09PQHMWei6nivg==
+
 loader-utils@^2.0.0:
   version "2.0.4"
   resolved "https://registry.npmmirror.com/loader-utils/-/loader-utils-2.0.4.tgz#8b5cb38b5c34a9a018ee1fc0e6a066d1dfcc528c"

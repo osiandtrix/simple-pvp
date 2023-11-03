@@ -13,6 +13,13 @@ type params = {
   guildId: number;
 };
 
+const getDefaultState = () => ({
+  warlist: [],
+  activeGuildIndex: 0,
+  targets: [],
+  targetIndex: 0,
+});
+
 const rng = (min: number, max: number): number =>
   Math.floor(Math.random() * (max - min) + min);
 
@@ -48,8 +55,11 @@ export default {
     SHUFFLE_WARS(state: State) {
       state.warlist = shuffleArray(state.warlist);
     },
-    UPDATE_GUILDINDEX(state: State, val: 1 | -1) {
+    UPDATE_GUILD_INDEX(state: State, val: 1 | -1) {
       state.activeGuildIndex += val;
+    },
+    SET_GUILD_INDEX(state: State, val: number) {
+      state.activeGuildIndex = val;
     },
     UPDATE_TARGETS(state: State, data: Array<any>) {
       state.targets = [...state.targets, ...data];
@@ -60,9 +70,12 @@ export default {
     SET_TARGET_INDEX(state: State, index: number) {
       state.targetIndex = index;
     },
+    RESET(state: State) {
+      Object.assign(state, getDefaultState());
+    },
   },
   actions: {
-    init({ commit }: any) {
+    async init({ commit }: any) {
       window.api.send("fetchWarEntries");
 
       window.api.receive("resolveWarEntries", (data: Warlist) => {
@@ -72,6 +85,9 @@ export default {
       window.api.receive("newTargets", (data: Array<any>) => {
         commit("UPDATE_TARGETS", data);
       });
+    },
+    reset({ commit }: any) {
+      commit("RESET");
     },
     shuffleWars({ commit }: any) {
       commit("SHUFFLE_WARS");
@@ -92,14 +108,14 @@ export default {
         resolve(res.data);
       });
     },
-    overwriteWarlist({ commit }: any, list: Array<any>) {
+    overwriteWarlist(_: any, list: Array<any>) {
       window.api.send("updateWarlist", list);
     },
     getNextGuild({ commit }: any) {
-      commit("UPDATE_GUILDINDEX", 1);
+      commit("UPDATE_GUILD_INDEX", 1);
     },
     getPreviousGuild({ commit }: any) {
-      commit("UPDATE_GUILDINDEX", -1);
+      commit("UPDATE_GUILD_INDEX", -1);
     },
     async fetchTargets({ commit }: any, { guildId, apiKey, maxLevel }: any) {
       const url = `https://api.simple-mmo.com/v1/guilds/members/${guildId}`;
@@ -112,19 +128,17 @@ export default {
         if (error) return reject(error);
 
         const filtered = res.data.filter(
-          (target) =>
+          (target: any) =>
             target.safe_mode === 0 &&
             target.banned === 0 &&
             (target.level > 200 ||
-              new Date() / 1000 - target.last_active >= 600) &&
+              new Date().getTime() / 1000 - target.last_activity >= 600) &&
             target.current_hp / target.max_hp >= 0.5 &&
             (maxLevel ? target.level <= maxLevel : true)
         );
 
         if (filtered && filtered.length > 0) commit("UPDATE_TARGETS", filtered);
-        commit("UPDATE_GUILDINDEX", 1);
-
-        console.log(this.targets);
+        commit("UPDATE_GUILD_INDEX", 1);
 
         return resolve(filtered);
       });
