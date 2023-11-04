@@ -1,5 +1,5 @@
 {
-  "name": "electron-vue",
+  "name": "smmo-yaka",
   "version": "1.0.0",
   "description": "SMMO PvP Tool",
   "main": "./dist/main.js",
@@ -19,8 +19,8 @@
     "electron:builder": "electron-builder",
     "app:build": "yarn prod:rename && yarn build:front && yarn electron:build && yarn electron:builder",
     "app:build:nightly": "set APP_IS_NIGHTLY=yes && set APP_IS_DEV=no && yarn nightly:rename && yarn build:front && yarn electron:build && yarn electron:builder",
-    "nightly:rename": "json -I -f package.json -e \"this.name='electron-vue'\" && json -I -f package.json -e \"this.build.productName='SMMO Yaka'\" && json -I -f package.json -e \"this.build.appId='com.official-electron-vue.app'\"",
-    "prod:rename": "json -I -f package.json -e \"this.name='electron-vue'\" && json -I -f package.json -e \"this.build.productName='Electron Vue'\" && json -I -f package.json -e \"this.build.appId='com.official-electron-vue.app'\"",
+    "nightly:rename": "json -I -f package.json -e \"this.name='smmo-yaka'\" && json -I -f package.json -e \"this.build.productName='SMMO Yaka'\" && json -I -f package.json -e \"this.build.appId='com.smmo-aka.app'\"",
+    "prod:rename": "json -I -f package.json -e \"this.name='smmo-yaka'\" && json -I -f package.json -e \"this.build.productName='Electron Vue'\" && json -I -f package.json -e \"this.build.appId='com.smmo-aka.app'\"",
     "electron-rebuild": "./node_modules/.bin/electron-rebuild",
     "sqlite-rebuild": "cd node_modules/better-sqlite3 && npm run build-release",
     "postinstall": "electron-builder install-app-deps",
@@ -43,7 +43,7 @@
     "electron-updater": "^5.3.0"
   },
   "build": {
-    "appId": "com.official-electron-vue.app",
+    "appId": "com.smmo-aka.app",
     "productName": "SMMO Yaka",
     "copyright": "Copyright © 2023 ${author}",
     "publish": [
