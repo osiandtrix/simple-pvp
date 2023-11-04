@@ -127,6 +127,11 @@ export default {
           .catch((e) => (error = e));
         if (error) return reject(error);
 
+        window.api.send(
+          "fetchTargetLogs",
+          res.data.map((e: any) => e.user_id)
+        );
+
         const filtered = res.data.filter(
           (target: any) =>
             target.safe_mode === 0 &&
@@ -138,9 +143,21 @@ export default {
         );
 
         if (filtered && filtered.length > 0) commit("UPDATE_TARGETS", filtered);
-        commit("UPDATE_GUILD_INDEX", 1);
 
-        return resolve(filtered);
+        commit("UPDATE_GUILD_INDEX", 1);
+        window.api.receive("resolveTargetLogs", (logs: any) => {
+          const filter = (target: any) =>
+            !logs?.find(
+              (log: any) =>
+                log.user_id === target.user_id &&
+                ((logs.hits === 3 &&
+                  new Date().getTime() - logs.first_hit <= 43_200 &&
+                  new Date().getTime() - logs.first_hit > 46_800) ||
+                  log.hits === 4)
+            );
+
+          return resolve(filtered.filter(filter));
+        });
       });
     },
     changeTargetIndex({ commit }: any, index: number) {

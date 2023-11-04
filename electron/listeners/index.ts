@@ -10,6 +10,8 @@ import updateCurrentTarget from "./update/updateCurrentTarget";
 import unregisterKeybinds from "./misc/unregisterKeybinds";
 import fetchKeybinds from "./fetch/fetchKeybinds";
 import updateKeybind from "./update/updateKeybind";
+import updateTargetHit from "./update/updateTargetHit";
+import fetchTargetLogs from "./fetch/fetchTargetLogs";
 
 export default {
   fetchUserdata,
@@ -24,4 +26,6 @@ export default {
   unregisterKeybinds,
   fetchKeybinds,
   updateKeybind,
+  updateTargetHit,
+  fetchTargetLogs,
 };

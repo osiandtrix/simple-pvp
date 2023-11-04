@@ -45,11 +45,11 @@
   "build": {
     "appId": "com.official-electron-vue.app",
     "productName": "Electron Vue Nightly",
-    "copyright": "Copyright © 2022 ${author}",
+    "copyright": "Copyright © 2023 ${author}",
     "publish": [
       {
         "provider": "github",
-        "owner": "Bible-Projects"
+        "owner": "nex"
       }
     ],
     "nsis": {

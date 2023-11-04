@@ -20,11 +20,7 @@ export default {
   },
   methods: {
     async fetchKeybinds() {
-      const res = await this.$store.dispatch("process/fetchKeybinds");
-
-      console.log(res);
-
-      this.keybinds = res;
+      this.keybinds = await this.$store.dispatch("process/fetchKeybinds");
     },
   },
 };

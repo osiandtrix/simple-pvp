@@ -94,6 +94,9 @@ export default {
   components: { Warlist, EventLog },
   mounted() {
     window.api.receive("spacebar", this.handleSpaceBar);
+    window.api.receive("Control+Space", this.handleCtrlSpaceBar);
+    window.api.receive("Control+ArrowLeft", this.handleCtrlArrowLeft);
+    window.api.receive("Shift+ArrowLeft", this.handleShiftArrowLeft);
 
     this.maxLevel = this.savedMaxLevel;
   },
@@ -146,20 +149,32 @@ export default {
     newEvent(event: Event) {
       this.$store.dispatch("events/push", event);
     },
+    handleCtrlSpaceBar() {
+      this.$store.dispatch("wars/changeTargetIndex", -1);
+
+      window.api.send("updateCurrentTarget", this.currentTarget.user_id);
+    },
     async handleSpaceBar() {
       if (this.apiLimitReached) return this.showAPILimitError();
-      if (this.activeGuildIndex >= this.warlist.length)
+      if (
+        this.activeGuildIndex >= this.warlist.length &&
+        this.targetIndex === this.targets.length
+      )
         return this.$toast.error("No More Targets");
 
-      this.$store.dispatch("wars/changeTargetIndex", 1);
-
-      if (!this.currentTarget) await this.fetchTargets();
-
+      window.api.send("updateTargetHit", {
+        userId: this.currentTarget.user_id,
+        hit: 1,
+      });
       this.newEvent({
         userId: this.currentTarget.user_id,
         userName: this.currentTarget.name,
         type: "attack",
       });
+
+      this.$store.dispatch("wars/changeTargetIndex", 1);
+
+      if (!this.currentTarget) await this.fetchTargets();
 
       window.api.send("updateCurrentTarget", this.currentTarget.user_id);
 
@@ -167,6 +182,81 @@ export default {
 
       this.$toast.info("Fetching new Targets...");
       this.fetchTargets();
+    },
+
+    handleCtrlArrowLeft() {
+      if (this.targetIndex === 0)
+        return this.$toast.error("There is no prior target.");
+
+      window.api.send("updateTargetHit", {
+        userId: this.targets[this.targetIndex - 1].user_id,
+        hit: -1,
+      });
+
+      this.$toast.success(
+        `Successfully marked ${
+          this.targets[this.targetIndex - 1].name
+        } as 'not hit'`
+      );
+
+      this.newEvent({
+        userId: this.targets[this.targetIndex - 1].user_id,
+        userName: this.targets[this.targetIndex - 1].name,
+        type: "nothit",
+      });
+    },
+    handleShiftArrowLeft() {
+      if (this.targetIndex === 0)
+        return this.$toast.error("There is no prior target.");
+
+      window.api.send("updateTargetHit", {
+        userId: this.targets[this.targetIndex - 1].user_id,
+        hit: 1,
+      });
+
+      this.$toast.success(
+        `Successfully marked ${
+          this.targets[this.targetIndex - 1].name
+        } as 'hit'`
+      );
+
+      this.newEvent({
+        userId: this.targets[this.targetIndex - 1].user_id,
+        userName: this.targets[this.targetIndex - 1].name,
+        type: "hit",
+      });
+    },
+    handleCtrlArrowDown() {
+      window.api.send("updateTargetHit", {
+        userId: this.currentTarget.user_id,
+        hit: -1,
+      });
+
+      this.$toast.success(
+        `Successfully marked ${this.currentTarget.name} as 'not hit'`
+      );
+
+      this.newEvent({
+        userId: this.currentTarget.user_id,
+        userName: this.currentTarget.name,
+        type: "nothit",
+      });
+    },
+    handleShiftArrowDown() {
+      window.api.send("updateTargetHit", {
+        userId: this.currentTarget.user_id,
+        hit: 1,
+      });
+
+      this.$toast.success(
+        `Successfully marked ${this.currentTarget.name} as 'hit'`
+      );
+
+      this.newEvent({
+        userId: this.currentTarget.user_id,
+        userName: this.currentTarget.name,
+        type: "hit",
+      });
     },
     showAPILimitError() {
       const secondsTillReset: number =

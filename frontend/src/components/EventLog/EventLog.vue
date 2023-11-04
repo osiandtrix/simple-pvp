@@ -36,16 +36,22 @@
 
           <v-spacer></v-spacer>
 
-          <div class="indicatorText">{{ 40 - apiLimit }}</div>
+          <div class="indicatorText">
+            {{ 40 - apiLimit }}
+          </div>
           <v-tooltip :text="`API Limit (${resetIn}s)`" location="top">
             <template v-slot:activator="{ props }">
-              <v-icon
-                @mouseover="isHovering = true"
-                @mouseleave="isHovering = false"
-                color="blue"
-                v-bind="props"
-                >mdi-access-point</v-icon
-              >
+              <div v-bind="props">
+                <v-icon
+                  @mouseover="isHovering = true"
+                  @mouseleave="isHovering = false"
+                  color="blue"
+                  >mdi-access-point</v-icon
+                >
+                <v-icon size="xs" v-if="apiLimit > 0" class="rotating">
+                  mdi-loading
+                </v-icon>
+              </div>
             </template>
           </v-tooltip>
         </v-row>
@@ -59,13 +65,13 @@
       >
         <div
           v-if="showEventLog"
-          v-for="(event, i) in events.reverse()"
+          v-for="(event, i) in showEvents"
           :class="mod(i, 2) === 0 ? 'evenElement' : 'oddElement'"
           class="mx-0 px-2"
         >
           <v-row>
             <v-col cols="1">{{ i + 1 }}.</v-col>
-            <!-- <v-col cols="1">
+            <v-col cols="1">
               <v-tooltip
                 :text="capitalizeFirstLetter(event.type)"
                 location="top"
@@ -76,7 +82,7 @@
                   </v-icon>
                 </template>
               </v-tooltip>
-            </v-col> -->
+            </v-col>
             <v-col>{{ event.text }}</v-col>
           </v-row>
         </div>
@@ -118,6 +124,9 @@ export default {
       apiLimit: "process/apiLimit",
       apiLimit_Stamp: "process/apiLimit_Stamp",
     }),
+    showEvents() {
+      return [...this.events].reverse().slice(0, 10);
+    },
   },
   methods: {
     mod(n: number, m: number) {
@@ -127,6 +136,10 @@ export default {
       switch (event.type) {
         case "attack":
           return "mdi-sword";
+        case "hit":
+          return "mdi-eye-check-outline";
+        case "nothit":
+          return "mdi-eye-remove-outline";
         default:
           return "mdi-help";
       }
@@ -134,6 +147,10 @@ export default {
     getColorForEventIcon(event: Event) {
       switch (event.type) {
         case "attack":
+          return "blue";
+        case "hit":
+          return "green";
+        case "nothit":
           return "red";
         default:
           return "";
@@ -160,11 +177,39 @@ export default {
 </style>
 
 <style scoped>
-.oddElement {
-  background-color: rgb(26, 26, 26);
+@-webkit-keyframes rotating /* Safari and Chrome */ {
+  from {
+    -webkit-transform: rotate(0deg);
+    -o-transform: rotate(0deg);
+    transform: rotate(0deg);
+  }
+  to {
+    -webkit-transform: rotate(360deg);
+    -o-transform: rotate(360deg);
+    transform: rotate(360deg);
+  }
 }
-
-.evenElement {
-  background-color: rgb(37, 37, 37);
+@keyframes rotating {
+  from {
+    -ms-transform: rotate(0deg);
+    -moz-transform: rotate(0deg);
+    -webkit-transform: rotate(0deg);
+    -o-transform: rotate(0deg);
+    transform: rotate(0deg);
+  }
+  to {
+    -ms-transform: rotate(360deg);
+    -moz-transform: rotate(360deg);
+    -webkit-transform: rotate(360deg);
+    -o-transform: rotate(360deg);
+    transform: rotate(360deg);
+  }
+}
+.rotating {
+  -webkit-animation: rotating 1s linear infinite;
+  -moz-animation: rotating 1s linear infinite;
+  -ms-animation: rotating 1s linear infinite;
+  -o-animation: rotating 1s linear infinite;
+  animation: rotating 1s linear infinite;
 }
 </style>

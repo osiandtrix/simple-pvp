@@ -15,11 +15,17 @@ import "./database/functions/init";
 
 import DBMigrations from "./database";
 import * as DBFunctions from "./database/functions";
+import Logger from "./ext/Logger";
 
 (async function init() {
   const versionsToPatch: any = await DBMigrations;
 
   for (const version of versionsToPatch) {
+    Logger.log(
+      "info",
+      `Updating Database to Version v.${version.default.version}`
+    );
+
     for (const change of version.default.changes) {
       if (change.type === "create") DBFunctions.create(change);
     }
@@ -30,6 +36,7 @@ import * as DBFunctions from "./database/functions";
 
 // Register all listeners
 for (const [event, callback] of Object.entries(listeners)) {
+  Logger.log("info", `Registering listener [${event}]`);
   ipcMain.on(event, callback);
 }
 

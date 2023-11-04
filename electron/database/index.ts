@@ -6,6 +6,7 @@ import Database, { SqliteError } from "better-sqlite3";
 const path = "./electron/database/migrations";
 
 const main = async (): Promise<Array<DatabaseMigration>> => {
+  if (!fs.existsSync("./database")) fs.mkdirSync("./database");
   if (!fs.existsSync("./database/data.db")) {
     const createStream = fs.createWriteStream("./database/data.db");
     createStream.end();
@@ -13,16 +14,16 @@ const main = async (): Promise<Array<DatabaseMigration>> => {
     const db = new Database("./database/data.db");
     db.pragma("journal_mode = WAL");
 
-    db.prepare(
-      `CREATE TABLE version(
-      vNumber VARCHAR(5) PRIMARY KEY,
-      date TEXT 
-    )`
-    ).run();
+    // db.prepare(
+    //   `CREATE TABLE version(
+    //   vNumber VARCHAR(5) PRIMARY KEY,
+    //   date TEXT
+    // )`
+    // ).run();
 
-    db.prepare(
-      `INSERT INTO version VALUES('0000', '${new Date().getTime()}')`
-    ).run();
+    // db.prepare(
+    //   `INSERT INTO version VALUES('0000', '${new Date().getTime()}')`
+    // ).run();
   }
 
   let currentVersion: number | null;

@@ -31,7 +31,7 @@
     >
       <v-row>
         <v-col cols="3">Remapping: </v-col>
-        <v-col cols="1">{{ targetKey }}</v-col>
+        <v-col cols="2">{{ targetKey }}</v-col>
         <v-col>[ {{ pressedKeys.join("+") }} ]</v-col>
         <v-spacer></v-spacer>
         <v-col cols="2">Esc to cancel</v-col>
@@ -53,13 +53,17 @@
         v-for="(bind, i) of keyBinds"
         :class="mod(i, 2) === 0 ? 'evenElement' : 'oddElement'"
       >
-        <v-col class="pa-0 py-2 pt-4" cols="7">{{ bind.description }}</v-col>
+        <v-col class="pa-0 py-2 pt-4">{{ bind.description }}</v-col>
         <v-spacer></v-spacer>
-        <v-col class="pa-0 py-2">
+        <v-col class="pa-0 py-2" cols="4">
           <KeyboardButton
             @click="startKeyboardRemap(bind.defaultKey)"
             :button="bind.remapKey ? bind.remapKey : bind.defaultKey"
+            style="cursor: pointer"
           />
+          <v-tooltip activator="parent" location="left">
+            Change Keybind
+          </v-tooltip>
         </v-col>
       </v-row>
     </v-card>

@@ -25,10 +25,11 @@
           icon
           size="small"
           class="mx-2"
-          :disabled="!keySet"
+          :disabled="!keySet || fetchingWars"
           @click="updateWarData"
         >
-          <v-icon>mdi-shield-refresh-outline</v-icon>
+          <v-icon v-if="fetchingWars" class="rotating">mdi-loading</v-icon>
+          <v-icon v-else>mdi-shield-refresh-outline</v-icon>
           <v-tooltip activator="parent" location="top">
             Update War Data
           </v-tooltip>
@@ -87,6 +88,7 @@ export default {
   name: "warlist",
   data() {
     return {
+      fetchingWars: false,
       headers: [
         { text: "Name", value: "name" },
         { text: "Enemy", value: "enemy" },
@@ -102,7 +104,6 @@ export default {
       return this.$store.getters["user/guildId"];
     },
   },
-  mounted() {},
   methods: {
     showAPILimitError() {
       const secondsTillReset: number =
@@ -121,6 +122,8 @@ export default {
       this.warlist.sort((a: any, b: any) => a[param].localeCompare(b[param]));
     },
     async updateWarData() {
+      this.fetchingWars = true;
+
       if (this.$store.getters["process/apiLimit"] >= 40)
         return this.showAPILimitError();
 
@@ -134,6 +137,8 @@ export default {
         return this.$toast.error("You have no active wars.");
 
       this.warlist = JSON.parse(JSON.stringify(newWarlist));
+
+      this.fetchingWars = false;
     },
     async shuffleWars() {
       await this.$store.dispatch("wars/shuffleWars");
@@ -205,5 +210,41 @@ export default {
 /* Handle on hover */
 ::-webkit-scrollbar-thumb:hover {
   background: #444444;
+}
+
+@-webkit-keyframes rotating /* Safari and Chrome */ {
+  from {
+    -webkit-transform: rotate(0deg);
+    -o-transform: rotate(0deg);
+    transform: rotate(0deg);
+  }
+  to {
+    -webkit-transform: rotate(360deg);
+    -o-transform: rotate(360deg);
+    transform: rotate(360deg);
+  }
+}
+@keyframes rotating {
+  from {
+    -ms-transform: rotate(0deg);
+    -moz-transform: rotate(0deg);
+    -webkit-transform: rotate(0deg);
+    -o-transform: rotate(0deg);
+    transform: rotate(0deg);
+  }
+  to {
+    -ms-transform: rotate(360deg);
+    -moz-transform: rotate(360deg);
+    -webkit-transform: rotate(360deg);
+    -o-transform: rotate(360deg);
+    transform: rotate(360deg);
+  }
+}
+.rotating {
+  -webkit-animation: rotating 1s linear infinite;
+  -moz-animation: rotating 1s linear infinite;
+  -ms-animation: rotating 1s linear infinite;
+  -o-animation: rotating 1s linear infinite;
+  animation: rotating 1s linear infinite;
 }
 </style>

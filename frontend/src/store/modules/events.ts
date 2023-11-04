@@ -25,6 +25,12 @@ export default {
         case "attack":
           eventText = `[${event.userId}] ${event.userName} attacked.`;
           break;
+        case "hit":
+          eventText = `[${event.userId}] ${event.userName} marked as 'hit'`;
+          break;
+        case "nothit":
+          eventText = `[${event.userId}] ${event.userName} marked as 'not hit'`;
+          break;
         default:
           break;
       }

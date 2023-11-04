@@ -31,7 +31,24 @@ export default {
   },
   methods: {
     formatKey(key: string) {
-      return key.length === 1 ? key.toUpperCase() : key;
+      let newKey = key;
+
+      switch (newKey.toLowerCase()) {
+        case "arrowup":
+          newKey = "↑";
+          break;
+        case "arrowdown":
+          newKey = "↓";
+          break;
+        case "arrowleft":
+          newKey = "←";
+          break;
+        case "arrowright":
+          newKey = "→";
+          break;
+      }
+
+      return newKey.length === 1 ? newKey.toUpperCase() : key;
     },
   },
 };
