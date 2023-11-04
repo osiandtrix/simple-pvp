@@ -134,7 +134,7 @@ export default {
             (target.level > 200 ||
               new Date().getTime() / 1000 - target.last_activity >= 600) &&
             target.current_hp / target.max_hp >= 0.5 &&
-            (maxLevel ? target.level <= maxLevel : true)
+            (!maxLevel || target.level <= maxLevel)
         );
 
         if (filtered && filtered.length > 0) commit("UPDATE_TARGETS", filtered);

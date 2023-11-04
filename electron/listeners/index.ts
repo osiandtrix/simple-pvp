@@ -8,6 +8,8 @@ import enterCombat from "./misc/enterCombat";
 import registerKeybinds from "./misc/registerKeybinds";
 import updateCurrentTarget from "./update/updateCurrentTarget";
 import unregisterKeybinds from "./misc/unregisterKeybinds";
+import fetchKeybinds from "./fetch/fetchKeybinds";
+import updateKeybind from "./update/updateKeybind";
 
 export default {
   fetchUserdata,
@@ -20,4 +22,6 @@ export default {
   registerKeybinds,
   updateCurrentTarget,
   unregisterKeybinds,
+  fetchKeybinds,
+  updateKeybind,
 };
