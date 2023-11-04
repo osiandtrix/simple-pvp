@@ -11,6 +11,10 @@ import { isDev } from "./setup/config";
 import { appConfig } from "./ElectronStore/Configuration";
 import AppUpdater from "./setup/AutoUpdate";
 import listeners from "./listeners";
+
+import fs from "node:fs";
+if (!fs.existsSync("database")) fs.mkdirSync("database");
+
 import "./database/functions/init";
 
 import DBMigrations from "./database";

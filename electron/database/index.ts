@@ -6,7 +6,6 @@ import Database, { SqliteError } from "better-sqlite3";
 const path = "./electron/database/migrations";
 
 const main = async (): Promise<Array<DatabaseMigration>> => {
-  if (!fs.existsSync("./database")) fs.mkdirSync("./database");
   if (!fs.existsSync("./database/data.db")) {
     const createStream = fs.createWriteStream("./database/data.db");
     createStream.end();
