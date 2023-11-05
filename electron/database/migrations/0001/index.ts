@@ -2,6 +2,7 @@ import DatabaseMigration from "../../../types/DatabaseMigration";
 
 const migration: DatabaseMigration = {
   version: "0001",
+  description: "Adds Table for Guildwars to persist across sessions",
   changes: [
     {
       type: "create",

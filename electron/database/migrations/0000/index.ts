@@ -2,6 +2,7 @@ import DatabaseMigration from "../../../types/DatabaseMigration";
 
 const migration: DatabaseMigration = {
   version: "0000",
+  description: "Adds Database Management through Migrations",
   changes: [
     {
       type: "create",

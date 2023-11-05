@@ -1,8 +1,10 @@
 const fetchUserdata = (event: any) => {
-  event.reply(
-    "resolveUserdata",
-    global.db.prepare(`SELECT * FROM userdata`).all()[0] ?? {}
-  );
+  let data;
+  try {
+    data = global.db.prepare(`SELECT * FROM userdata`).all()[0];
+  } catch {}
+
+  event.reply("resolveUserdata", data ?? {});
 };
 
 export default fetchUserdata;

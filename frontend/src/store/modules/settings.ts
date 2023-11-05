@@ -2,6 +2,13 @@ type State = {
   maxLevel: number;
   apiKey: string;
   keyBinds: any;
+  version_max: string;
+  version_current: string;
+};
+
+type Version = {
+  max: string;
+  current: string;
 };
 
 export default {
@@ -10,11 +17,15 @@ export default {
     maxLevel: null,
     apiKey: null,
     keyBinds: [],
+    version_max: null,
+    version_current: null,
   },
   getters: {
     maxLevel: (state: State) => state.maxLevel,
     apiKey: (state: State) => state.apiKey,
     keyBinds: (state: State) => state.keyBinds,
+    version_max: (state: State) => state.version_max,
+    version_current: (state: State) => state.version_current,
   },
   mutations: {
     UPDATE_USERSETTINGS(
@@ -36,11 +47,19 @@ export default {
     UPDATE_KEYBINDS(state: State, data: any) {
       state.keyBinds = data;
     },
+    SET_VERSION(state: State, { max, current }: Version) {
+      state.version_current = current;
+      state.version_max = max;
+    },
   },
   actions: {
     init({ commit }: any) {
-      window.api.send("fetchUsersettings");
+      window.api.send("fetchVersion");
+      window.api.receive("resolveVersion", (data) => {
+        commit("SET_VERSION", data);
+      });
 
+      window.api.send("fetchUsersettings");
       window.api.receive("resolveUsersettings", (data) => {
         commit("UPDATE_USERSETTINGS", data);
       });

@@ -2,6 +2,7 @@ import DatabaseMigration from "../../../types/DatabaseMigration";
 
 const migration: DatabaseMigration = {
   version: "0003",
+  description: "Adds Keyboard Shortcut remapping",
   changes: [
     {
       type: "create",

@@ -1,8 +1,10 @@
 const fetchUsersettings = (event: any) => {
-  event.reply(
-    "resolveUsersettings",
-    global.db.prepare(`SELECT * FROM settings`).all()[0] ?? {}
-  );
+  let data;
+  try {
+    data = global.db.prepare(`SELECT * FROM settings`).all()[0];
+  } catch {}
+
+  event.reply("resolveUsersettings", data ?? {});
 };
 
 export default fetchUsersettings;

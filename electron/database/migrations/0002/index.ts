@@ -2,6 +2,7 @@ import DatabaseMigration from "../../../types/DatabaseMigration";
 
 const migration: DatabaseMigration = {
   version: "0002",
+  description: "Adds Settings table",
   changes: [
     {
       type: "create",

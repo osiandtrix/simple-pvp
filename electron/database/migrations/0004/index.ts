@@ -2,6 +2,7 @@ import DatabaseMigration from "../../../types/DatabaseMigration";
 
 const migration: DatabaseMigration = {
   version: "0004",
+  description: "Adds Logs to keep track of 3x/4x",
   changes: [
     {
       type: "create",

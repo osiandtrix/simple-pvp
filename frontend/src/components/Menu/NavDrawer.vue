@@ -26,7 +26,7 @@
       </v-navigation-drawer>
 
       <v-main>
-        <component :is="activePage"></component>
+        <component @reload="reload" :is="activePage"></component>
       </v-main>
     </v-layout>
   </v-card>
@@ -36,28 +36,43 @@
 import Main from "../Main/Main.vue";
 import Settings from "../Settings/Settings.vue";
 import Profile from "../Profile/Profile.vue";
+import Migrations from "../Migrations/Migrations.vue";
 
 export default {
   name: "navdrawer",
   data() {
     return {
       drawer: false,
-      activePage: Main.name,
+      activePage: Migrations.name,
     };
   },
   components: {
     Main,
     Settings,
     Profile,
+    Migrations,
+  },
+  mounted() {
+    window.api.receive("resolveVersion", ({ max, current }: any) => {
+      if (parseInt(current) === parseInt(max)) this.activePage = Main.name;
+    });
   },
   methods: {
     updateActiveElement(val: string) {
       this.drawer = false;
 
+      if (this.activePage === Migrations.name)
+        return this.$toast.error(
+          "You must perform the update before switching pages"
+        );
+
       if (this.$store.getters["process/inCombat"])
         return this.$toast.error("Cannot switch pages while in Combat");
 
       this.activePage = val;
+    },
+    reload() {
+      location.reload();
     },
   },
   props: {

@@ -12,6 +12,9 @@ import fetchKeybinds from "./fetch/fetchKeybinds";
 import updateKeybind from "./update/updateKeybind";
 import updateTargetHit from "./update/updateTargetHit";
 import fetchTargetLogs from "./fetch/fetchTargetLogs";
+import fetchVersion from "./fetch/fetchVersion";
+import runVersionUpdate from "./misc/runVersionUpdate";
+import installMigration from "./misc/installMigration";
 
 export default {
   fetchUserdata,
@@ -28,4 +31,7 @@ export default {
   updateKeybind,
   updateTargetHit,
   fetchTargetLogs,
+  fetchVersion,
+  runVersionUpdate,
+  installMigration,
 };

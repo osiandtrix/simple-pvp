@@ -1,7 +1,7 @@
 const fetchWarEntries = (event: any) => {
-  event.reply(
-    "resolveWarEntries",
-    global.db
+  let data;
+  try {
+    data = global.db
       .prepare(`SELECT * FROM wars`)
       .all()
       .map((e: any) => ({
@@ -15,8 +15,10 @@ const fetchWarEntries = (event: any) => {
           id: e.defender_id,
           kills: e.defender_kills,
         },
-      }))
-  );
+      }));
+  } catch {}
+
+  event.reply("resolveWarEntries", data ?? []);
 };
 
 export default fetchWarEntries;
