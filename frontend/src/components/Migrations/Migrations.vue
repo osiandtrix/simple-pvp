@@ -9,16 +9,22 @@
         </v-row>
       </v-card-title>
 
-      <v-row class="my-2" v-if="migrations.length === 0">
-        <v-spacer></v-spacer>
-        All migrations installed
-        <v-spacer></v-spacer>
-      </v-row>
-      <v-row class="my-2" v-if="migrations.length === 0">
-        <v-spacer></v-spacer>
-        <v-btn @click="$emit('reload')"> Reload </v-btn>
-        <v-spacer></v-spacer>
-      </v-row>
+      <div v-if="migrations.length === 0">
+        <v-row class="my-2">
+          <v-spacer></v-spacer>
+          All migrations installed
+          <v-spacer></v-spacer>
+        </v-row>
+        <v-row class="my-2">
+          <v-spacer></v-spacer>
+          <v-btn @click="$emit('reload')"> Reload </v-btn>
+          <v-spacer></v-spacer>
+        </v-row>
+
+        <v-row class="my-5">
+          {{ migrations.map((e) => e.version) }}
+        </v-row>
+      </div>
 
       <v-card
         v-else

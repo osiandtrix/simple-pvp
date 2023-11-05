@@ -20,7 +20,7 @@
     "app:build": "yarn prod:rename && yarn build:front && yarn electron:build && yarn electron:builder",
     "app:build:nightly": "set APP_IS_NIGHTLY=yes && set APP_IS_DEV=no && yarn nightly:rename && yarn build:front && yarn electron:build && yarn electron:builder",
     "nightly:rename": "json -I -f package.json -e \"this.name='smmo-yaka'\" && json -I -f package.json -e \"this.build.productName='SMMO Yaka'\" && json -I -f package.json -e \"this.build.appId='com.smmo-aka.app'\"",
-    "prod:rename": "json -I -f package.json -e \"this.name='smmo-yaka'\" && json -I -f package.json -e \"this.build.productName='Electron Vue'\" && json -I -f package.json -e \"this.build.appId='com.smmo-aka.app'\"",
+    "prod:rename": "json -I -f package.json -e \"this.name='smmo-yaka'\" && json -I -f package.json -e \"this.build.productName='SMMO Yaka'\" && json -I -f package.json -e \"this.build.appId='com.smmo-aka.app'\"",
     "electron-rebuild": "./node_modules/.bin/electron-rebuild",
     "sqlite-rebuild": "cd node_modules/better-sqlite3 && npm run build-release",
     "postinstall": "electron-builder install-app-deps",
@@ -29,7 +29,7 @@
   "devDependencies": {
     "concurrently": "^7.6.0",
     "electron": "^22.0.0",
-    "electron-builder": "^23.6.0",
+    "electron-builder": "^24.6.4",
     "electron-devtools-installer": "^3.2.0",
     "json": "^11.0.0",
     "nodemon": "^2.0.20",
