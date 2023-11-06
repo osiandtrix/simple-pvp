@@ -1,0 +1,17 @@
+appId: com.smmo-aka.app
+productName: SMMO Yaka
+copyright: Copyright © 2023 ${author}
+publish:
+  provider: github
+  owner: nex
+nsis:
+  oneClick: true
+  allowToChangeInstallationDirectory: false
+  deleteAppDataOnUninstall: true
+files:
+  - dist/**/*
+extraResources:
+  - defaults/**/*
+directories:
+  buildResources: assets
+  output: dist_electron
