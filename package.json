@@ -35,7 +35,6 @@
     "json": "^11.0.0",
     "nodemon": "^2.0.20",
     "typescript": "^4.9.4",
-    "vite": "^4.5.0",
     "wait-on": "^7.0.1"
   },
   "dependencies": {
