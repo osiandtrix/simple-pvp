@@ -1,6 +1,8 @@
 const updateSettings = (event: any, data: any) => {
   const keys = Object.keys(data);
-  const values = Object.values(data);
+  const values = Object.values(data).map((e: any) =>
+    typeof e === "string" ? `'${e}'` : e
+  );
 
   const mapped = Object.entries(data).map(
     ([key, value]: [string, unknown]) =>
