@@ -28,6 +28,9 @@ jobs:
       - name: Install vue-toast-notification
         run: npm install --save vue-toast-notification
 
+      - name: Install @mdi/font
+        run: npm install --save @mdi/font
+
       - name: Build
         run: npm run app:build
 
