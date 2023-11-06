@@ -4,6 +4,7 @@ copyright: Copyright © 2023 ${author}
 publish:
   provider: github
   owner: nex
+  publishPulicy: always
 nsis:
   oneClick: true
   allowToChangeInstallationDirectory: false
