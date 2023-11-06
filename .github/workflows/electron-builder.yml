@@ -25,6 +25,9 @@ jobs:
       - name: Install vite-plugin-vuetify
         run: npm install --save-dev vite-plugin-vuetify
 
+      - name: Install vue-toast-notification
+        run: npm install --save vue-toast-notification
+
       - name: Build
         run: npm run app:build
 
