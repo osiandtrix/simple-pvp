@@ -33,7 +33,7 @@ npm manifest:
     "description": "SMMO PvP Tool",
     "main": "./dist/main.js",
     "license": "MIT",
-    "author": "nex",
+    "author": "n3xistence",
     "scripts": {
       "build": "tsc",
       "watch": "nodemon --exec yarn serve:electron",
@@ -78,7 +78,7 @@ npm manifest:
       "publish": [
         {
           "provider": "github",
-          "owner": "nex"
+          "owner": "n3xistence"
         }
       ],
       "nsis": {
