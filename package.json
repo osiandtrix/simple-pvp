@@ -51,7 +51,8 @@
     "publish": [
       {
         "provider": "github",
-        "owner": "nex"
+        "owner": "nex",
+        "publishPolicy": "always"
       }
     ],
     "nsis": {
