@@ -37,6 +37,9 @@ jobs:
       - name: Install webfontloader
         run: npm install --save webfontloader
 
+      - name: Install keyboard-css
+        run: npm install --save keyboard-css
+
       - name: Build
         run: npm run app:build
 
