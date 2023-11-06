@@ -31,6 +31,9 @@ jobs:
       - name: Install @mdi/font
         run: npm install --save @mdi/font
 
+      - name: Install vuex
+        run: npm install --save vuex
+
       - name: Build
         run: npm run app:build
 
