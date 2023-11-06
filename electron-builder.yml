@@ -1,10 +1,10 @@
 appId: com.smmo-aka.app
 productName: SMMO Yaka
 copyright: Copyright © 2023 ${author}
-publish:
-  provider: github
-  owner: nex
-  publishPulicy: always
+win:
+  publish:
+    - provider: github
+      protocol: https
 nsis:
   oneClick: true
   allowToChangeInstallationDirectory: false
