@@ -34,6 +34,9 @@ jobs:
       - name: Install vuex
         run: npm install --save vuex
 
+      - name: Install webfontloader
+        run: npm install --save webfontloader
+
       - name: Build
         run: npm run app:build
 
