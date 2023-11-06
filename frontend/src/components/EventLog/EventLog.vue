@@ -77,7 +77,11 @@
                 location="top"
               >
                 <template v-slot:activator="{ props }">
-                  <v-icon v-bind="props" :color="getColorForEventIcon(event)">
+                  <v-icon
+                    v-bind="props"
+                    @click="goto(event)"
+                    :color="getColorForEventIcon(event)"
+                  >
                     {{ getIconForEvent(event) }}
                   </v-icon>
                 </template>
@@ -93,6 +97,7 @@
 
 <script lang="ts">
 import { mapGetters } from "vuex";
+import Event from "../../types/Event";
 
 export default {
   name: "eventlog",
@@ -124,6 +129,9 @@ export default {
       apiLimit: "process/apiLimit",
       apiLimit_Stamp: "process/apiLimit_Stamp",
     }),
+    currentTarget() {
+      return this.targets[this.targetIndex];
+    },
     showEvents() {
       return [...this.events].reverse().slice(0, 10);
     },
@@ -155,6 +163,17 @@ export default {
         default:
           return "";
       }
+    },
+    async goto(event: Event) {
+      const index = this.targets.findIndex(
+        (e: any) => e.user_id === event.userId
+      );
+
+      if (!index) return this.$toast.error("Could not find target");
+
+      await this.$store.dispatch("wars/setTargetIndex", index);
+
+      window.api.send("updateCurrentTarget", this.currentTarget.user_id);
     },
     capitalizeFirstLetter(text: string) {
       return text.charAt(0).toUpperCase() + text.slice(1);

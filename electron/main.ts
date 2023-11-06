@@ -11,15 +11,25 @@ import { isDev } from "./setup/config";
 import { appConfig } from "./ElectronStore/Configuration";
 import AppUpdater from "./setup/AutoUpdate";
 import listeners from "./listeners";
+import registerKeybinds from "./listeners/misc/registerKeybinds";
+
+import cronjobs from "./cronjobs";
+import { CronJob } from "cron";
 
 import Logger from "./ext/Logger";
 
 import "./database/functions/init";
+import unregisterKeybinds from "./listeners/misc/unregisterKeybinds";
 
 // Register all listeners
 for (const [event, callback] of Object.entries(listeners)) {
   Logger.log("info", `Registering listener [${event}]`);
   ipcMain.on(event, callback);
+}
+
+// Register all cronjobs
+for (const job of cronjobs) {
+  new CronJob(job.cronTime, job.onTick as any, null, job.start, job.timeZone);
 }
 
 let mainWindow: BrowserWindow;
@@ -84,6 +94,18 @@ async function createWindow() {
       version: app.getVersion(),
       name: app.getName(),
     };
+  });
+
+  mainWindow.on("blur", () => {
+    global.mainWindowBlurred = true;
+
+    if (global.combatWindowBlurred) unregisterKeybinds();
+  });
+
+  mainWindow.on("focus", () => {
+    global.mainWindowBlurred = false;
+
+    if (global.inCombat) registerKeybinds(null);
   });
 }
 

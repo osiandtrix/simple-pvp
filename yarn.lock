@@ -179,6 +179,11 @@
   dependencies:
     "@types/node" "*"
 
+"@types/luxon@~3.3.0":
+  version "3.3.3"
+  resolved "https://registry.yarnpkg.com/@types/luxon/-/luxon-3.3.3.tgz#b2e20a9536f91ab3e6e7895c91883e1a7ad49a6e"
+  integrity sha512-/BJF3NT0pRMuxrenr42emRUF67sXwcZCd+S1ksG/Fcf9O7C3kKCY4uJSbKBE4KDUIYr3WMsvfmWD8hRjXExBJQ==
+
 "@types/ms@*":
   version "0.7.33"
   resolved "https://registry.yarnpkg.com/@types/ms/-/ms-0.7.33.tgz#80bf1da64b15f21fd8c1dc387c31929317d99ee9"
@@ -697,6 +702,14 @@ crc@^3.8.0:
   integrity sha512-iX3mfgcTMIq3ZKLIsVFAbv7+Mc10kxabAGQb8HvjA1o3T1PIYprbakQ65d3I+2HGHt6nSKkM9PYjgoJO2KcFBQ==
   dependencies:
     buffer "^5.1.0"
+
+cron@^3.1.6:
+  version "3.1.6"
+  resolved "https://registry.yarnpkg.com/cron/-/cron-3.1.6.tgz#e7e1798a468e017c8d31459ecd7c2d088f97346c"
+  integrity sha512-cvFiQCeVzsA+QPM6fhjBtlKGij7tLLISnTSvFxVdnFGLdz+ZdXN37kNe0i2gefmdD17XuZA6n2uPVwzl4FxW/w==
+  dependencies:
+    "@types/luxon" "~3.3.0"
+    luxon "~3.4.0"
 
 cross-spawn@^7.0.1, cross-spawn@^7.0.3:
   version "7.0.3"
@@ -1508,6 +1521,11 @@ lru-cache@^6.0.0:
   integrity sha512-Jo6dJ04CmSjuznwJSS3pUeWmd/H0ffTlkXXgwZi+eq1UCmqQwCh+eLsYOYCwY991i2Fah4h1BEMCx4qThGbsiA==
   dependencies:
     yallist "^4.0.0"
+
+luxon@~3.4.0:
+  version "3.4.3"
+  resolved "https://registry.yarnpkg.com/luxon/-/luxon-3.4.3.tgz#8ddf0358a9492267ffec6a13675fbaab5551315d"
+  integrity sha512-tFWBiv3h7z+T/tDaoxA8rqTxy1CHV6gHS//QdaH4pulbq/JuBSGgQspQQqcgnwdAx6pNI7cmvz5Sv/addzHmUg==
 
 matcher@^3.0.0:
   version "3.0.0"

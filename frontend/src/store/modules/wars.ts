@@ -151,8 +151,10 @@ export default {
               (log: any) =>
                 log.user_id === target.user_id &&
                 ((logs.hits === 3 &&
-                  new Date().getTime() - logs.first_hit <= 43_200 &&
-                  new Date().getTime() - logs.first_hit > 46_800) ||
+                  Math.floor(new Date().getTime() / 1000) - logs.first_hit <=
+                    43_200 &&
+                  Math.floor(new Date().getTime() / 1000) - logs.first_hit >
+                    46_800) ||
                   log.hits === 4)
             );
 

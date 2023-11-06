@@ -21,7 +21,9 @@ const updateTargetHit = (event: any, data: Payload) => {
 
   global.db
     .prepare(
-      `INSERT INTO player_logs VALUES(${userId}, 1, ${new Date().getTime()})`
+      `INSERT INTO player_logs VALUES(${userId}, 1, ${Math.floor(
+        new Date().getTime() / 1000
+      )})`
     )
     .run();
 };

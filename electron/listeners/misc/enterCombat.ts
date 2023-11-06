@@ -1,4 +1,6 @@
 import { BrowserWindow, screen } from "electron";
+import registerKeybinds from "./registerKeybinds";
+import unregisterKeybinds from "./unregisterKeybinds";
 
 const enterCombat = (event: any, target: any) => {
   if (!global.combatWindow) {
@@ -18,15 +20,7 @@ const enterCombat = (event: any, target: any) => {
 
       global.combatWindow = null;
       event.reply("setCombatState", false);
-    });
-
-    global.combatWindow.webContents.on("did-finish-load", async () => {
-      if (!global.combatWindow) return;
-
-      let display = screen.getPrimaryDisplay();
-      let width = display.bounds.width;
-
-      global.combatWindow.setPosition(width - 600, 50);
+      global.inCombat = false;
     });
 
     global.combatWindow.webContents.on(
@@ -37,11 +31,25 @@ const enterCombat = (event: any, target: any) => {
         console.log("Error description:", errorDescription);
       }
     );
+
+    global.combatWindow.on("blur", () => {
+      global.combatWindowBlurred = true;
+
+      if (global.mainWindowBlurred) unregisterKeybinds();
+    });
+
+    global.combatWindow.on("focus", () => {
+      global.combatWindowBlurred = false;
+
+      if (global.inCombat) registerKeybinds(null);
+    });
   }
 
   global.combatWindow.loadURL(
     `https://web.simple-mmo.com/user/attack/${target.user_id}`
   );
+
+  global.inCombat = true;
 };
 
 export default enterCombat;

@@ -2,12 +2,12 @@
   <v-main style="height: 100vh; overflow: hidden">
     <v-card class="px-5">
       <v-card-title>
-        <v-row class="mx-0">
+        <v-row class="mx-0 my-4">
           <v-col cols="10" class="px-0 pb-0">
             <h3 class="pt-4">Setup</h3>
           </v-col>
           <v-spacer></v-spacer>
-          <v-col class="px-0 pb-0">
+          <!-- <v-col class="px-0 pb-0">
             <v-tooltip activator="parent" location="left">
               {{ keybindsActive ? "Unregister Keybinds" : "Register Keybinds" }}
             </v-tooltip>
@@ -17,7 +17,7 @@
               color="blue"
             >
             </v-switch>
-          </v-col>
+          </v-col> -->
         </v-row>
       </v-card-title>
 

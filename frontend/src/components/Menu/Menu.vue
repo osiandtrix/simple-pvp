@@ -5,7 +5,7 @@
         <v-icon>mdi-menu</v-icon>
       </v-app-bar-nav-icon>
 
-      <v-app-bar-title>The orbital cannon of PvP tools</v-app-bar-title>
+      <v-app-bar-title>SMMO Yaka</v-app-bar-title>
 
       <v-menu>
         <template v-slot:activator="{ props }">
