@@ -14,6 +14,8 @@ import listeners from "./listeners";
 
 import Logger from "./ext/Logger";
 
+import "./database/functions/init";
+
 // Register all listeners
 for (const [event, callback] of Object.entries(listeners)) {
   Logger.log("info", `Registering listener [${event}]`);
@@ -86,14 +88,14 @@ async function createWindow() {
 }
 
 app.whenReady().then(async () => {
-  if (isDev) {
-    try {
-      const { installExt } = await import("./setup/installDevTools");
-      await installExt();
-    } catch (e) {
-      console.log("Can not install extension!");
-    }
+  // if (isDev) {
+  try {
+    const { installExt } = await import("./setup/installDevTools");
+    await installExt();
+  } catch (e) {
+    console.log("Can not install extension!");
   }
+  // }
 
   createWindow();
   app.on("activate", function () {

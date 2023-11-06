@@ -1,4 +1,5 @@
 const updateUserdata = (event: any, data: any) => {
+  console.log(data);
   const keys = Object.keys(data);
   const values = Object.values(data);
 

@@ -16,6 +16,8 @@ import fetchVersion from "./fetch/fetchVersion";
 import runVersionUpdate from "./misc/runVersionUpdate";
 import installMigration from "./misc/installMigration";
 
+import test from "./test";
+
 export default {
   fetchUserdata,
   fetchUsersettings,
@@ -34,4 +36,6 @@ export default {
   fetchVersion,
   runVersionUpdate,
   installMigration,
+
+  test,
 };

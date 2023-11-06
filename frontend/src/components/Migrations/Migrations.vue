@@ -9,6 +9,8 @@
         </v-row>
       </v-card-title>
 
+      <v-btn @click="test">Click</v-btn>
+
       <div v-if="migrations.length === 0">
         <v-row class="my-2">
           <v-spacer></v-spacer>
@@ -102,6 +104,9 @@ export default {
         "installMigration",
         JSON.parse(JSON.stringify(migration))
       );
+    },
+    test() {
+      window.api.send("fetchVersion");
     },
   },
 };

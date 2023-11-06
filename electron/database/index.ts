@@ -13,16 +13,16 @@ const main = async (): Promise<Array<DatabaseMigration>> => {
     const db = new Database("./database/data.db");
     db.pragma("journal_mode = WAL");
 
-    // db.prepare(
-    //   `CREATE TABLE version(
-    //   vNumber VARCHAR(5) PRIMARY KEY,
-    //   date TEXT
-    // )`
-    // ).run();
+    db.prepare(
+      `CREATE TABLE version(
+      vNumber VARCHAR(5) PRIMARY KEY,
+      date TEXT
+    )`
+    ).run();
 
-    // db.prepare(
-    //   `INSERT INTO version VALUES('0000', '${new Date().getTime()}')`
-    // ).run();
+    db.prepare(
+      `INSERT INTO version VALUES('0000', '${new Date().getTime()}')`
+    ).run();
   }
 
   let currentVersion: number | null;
