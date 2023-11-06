@@ -51,8 +51,9 @@
     "publish": [
       {
         "provider": "github",
-        "owner": "nex",
-        "publishPolicy": "always"
+        "publishPolicy": "always",
+        "repo": "smmo-yaka",
+        "vPrefixedTagName": false
       }
     ],
     "nsis": {
