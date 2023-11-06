@@ -46,6 +46,9 @@ jobs:
       - name: Set GitHub Personal Access Token
         run: echo "GH_TOKEN=${{ secrets.GH_TOKEN }}" >> $GITHUB_ENV
 
+      - name: Start snapd
+        run: sudo systemctl start snapd
+
       - name: Install snapcraft
         run: sudo snap install snapcraft --classic
 
