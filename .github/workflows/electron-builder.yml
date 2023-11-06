@@ -40,6 +40,9 @@ jobs:
       - name: Install keyboard-css
         run: npm install --save keyboard-css
 
+      - name: Install @types/better-sqlite3
+        run: npm install --save-dev @types/better-sqlite3
+
       - name: Build
         run: npm run app:build
 
