@@ -12,14 +12,11 @@ import { appConfig } from "./ElectronStore/Configuration";
 import AppUpdater from "./setup/AutoUpdate";
 import listeners from "./listeners";
 import registerKeybinds from "./listeners/misc/registerKeybinds";
-
+import unregisterKeybinds from "./listeners/misc/unregisterKeybinds";
 import cronjobs from "./cronjobs";
 import { CronJob } from "cron";
-
 import Logger from "./ext/Logger";
-
 import "./database/functions/init";
-import unregisterKeybinds from "./listeners/misc/unregisterKeybinds";
 
 // Register all listeners
 for (const [event, callback] of Object.entries(listeners)) {

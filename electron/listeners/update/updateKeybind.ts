@@ -1,3 +1,6 @@
+import registerKeybinds from "../misc/registerKeybinds";
+import unregisterKeybinds from "../misc/unregisterKeybinds";
+
 const updateKeybind = (event: any, data: any) => {
   const { remap, key } = data;
 
@@ -13,6 +16,9 @@ const updateKeybind = (event: any, data: any) => {
       .run();
 
   global.db.prepare(`INSERT INTO remaps VALUES('${key}', '${remap}')`).run();
+
+  unregisterKeybinds();
+  registerKeybinds(null);
 };
 
 export default updateKeybind;
