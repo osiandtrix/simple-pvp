@@ -132,7 +132,12 @@ export default {
         guildId: this.$store.getters["user/guildId"],
       };
 
-      const newWarlist = await this.$store.dispatch("wars/updateWars", options);
+      const newWarlist = await this.$store
+        .dispatch("wars/updateWars", options)
+        .catch(() => {
+          this.$store.dispatch("process/setApiLimit", 40);
+        });
+
       if (!newWarlist || newWarlist.length === 0)
         return this.$toast.error("You have no active wars.");
 

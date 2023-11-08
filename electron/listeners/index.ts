@@ -15,6 +15,7 @@ import fetchTargetLogs from "./fetch/fetchTargetLogs";
 import fetchVersion from "./fetch/fetchVersion";
 import runVersionUpdate from "./misc/runVersionUpdate";
 import installMigration from "./misc/installMigration";
+import ignoreKeybinds from "./misc/ignoreKeybinds";
 
 export default {
   fetchUserdata,
@@ -34,4 +35,5 @@ export default {
   fetchVersion,
   runVersionUpdate,
   installMigration,
+  ignoreKeybinds,
 };

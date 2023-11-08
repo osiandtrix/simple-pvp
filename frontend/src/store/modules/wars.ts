@@ -92,13 +92,15 @@ export default {
     shuffleWars({ commit }: any) {
       commit("SHUFFLE_WARS");
     },
-    updateWars({ commit }: any, data: params) {
-      const url = `https://api.simple-mmo.com/v1/guilds/wars/${data.guildId}/1`;
+    async updateWars({ commit }: any, { guildId, apiKey }: params) {
+      const url = `https://api.simple-mmo.com/v1/guilds/wars/${guildId}/1`;
 
       return new Promise(async (resolve, reject) => {
-        const res: AxiosResponse | void = await axios
-          .post(url, { api_key: data.apiKey })
-          .catch(() => {});
+        let error = null;
+        const res = await axios
+          .post(url, { api_key: apiKey })
+          .catch((e) => (error = e));
+        if (error) return reject(error);
 
         if (!res) return reject();
 

@@ -7,7 +7,7 @@
             <h3 class="pt-4">Setup</h3>
           </v-col>
           <v-spacer></v-spacer>
-          <!-- <v-col class="px-0 pb-0">
+          <v-col class="px-0 pb-0">
             <v-tooltip activator="parent" location="left">
               {{ keybindsActive ? "Unregister Keybinds" : "Register Keybinds" }}
             </v-tooltip>
@@ -17,7 +17,7 @@
               color="blue"
             >
             </v-switch>
-          </v-col> -->
+          </v-col>
         </v-row>
       </v-card-title>
 
@@ -86,8 +86,7 @@ export default {
   data() {
     return {
       maxLevel: this.savedMaxLevel,
-      combatWindow: null,
-      keybindsActive: false,
+      keybindsActive: true,
       initiatingCombat: false,
     };
   },
@@ -105,14 +104,13 @@ export default {
       this.maxLevel = val;
     },
     keybindsActive(val) {
-      window.api.send(val ? "registerKeybinds" : "unregisterKeybinds");
+      window.api.send("ignoreKeybinds", !val);
     },
     inCombat(val) {
       if (val) return;
 
       this.$store.dispatch("wars/reset");
       this.$store.dispatch("wars/init");
-      this.keybindsActive = val;
     },
   },
   computed: {
@@ -155,6 +153,7 @@ export default {
       window.api.send("updateCurrentTarget", this.currentTarget.user_id);
     },
     async handleSpaceBar() {
+      console.log("SPACEBAR");
       if (this.apiLimitReached) return this.showAPILimitError();
       if (
         this.activeGuildIndex >= this.warlist.length &&

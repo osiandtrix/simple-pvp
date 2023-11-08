@@ -7,4 +7,5 @@ declare global {
   var mainWindowBlurred: boolean;
   var combatWindowBlurred: boolean;
   var inCombat: boolean = false;
+  var ignoreKeybinds: boolean = false;
 }

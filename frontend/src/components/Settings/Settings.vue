@@ -155,6 +155,8 @@ export default {
         JSON.parse(JSON.stringify({ remap, key }))
       );
 
+      // location.reload();
+
       this.$toast.success("Successfully set new keybind.");
     },
     resetKeyboardListenEvent() {

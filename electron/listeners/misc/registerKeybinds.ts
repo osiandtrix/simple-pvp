@@ -1,8 +1,13 @@
 import keybinds from "../../hotkeys";
 import Remap from "../../types/Remap";
+import unregisterKeybinds from "./unregisterKeybinds";
 
 const registerKeybinds = (event: any) => {
-  const remap: Array<Remap> = require("../../hotkeys/utils/remap").default;
+  if (global.ignoreKeybinds) return;
+
+  unregisterKeybinds();
+
+  const remap: Array<Remap> = require("../../hotkeys/utils/remap").default();
 
   for (const bind of keybinds) {
     bind.effect(

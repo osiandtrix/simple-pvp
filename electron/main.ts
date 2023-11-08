@@ -102,7 +102,10 @@ async function createWindow() {
   mainWindow.on("focus", () => {
     global.mainWindowBlurred = false;
 
-    if (global.inCombat) registerKeybinds(null);
+    if (!global.inCombat) return;
+
+    unregisterKeybinds();
+    registerKeybinds(null);
   });
 }
 

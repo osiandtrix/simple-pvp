@@ -21,6 +21,9 @@ const enterCombat = (event: any, target: any) => {
       global.combatWindow = null;
       event.reply("setCombatState", false);
       global.inCombat = false;
+      global.ignoreKeybinds = false;
+
+      unregisterKeybinds();
     });
 
     global.combatWindow.webContents.on(
@@ -41,7 +44,10 @@ const enterCombat = (event: any, target: any) => {
     global.combatWindow.on("focus", () => {
       global.combatWindowBlurred = false;
 
-      if (global.inCombat) registerKeybinds(null);
+      if (!global.inCombat) return;
+
+      unregisterKeybinds();
+      registerKeybinds(null);
     });
   }
 

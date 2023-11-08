@@ -52,24 +52,15 @@ export default {
     Profile,
     Migrations,
   },
-  mounted() {
-    // window.api.receive("resolveVersion", ({ max, current }: any) => {
-    //   if (parseInt(current) === parseInt(max)) this.activePage = Main.name;
-    // });
-  },
   methods: {
     updateActiveElement(val: string) {
       this.drawer = false;
-
-      // if (this.activePage === Migrations.name)
-      //   return this.$toast.error(
-      //     "You must perform the update before switching pages"
-      //   );
 
       if (this.$store.getters["process/inCombat"])
         return this.$toast.error("Cannot switch pages while in Combat");
 
       this.activePage = val;
+      if (val === Main.name) location.reload();
     },
     reload() {
       location.reload();
