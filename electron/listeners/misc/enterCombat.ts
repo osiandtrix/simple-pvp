@@ -56,6 +56,14 @@ const enterCombat = (event: any, target: any) => {
   );
 
   global.inCombat = true;
+
+  global.db
+    .prepare(
+      `INSERT INTO stats(start) VALUES('${Math.floor(
+        new Date().getTime() / 100
+      )}')`
+    )
+    .run();
 };
 
 export default enterCombat;

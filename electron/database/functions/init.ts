@@ -8,53 +8,55 @@ if (!fs.existsSync("database/data.db")) {
   fs.writeFileSync("./database/data.db", "");
 
   db = new Database("./database/data.db");
-  db.pragma("journal_mode = WAL");
+} else db = new Database("./database/data.db");
 
-  db.prepare(
-    `CREATE TABLE IF NOT EXISTS version(
+db.pragma("journal_mode = WAL");
+
+db.prepare(
+  `CREATE TABLE IF NOT EXISTS version(
       vNumber VARCHAR(5) PRIMARY KEY,
       date TEXT
     )`
-  ).run();
+).run();
 
-  db.prepare(
-    `CREATE TABLE IF NOT EXISTS guild_logs(
+db.prepare(
+  `CREATE TABLE IF NOT EXISTS guild_logs(
       guild_id INT,
       timestamp TEXT
     )`
-  ).run();
+).run();
 
-  db.prepare(
-    `CREATE TABLE IF NOT EXISTS player_logs(
+db.prepare(
+  `CREATE TABLE IF NOT EXISTS player_logs(
       user_id INT,
       hits INT,
       first_hit INT
     )`
-  ).run();
+).run();
 
-  db.prepare(
-    `CREATE TABLE IF NOT EXISTS remaps(
+db.prepare(
+  `CREATE TABLE IF NOT EXISTS remaps(
       original_key VARCHAR(25),
       new_key VARCHAR(25)
     )`
-  ).run();
+).run();
 
-  db.prepare(
-    `CREATE TABLE IF NOT EXISTS settings(
+db.prepare(
+  `CREATE TABLE IF NOT EXISTS settings(
       maxLevel INT,
       api_key TEXT
     )`
-  ).run();
+).run();
 
-  db.prepare(
-    `CREATE TABLE IF NOT EXISTS userdata(
+db.prepare(
+  `CREATE TABLE IF NOT EXISTS userdata(
       userid INT PRIMARY KEY,
       guildid INT
     )`
-  ).run();
+).run();
 
-  db.prepare(
-    `CREATE TABLE IF NOT EXISTS wars(
+db.prepare(
+  `CREATE TABLE IF NOT EXISTS wars(
       attacker VARCHAR(100),
       attacker_id INT,
       attacker_kills INT,
@@ -62,23 +64,26 @@ if (!fs.existsSync("database/data.db")) {
       defender_id INT,
       defender_kills INT
     )`
-  ).run();
+).run();
 
-  db.prepare(`DELETE FROM version`).run();
+db.prepare(`DELETE FROM version`).run();
 
-  db.prepare(
-    `INSERT INTO version VALUES
+db.prepare(
+  `INSERT INTO version VALUES
     ('0000', null),
     ('0001', null),
     ('0002', null),
     ('0003', null),
     ('0004', null)`
-  ).run();
-}
+).run();
 
-if (!db) {
-  db = new Database("./database/data.db");
-  db.pragma("journal_mode = WAL");
-}
+db.prepare(
+  `CREATE TABLE IF NOT EXISTS stats(
+  session_id INTEGER PRIMARY KEY AUTOINCREMENT,
+  start TEXT,
+  end TEXT,
+  kills INT DEFAULT 0
+)`
+).run();
 
 global.db = db;

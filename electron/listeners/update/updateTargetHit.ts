@@ -10,6 +10,10 @@ const updateTargetHit = (event: any, data: Payload) => {
     .prepare(`SELECT * FROM player_logs WHERE user_id='${userId}'`)
     .get();
 
+  global.db
+    .prepare(`UPDATE stats SET kills=kills+${hit} WHERE end is null`)
+    .run();
+
   if (exists)
     return global.db
       .prepare(

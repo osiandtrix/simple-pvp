@@ -133,5 +133,11 @@ app.on("window-all-closed", () => {
 
 app.on("will-quit", () => {
   // Unregister all shortcuts.
+  db.prepare(
+    `UPDATE stats SET end='${Math.floor(
+      new Date().getTime() / 1000
+    )}' WHERE end is null`
+  ).run();
+
   globalShortcut.unregisterAll();
 });
