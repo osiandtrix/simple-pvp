@@ -86,17 +86,17 @@ export default {
         return;
       }
 
-      const sorted = [...state.rawWarlist].sort((a, b) => {
+      const sorted = [...state.rawWarlist].sort((a: any, b: any) => {
         let aValue, bValue;
 
         if (state.sortField === 'yourKills') {
           // Get your guild's kills for each war
-          aValue = state.userGuildId === a.attackerId ? a.attackerKills : a.defenderKills;
-          bValue = state.userGuildId === b.attackerId ? b.attackerKills : b.defenderKills;
+          aValue = state.userGuildId === a.guild_1.id ? a.guild_1.kills : a.guild_2.kills;
+          bValue = state.userGuildId === b.guild_1.id ? b.guild_1.kills : b.guild_2.kills;
         } else if (state.sortField === 'theirKills') {
           // Get enemy guild's kills for each war
-          aValue = state.userGuildId === a.attackerId ? a.defenderKills : a.attackerKills;
-          bValue = state.userGuildId === b.attackerId ? b.defenderKills : b.attackerKills;
+          aValue = state.userGuildId === a.guild_1.id ? a.guild_2.kills : a.guild_1.kills;
+          bValue = state.userGuildId === b.guild_1.id ? b.guild_2.kills : b.guild_1.kills;
         } else {
           return 0;
         }
