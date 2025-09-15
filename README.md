@@ -2,7 +2,7 @@
 
 A powerful desktop application for managing PvP activities in Simple MMO. Built with Electron and Vue.js, Simple PvP provides an intuitive interface for optimal mass PvP.
 
-![Simple PvP Logo](assets/app-logo.png)
+<img src="assets/app-logo.png" alt="Simple PvP Logo" width="20%"/>
 
 ## ✨ Features
 
