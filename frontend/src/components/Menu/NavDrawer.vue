@@ -43,7 +43,6 @@
 <script lang="ts">
 import Main from "../Main/Main.vue";
 import Settings from "../Settings/Settings.vue";
-import Profile from "../Profile/Profile.vue";
 import Migrations from "../Migrations/Migrations.vue";
 import ApiKeySetup from "../Setup/ApiKeySetup.vue";
 import AppLogo from "../misc/AppLogo.vue";
@@ -60,7 +59,6 @@ export default {
   components: {
     Main,
     Settings,
-    Profile,
     Migrations,
     ApiKeySetup,
     AppLogo,

@@ -56,7 +56,7 @@
             v-for="(item, index) in items"
             :key="index"
             @click="handleMenuClick(item.redirect)"
-            :class="['modern-menu-item', { 'logout-item': item.redirect === 'logout' }]"
+            class="modern-menu-item"
           >
             <template v-slot:prepend>
               <v-icon :icon="item.icon" color="primary"></v-icon>
@@ -86,11 +86,6 @@ export default {
       isSidebarOpen: false,
       drawerOpen: false,
       items: [
-        {
-          title: "Profile",
-          redirect: "profile",
-          icon: "mdi-account",
-        },
         {
           title: "Logout",
           redirect: "logout",
@@ -217,20 +212,5 @@ export default {
 .modern-menu-item:hover {
   background-color: rgba(58, 58, 58, 0.3);
   transform: translateX(4px);
-}
-
-.logout-item {
-  border-top: 1px solid rgba(255, 255, 255, 0.05);
-  margin-top: 8px;
-  padding-top: 12px;
-}
-
-.logout-item:hover {
-  background-color: rgba(220, 38, 38, 0.1) !important;
-  border-color: rgba(220, 38, 38, 0.2);
-}
-
-.logout-item .v-icon {
-  color: rgb(var(--v-theme-error)) !important;
 }
 </style>
