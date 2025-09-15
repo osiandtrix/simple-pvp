@@ -64,6 +64,14 @@ export default {
   },
   actions: {
     init({ commit }: any) {
+      // Check if window.api is available
+      if (!window.api) {
+        setTimeout(() => {
+          this.init({ commit });
+        }, 100);
+        return;
+      }
+
       // First, run any pending database migrations
       window.api.send("runVersionUpdate");
       window.api.receive("resolveVersionUpdate", () => {
@@ -79,7 +87,7 @@ export default {
         });
       });
     },
-    saveAPIKey({ commit }: any, data: { apiKey: string }) {
+    saveAPIKey({ commit }: any, data: { api_key: string }) {
       window.api.send("updateSettings", data);
       commit("UPDATE_APIKEY", data);
     },
