@@ -1,13 +1,16 @@
 <template>
   <div class="wrapper" style="height: 9vh">
     <v-app-bar :elevation="3" rounded height="56">
-      <v-app-bar-nav-icon @click="() => (drawerOpen = !drawerOpen)">
+      <v-app-bar-nav-icon
+        v-if="hasApiKey"
+        @click="() => (drawerOpen = !drawerOpen)"
+      >
         <v-icon size="22">mdi-menu</v-icon>
       </v-app-bar-nav-icon>
 
       <v-app-bar-title class="text-h6">Simple PvP</v-app-bar-title>
 
-      <v-menu>
+      <v-menu v-if="hasApiKey">
         <template v-slot:activator="{ props }">
           <v-btn v-bind="props" icon="mdi-dots-vertical"></v-btn>
         </template>
@@ -35,6 +38,7 @@
 
 <script lang="ts">
 import NavDrawer from "./NavDrawer.vue";
+import { mapGetters } from "vuex";
 
 export default {
   data() {
@@ -58,6 +62,14 @@ export default {
   },
   components: {
     NavDrawer,
+  },
+  computed: {
+    ...mapGetters({
+      apiKey: "settings/apiKey",
+    }),
+    hasApiKey() {
+      return this.apiKey && this.apiKey.length > 0;
+    },
   },
   methods: {
     toggleSidebar() {

@@ -1,10 +1,17 @@
 appId: com.simple-pvp.app
 productName: Simple PvP
 copyright: Copyright © 2023 ${author}
+# App icon configuration
+icon: assets/icon
 win:
+  icon: assets/icon.ico
   publish:
     - provider: github
       protocol: https
+mac:
+  icon: assets/icon.icns
+linux:
+  icon: assets/icon.png
 nsis:
   oneClick: true
   allowToChangeInstallationDirectory: false
