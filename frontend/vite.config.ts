@@ -9,13 +9,42 @@ export default defineConfig(({ mode }) => ({
   build: {
     outDir: "./../dist",
     chunkSizeWarningLimit: 1000,
+    // Performance optimizations
+    minify: 'terser',
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          // Split vendor chunks for better caching
+          'vendor-vue': ['vue', 'vuex'],
+          'vendor-ui': ['vuetify'],
+          'vendor-utils': ['axios', 'vue-toast-notification']
+        }
+      }
+    },
+    // Enable compression
+    cssCodeSplit: true,
+    sourcemap: mode === 'development'
   },
   base: mode === "development" ? "" : "./",
   plugins: [
-		vue(),
-		vuetify({ autoImport: true }),
+		vue({
+      // Performance: reduce template compilation overhead
+      template: {
+        compilerOptions: {
+          hoistStatic: true,
+          cacheHandlers: true
+        }
+      }
+    }),
+		vuetify({
+      autoImport: true
+    }),
 	],
   server: {
     port: 3000,
   },
+  // Performance optimizations for development
+  optimizeDeps: {
+    include: ['vue', 'vuex', 'vuetify', 'axios']
+  }
 }));

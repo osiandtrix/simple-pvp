@@ -381,9 +381,8 @@ export default {
 
 <style scoped>
 .modern-setup-main {
-  height: 100vh;
+  min-height: 100vh;
   background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%);
-  overflow-y: auto;
   display: flex;
   align-items: center;
   justify-content: center;

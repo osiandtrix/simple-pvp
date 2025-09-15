@@ -35,8 +35,8 @@ async function createWindow() {
   const appBounds: any = (appConfig as any).get("setting.appBounds");
 
   const BrowserWindowOptions: BrowserWindowConstructorOptions = {
-    width: 500,
-    minWidth: 500,
+    width: 600,
+    minWidth: 600,
     height: 750,
     minHeight: 200,
     x: 100,
@@ -46,6 +46,12 @@ async function createWindow() {
     webPreferences: {
       preload: __dirname + "/setup/preload.js",
       devTools: isDev,
+      // Performance optimizations
+      nodeIntegration: false,
+      contextIsolation: true,
+      webSecurity: true,
+      // Memory optimizations
+      backgroundThrottling: false
     },
     show: false,
     alwaysOnTop: false,

@@ -51,7 +51,7 @@ export default {
 
       setInterval(() => {
         commit("RESET_APILIMIT");
-      }, 100);
+      }, 1000); // Reduced from 100ms to 1000ms (1 second)
     },
     setInCombat({ commit }: any, val: boolean) {
       commit("UPDATE_INCOMBAT", val);

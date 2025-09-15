@@ -111,10 +111,23 @@ export default {
   },
   watch: {
     isHovering(val) {
-      if (!val) return (this.refreshInterval = null);
+      if (!val) {
+        // Properly clear interval to prevent memory leaks
+        if (this.refreshInterval) {
+          clearInterval(this.refreshInterval);
+          this.refreshInterval = null;
+        }
+        return;
+      }
 
-      this.refreshInterval = setInterval(this.refreshReset, 100);
+      this.refreshInterval = setInterval(this.refreshReset, 1000); // Reduced from 100ms to 1000ms
     },
+  },
+  beforeUnmount() {
+    // Cleanup interval on component destruction
+    if (this.refreshInterval) {
+      clearInterval(this.refreshInterval);
+    }
   },
   computed: {
     ...mapGetters({
@@ -133,7 +146,10 @@ export default {
       return this.targets[this.targetIndex];
     },
     showEvents() {
-      return [...this.events].reverse().slice(0, 10);
+      // Optimized: avoid creating new array and reversing every time
+      const events = this.events;
+      const startIndex = Math.max(0, events.length - 10);
+      return events.slice(startIndex).reverse();
     },
   },
   methods: {

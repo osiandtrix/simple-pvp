@@ -197,9 +197,7 @@ export default {
     apiLimitReached() {
       return this.$store.getters["process/apiLimit"] >= 40;
     },
-    currentTarget() {
-      return this.targets[this.targetIndex];
-    },
+    // Removed duplicate currentTarget - already available from mapGetters
     currentGuild() {
       return this.currentWar[
         this.guildId === this.currentWar.guild_2.id ? "guild_1" : "guild_2"

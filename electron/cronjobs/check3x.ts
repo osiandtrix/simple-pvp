@@ -1,7 +1,7 @@
 import Cronjob from "../types/CronJob";
 
 const check3x: Cronjob = {
-  cronTime: "* * * * *",
+  cronTime: "*/5 * * * *", // Changed from every minute to every 5 minutes
   onTick: function () {
     if (!global.db) return;
 
