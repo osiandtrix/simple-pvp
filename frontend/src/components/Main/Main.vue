@@ -172,8 +172,14 @@ export default {
       window.api.send("ignoreKeybinds", !val);
     },
     inCombat(val) {
-      if (val) return;
+      if (val) {
+        // Clear events when entering combat to start fresh
+        this.$store.dispatch("events/reset");
+        return;
+      }
 
+      // Clear events when exiting combat
+      this.$store.dispatch("events/reset");
       this.$store.dispatch("wars/reset");
       this.$store.dispatch("wars/init");
     },

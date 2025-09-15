@@ -16,6 +16,9 @@ export default {
     NEW_EVENT(state: State, newEvent: Event) {
       state.events.push(newEvent);
     },
+    RESET_EVENTS(state: State) {
+      state.events = [];
+    },
   },
   actions: {
     push({ commit }: any, event: Event) {
@@ -38,6 +41,9 @@ export default {
       event.text = eventText;
 
       commit("NEW_EVENT", event);
+    },
+    reset({ commit }: any) {
+      commit("RESET_EVENTS");
     },
   },
   modules: {},

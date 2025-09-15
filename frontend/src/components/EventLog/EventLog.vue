@@ -64,7 +64,6 @@
         style="height: 40vh; overflow-y: scroll; font-size: 0.8rem"
       >
         <div
-          v-if="showEventLog"
           v-for="(event, i) in showEvents"
           :class="mod(i, 2) === 0 ? 'evenElement' : 'oddElement'"
           class="mx-0 px-2"
@@ -106,7 +105,6 @@ export default {
       resetIn: 0,
       isHovering: false,
       refreshInterval: null as any,
-      showEventLog: false,
     };
   },
   watch: {
