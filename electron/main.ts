@@ -111,14 +111,15 @@ async function createWindow() {
 }
 
 app.whenReady().then(async () => {
-  // if (isDev) {
-  try {
-    const { installExt } = await import("./setup/installDevTools");
-    await installExt();
-  } catch (e) {
-    console.log("Can not install extension!");
+  if (isDev) {
+    try {
+      const { installExt } = await import("./setup/installDevTools");
+      await installExt();
+    } catch (e: any) {
+      // Silently handle DevTools installation errors - they're not critical
+      console.log("DevTools installation skipped:", e.message || "Unknown error");
+    }
   }
-  // }
 
   createWindow();
   app.on("activate", function () {
