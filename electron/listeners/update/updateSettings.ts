@@ -1,4 +1,14 @@
 const updateSettings = (event: any, data: any) => {
+  // Check if minLevel column exists, if not, add it
+  try {
+    global.db.prepare(`SELECT minLevel FROM settings LIMIT 1`).get();
+  } catch (error: any) {
+    if (error.message.includes("no such column: minLevel")) {
+      console.log("Adding missing minLevel column to settings table");
+      global.db.prepare(`ALTER TABLE settings ADD COLUMN minLevel INT DEFAULT 0`).run();
+    }
+  }
+
   const keys = Object.keys(data);
   const values = Object.values(data).map((e: any) =>
     typeof e === "string" ? `'${e}'` : e

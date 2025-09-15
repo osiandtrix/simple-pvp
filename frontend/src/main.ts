@@ -6,6 +6,7 @@ import store from "./store";
 import ToastPlugin from "vue-toast-notification";
 import "vue-toast-notification/dist/theme-bootstrap.css";
 import { Store } from "vuex/types/index.js";
+import AppLogo from "./components/misc/AppLogo.vue";
 
 loadFonts();
 
@@ -13,6 +14,7 @@ createApp(App)
   .use(store)
   .use(ToastPlugin)
   .use(vuetify)
+  .component('AppLogo', AppLogo)
   .mount("#app")
   .$nextTick(() => {
     init(store);

@@ -1,11 +1,15 @@
-import axios, { AxiosResponse } from "axios";
+import axios from "axios";
 import { Warlist } from "../../types/war";
 
 type State = {
   warlist: Warlist;
+  rawWarlist: Warlist;
   activeGuildIndex: number;
   targets: Array<any>;
   targetIndex: number;
+  sortField: string | null;
+  sortDirection: 'asc' | 'desc';
+  userGuildId: number | null;
 };
 
 type params = {
@@ -15,9 +19,13 @@ type params = {
 
 const getDefaultState = () => ({
   warlist: [],
+  rawWarlist: [],
   activeGuildIndex: 0,
   targets: [],
   targetIndex: 0,
+  sortField: null,
+  sortDirection: 'desc' as 'asc' | 'desc',
+  userGuildId: null,
 });
 
 const rng = (min: number, max: number): number =>
@@ -36,24 +44,73 @@ export default {
   namespaced: true,
   state: {
     warlist: [],
+    rawWarlist: [],
     activeGuildIndex: 0,
     targets: [],
     targetIndex: 0,
+    sortField: null,
+    sortDirection: 'desc',
+    userGuildId: null,
   },
   getters: {
     warlist: (state: State) => state.warlist,
+    rawWarlist: (state: State) => state.rawWarlist,
     activeGuildIndex: (state: State) => state.activeGuildIndex,
     targets: (state: State) => state.targets,
     targetIndex: (state: State) => state.targetIndex,
     currentWar: (state: State) => state.warlist[state.activeGuildIndex],
     currentTarget: (state: State) => state.targets[state.targetIndex],
+    sortField: (state: State) => state.sortField,
+    sortDirection: (state: State) => state.sortDirection,
   },
   mutations: {
     UPDATE_WARS(state: State, data: Array<any>) {
+      state.rawWarlist = data;
       state.warlist = data;
+      // Note: Sorting will be applied by the action that calls this
     },
     SHUFFLE_WARS(state: State) {
-      state.warlist = shuffleArray(state.warlist);
+      state.warlist = shuffleArray([...state.rawWarlist]);
+      state.sortField = null; // Clear sorting when shuffling
+    },
+    SET_USER_GUILD_ID(state: State, guildId: number) {
+      state.userGuildId = guildId;
+    },
+    SET_SORT(state: State, { field, direction }: { field: string | null, direction: 'asc' | 'desc' }) {
+      state.sortField = field;
+      state.sortDirection = direction;
+    },
+    APPLY_SORT(state: State) {
+      if (!state.sortField || !state.userGuildId) {
+        state.warlist = [...state.rawWarlist];
+        return;
+      }
+
+      const sorted = [...state.rawWarlist].sort((a, b) => {
+        let aValue, bValue;
+
+        if (state.sortField === 'yourKills') {
+          // Get your guild's kills for each war
+          aValue = state.userGuildId === a.attackerId ? a.attackerKills : a.defenderKills;
+          bValue = state.userGuildId === b.attackerId ? b.attackerKills : b.defenderKills;
+        } else if (state.sortField === 'theirKills') {
+          // Get enemy guild's kills for each war
+          aValue = state.userGuildId === a.attackerId ? a.defenderKills : a.attackerKills;
+          bValue = state.userGuildId === b.attackerId ? b.defenderKills : b.attackerKills;
+        } else {
+          return 0;
+        }
+
+        if (state.sortDirection === 'asc') {
+          return aValue - bValue;
+        } else {
+          return bValue - aValue;
+        }
+      });
+
+      state.warlist = sorted;
+      // Reset guild index when sorting changes
+      state.activeGuildIndex = 0;
     },
     UPDATE_GUILD_INDEX(state: State, val: 1 | -1) {
       state.activeGuildIndex += val;
@@ -92,6 +149,27 @@ export default {
     shuffleWars({ commit }: any) {
       commit("SHUFFLE_WARS");
     },
+    setUserGuildId({ commit }: any, guildId: number) {
+      commit("SET_USER_GUILD_ID", guildId);
+    },
+    sortWarlist({ commit, state }: any, { field, userGuildId }: { field: string, userGuildId: number }) {
+      const currentSortField = state.sortField;
+      const currentSortDirection = state.sortDirection;
+
+      let newDirection: 'asc' | 'desc';
+
+      if (currentSortField === field) {
+        // Toggle direction if same field
+        newDirection = currentSortDirection === 'asc' ? 'desc' : 'asc';
+      } else {
+        // New field, start with descending (highest kills first)
+        newDirection = 'desc';
+      }
+
+      commit("SET_USER_GUILD_ID", userGuildId);
+      commit("SET_SORT", { field, direction: newDirection });
+      commit("APPLY_SORT");
+    },
     async updateWars({ commit }: any, { guildId, apiKey }: params) {
       const url = `https://api.simple-mmo.com/v1/guilds/wars/${guildId}/1`;
 
@@ -119,7 +197,7 @@ export default {
     getPreviousGuild({ commit }: any) {
       commit("UPDATE_GUILD_INDEX", -1);
     },
-    async fetchTargets({ commit }: any, { guildId, apiKey, maxLevel }: any) {
+    async fetchTargets({ commit }: any, { guildId, apiKey, maxLevel, minLevel }: any) {
       const url = `https://api.simple-mmo.com/v1/guilds/members/${guildId}`;
 
       return new Promise(async (resolve, reject) => {
@@ -141,7 +219,8 @@ export default {
             (target.level > 200 ||
               new Date().getTime() / 1000 - target.last_activity >= 600) &&
             target.current_hp / target.max_hp >= 0.5 &&
-            (!maxLevel || target.level <= maxLevel)
+            (!maxLevel || target.level <= maxLevel) &&
+            (!minLevel || target.level >= minLevel)
         );
 
         if (filtered && filtered.length > 0) commit("UPDATE_TARGETS", filtered);

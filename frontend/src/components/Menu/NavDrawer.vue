@@ -46,6 +46,7 @@ import Settings from "../Settings/Settings.vue";
 import Profile from "../Profile/Profile.vue";
 import Migrations from "../Migrations/Migrations.vue";
 import ApiKeySetup from "../Setup/ApiKeySetup.vue";
+import AppLogo from "../misc/AppLogo.vue";
 import { mapGetters } from "vuex";
 
 export default {
@@ -62,6 +63,7 @@ export default {
     Profile,
     Migrations,
     ApiKeySetup,
+    AppLogo,
   },
   computed: {
     ...mapGetters({
@@ -79,7 +81,7 @@ export default {
         return this.$toast.error("Cannot switch pages while in Combat");
 
       this.activePage = val;
-      if (val === Main.name) location.reload();
+      // Removed unnecessary page reload when navigating to home
     },
     reload() {
       location.reload();

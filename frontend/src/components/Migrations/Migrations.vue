@@ -90,6 +90,9 @@ export default {
       this.migrations = migrations;
       this.loading = false;
     });
+
+    // Fetch version data when component is mounted
+    window.api.send("fetchVersion");
   },
   methods: {
     mod(n: number, m: number) {

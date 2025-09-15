@@ -1,133 +1,189 @@
 <template>
-  <v-main style="height: 100vh; overflow: hidden">
-    <v-container class="fill-height" fluid>
-      <v-row align="center" justify="center">
-        <v-col cols="12" sm="8" md="6" lg="4">
-          <v-card class="elevation-12 pa-6">
-            <v-card-title class="text-center mb-4">
-              <v-icon size="64" color="primary" class="mb-4">mdi-key</v-icon>
-              <h2>Welcome to Simple PvP!</h2>
-            </v-card-title>
+  <v-main class="modern-setup-main">
+    <v-container class="fill-height d-flex align-center justify-center" fluid>
+      <v-row align="center" justify="center" class="w-100">
+        <v-col cols="12" sm="10" md="8" lg="6" xl="5">
+          <div class="setup-container">
+            <!-- Welcome Header -->
+            <div class="welcome-header text-center mb-8">
+              <div class="icon-container mb-6">
+                <AppLogo :size="80" :glow="true" class="welcome-icon" />
+                <div class="icon-glow"></div>
+              </div>
+              <h1 class="welcome-title gradient-text mb-3">Welcome to Simple PvP</h1>
+            </div>
+
+            <!-- Setup Card -->
+            <v-card class="modern-setup-card glass-effect" elevation="0">
+              <v-card-title class="setup-card-title">
+                <div class="d-flex align-center justify-center">
+                  <h3>API Key Configuration</h3>
+                </div>
+              </v-card-title>
             
-            <v-card-text class="text-center">
-              <p class="text-h6 mb-4">
-                To get started, you'll need to set up your Simple MMO API key.
-              </p>
-              
-              <v-divider class="my-4"></v-divider>
-              
-              <div class="mb-4">
-                <h3 class="mb-2">How to get your API key:</h3>
-                <ol class="text-left">
-                  <li class="mb-2">Visit the Simple MMO API page</li>
-                  <li class="mb-2">Log in to your Simple MMO account</li>
-                  <li class="mb-2">Copy your API key</li>
-                  <li class="mb-2">Paste it in the field below</li>
-                </ol>
-              </div>
-              
-              <v-btn
-                color="primary"
-                variant="outlined"
-                prepend-icon="mdi-open-in-new"
-                @click="openApiPage"
-                class="mb-4"
-                block
-              >
-                Get Your API Key
-              </v-btn>
-              
-              <v-divider class="my-4"></v-divider>
-              
-              <v-text-field
-                v-model="apiKey"
-                label="Enter your API Key"
-                placeholder="Your Simple MMO API Key"
-                variant="outlined"
-                prepend-inner-icon="mdi-key"
-                :loading="validating"
-                :error="hasError"
-                :error-messages="errorMessage"
-                :disabled="validating"
-                @keyup.enter="validateAndSave"
-                class="mb-4"
-              ></v-text-field>
+              <v-card-text class="setup-card-content">
+                <div class="mb-6">
+                  <p class="text-body-1 mb-4 text-center">
+                    Connect your SimpleMMO account
+                  </p>
 
-              <!-- Progress indicator during validation -->
-              <v-card
-                v-if="validating"
-                class="mb-4 pa-4"
-                color="primary"
-                variant="tonal"
-              >
-                <v-row align="center" no-gutters>
-                  <v-col cols="auto">
-                    <v-progress-circular
-                      indeterminate
-                      size="24"
-                      width="3"
-                      color="primary"
-                    ></v-progress-circular>
-                  </v-col>
-                  <v-col class="ml-3">
-                    <div class="text-body-2 font-weight-medium">
-                      {{ validationStep }}
-                    </div>
-                    <div class="text-caption text-medium-emphasis">
-                      {{ validationMessage }}
-                    </div>
-                  </v-col>
-                </v-row>
-              </v-card>
-              
-              <v-btn
-                color="success"
-                size="large"
-                :loading="validating"
-                :disabled="!apiKey || apiKey.length < 10 || validating"
-                @click="validateAndSave"
-                prepend-icon="mdi-check"
-                block
-                class="mb-2"
-              >
-                {{ validating ? 'Validating...' : 'Save API Key' }}
-              </v-btn>
 
-              <!-- Retry button for failed attempts -->
-              <v-btn
-                v-if="hasError && !validating && retryCount > 0"
-                color="primary"
-                variant="outlined"
-                size="large"
-                @click="validateAndSave"
-                prepend-icon="mdi-refresh"
-                block
-                class="mb-2"
-              >
-                Try Again
-              </v-btn>
-              
-              <!-- Network status and security info -->
-              <div class="mt-4">
-                <div class="text-caption text-medium-emphasis mb-2">
-                  <v-icon size="small" class="mr-1">mdi-shield-check</v-icon>
-                  Your API key is stored securely on your device
                 </div>
 
-                <!-- Connection status -->
-                <div class="text-caption text-medium-emphasis">
-                  <v-icon
-                    size="small"
-                    class="mr-1"
-                    :color="isOnline ? 'success' : 'error'"
+                <!-- Instructions -->
+                <div class="instructions-section mb-6">
+                  <h4 class="mb-3 d-flex align-center justify-center">
+                    <v-icon size="20" color="accent" class="mr-2">mdi-information</v-icon>
+                    Setup Instructions
+                  </h4>
+                  <div class="instruction-steps">
+                    <div class="instruction-step">
+                      <div class="step-number">1</div>
+                      <div class="step-content-centered">
+                        <strong>Visit the API page</strong>
+                        <p class="text-body-2 text-on-surface-variant">Click the button below to open Simple MMO's API page</p>
+                      </div>
+                    </div>
+                    <div class="instruction-step">
+                      <div class="step-number">2</div>
+                      <div class="step-content-centered">
+                        <strong>Copy your API key</strong>
+                        <p class="text-body-2 text-on-surface-variant">Log in and copy your personal API key</p>
+                      </div>
+                    </div>
+                    <div class="instruction-step">
+                      <div class="step-number">3</div>
+                      <div class="step-content-centered">
+                        <strong>Paste and validate</strong>
+                        <p class="text-body-2 text-on-surface-variant">Enter your key below and we'll verify it</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- API Page Button -->
+                <v-btn
+                  color="primary"
+                  variant="flat"
+                  prepend-icon="mdi-open-in-new"
+                  @click="openApiPage"
+                  size="large"
+                  block
+                  class="modern-btn mb-6"
+                >
+                  Get Your API Key
+                </v-btn>
+              
+                <!-- API Key Input -->
+                <div class="api-input-section">
+                  <v-text-field
+                    v-model="apiKey"
+                    label="API Key"
+                    placeholder="Enter your Simple MMO API Key"
+                    variant="outlined"
+                    prepend-inner-icon="mdi-key"
+                    :loading="validating"
+                    :error="hasError"
+                    :error-messages="errorMessage"
+                    :disabled="validating"
+                    @keyup.enter="validateAndSave"
+                    density="comfortable"
+                    class="modern-input mb-4"
+                    hide-details="auto"
+                  ></v-text-field>
+
+                  <!-- Progress indicator during validation -->
+                  <v-card
+                    v-if="validating"
+                    class="validation-progress glass-effect mb-4"
+                    elevation="0"
                   >
-                    {{ isOnline ? 'mdi-wifi' : 'mdi-wifi-off' }}
-                  </v-icon>
-                  {{ isOnline ? 'Connected to internet' : 'No internet connection' }}
+                    <v-card-text class="pa-4">
+                      <v-row align="center" no-gutters>
+                        <v-col cols="auto">
+                          <v-progress-circular
+                            indeterminate
+                            size="28"
+                            width="3"
+                            color="primary"
+                          ></v-progress-circular>
+                        </v-col>
+                        <v-col class="ml-4">
+                          <div class="text-body-1 font-weight-medium mb-1">
+                            {{ validationStep }}
+                          </div>
+                          <div class="text-body-2 text-on-surface-variant">
+                            {{ validationMessage }}
+                          </div>
+                        </v-col>
+                      </v-row>
+                    </v-card-text>
+                  </v-card>
+              
+                  <!-- Action Buttons -->
+                  <div class="action-buttons">
+                    <v-btn
+                      color="success"
+                      size="large"
+                      :loading="validating"
+                      :disabled="!apiKey || apiKey.length < 10 || validating"
+                      @click="validateAndSave"
+                      prepend-icon="mdi-check-circle"
+                      block
+                      class="modern-btn primary-action mb-3"
+                    >
+                      {{ validating ? 'Validating...' : 'Connect & Validate' }}
+                    </v-btn>
+
+                    <!-- Retry button for failed attempts -->
+                    <v-btn
+                      v-if="hasError && !validating && retryCount > 0"
+                      color="primary"
+                      variant="outlined"
+                      size="large"
+                      @click="validateAndSave"
+                      prepend-icon="mdi-refresh"
+                      block
+                      class="modern-btn mb-3"
+                    >
+                      Try Again ({{ maxRetries - retryCount }} attempts left)
+                    </v-btn>
+                  </div>
                 </div>
-              </div>
-            </v-card-text>
-          </v-card>
+              </v-card-text>
+
+              <!-- Security & Status Footer -->
+              <v-card-text class="setup-footer pt-0">
+                <v-divider class="mb-4"></v-divider>
+
+                <div class="security-info">
+                  <div class="security-item mb-2">
+                    <v-icon size="16" color="success" class="mr-2">mdi-shield-check</v-icon>
+                    <span class="text-body-2">Your API key is stored securely on your device</span>
+                  </div>
+
+                  <div class="security-item mb-2">
+                    <v-icon size="16" color="info" class="mr-2">mdi-lock</v-icon>
+                    <span class="text-body-2">All connections use HTTPS encryption</span>
+                  </div>
+
+                  <!-- Connection status -->
+                  <div class="security-item">
+                    <v-icon
+                      size="16"
+                      class="mr-2"
+                      :color="isOnline ? 'success' : 'error'"
+                    >
+                      {{ isOnline ? 'mdi-wifi' : 'mdi-wifi-off' }}
+                    </v-icon>
+                    <span class="text-body-2">
+                      {{ isOnline ? 'Connected to internet' : 'No internet connection' }}
+                    </span>
+                  </div>
+                </div>
+              </v-card-text>
+            </v-card>
+          </div>
         </v-col>
       </v-row>
     </v-container>
@@ -136,9 +192,13 @@
 
 <script lang="ts">
 import axios from 'axios';
+import AppLogo from '../misc/AppLogo.vue';
 
 export default {
   name: "ApiKeySetup",
+  components: {
+    AppLogo
+  },
   data() {
     return {
       apiKey: '',
@@ -318,6 +378,262 @@ export default {
   }
 };
 </script>
+
+<style scoped>
+.modern-setup-main {
+  height: 100vh;
+  background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%);
+  overflow-y: auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.setup-container {
+  max-width: 100%;
+  margin: 0 auto;
+  width: 100%;
+}
+
+.welcome-header {
+  position: relative;
+}
+
+.icon-container {
+  position: relative;
+  display: inline-block;
+}
+
+.welcome-icon {
+  position: relative;
+  z-index: 2;
+  filter: drop-shadow(0 0 20px rgba(255, 255, 255, 0.3));
+}
+
+.icon-glow {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 120px;
+  height: 120px;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
+  border-radius: 50%;
+  z-index: 1;
+  animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    transform: translate(-50%, -50%) scale(1);
+    opacity: 0.7;
+  }
+  50% {
+    transform: translate(-50%, -50%) scale(1.1);
+    opacity: 1;
+  }
+}
+
+.welcome-title {
+  font-size: 2.5rem;
+  font-weight: 700;
+  letter-spacing: -0.025em;
+}
+
+.welcome-subtitle {
+  font-size: 1.125rem;
+  font-weight: 400;
+}
+
+.modern-setup-card {
+  background: rgba(26, 26, 26, 0.85) !important;
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow:
+    0 8px 32px rgba(0, 0, 0, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05);
+}
+
+.modern-setup-card:hover {
+  border-color: rgba(255, 255, 255, 0.15);
+  transform: translateY(-2px);
+  box-shadow:
+    0 12px 40px rgba(0, 0, 0, 0.4),
+    0 0 0 1px rgba(255, 255, 255, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08);
+}
+
+.setup-card-title {
+  padding: 24px 24px 16px 24px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  text-align: center;
+}
+
+.setup-card-content {
+  padding: 24px;
+  text-align: center;
+}
+
+
+
+.feature-item:hover {
+  background: rgba(58, 58, 58, 0.6);
+  border-color: rgba(255, 255, 255, 0.15);
+  transform: translateY(-2px);
+}
+
+.instructions-section {
+  background: rgba(42, 42, 42, 0.6);
+  border-radius: 12px;
+  padding: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  text-align: left;
+  max-width: 500px;
+  margin: 0 auto;
+  box-shadow:
+    0 4px 16px rgba(0, 0, 0, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.03);
+}
+
+.instruction-steps {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  align-items: center;
+}
+
+.instruction-step {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  text-align: center;
+  max-width: 300px;
+}
+
+.step-number {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  background: linear-gradient(135deg, #4a4a4a 0%, #6a6a6a 100%);
+  color: white;
+  border-radius: 50%;
+  font-weight: 600;
+  font-size: 0.875rem;
+  flex-shrink: 0;
+  box-shadow:
+    0 2px 8px rgba(0, 0, 0, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+}
+
+.step-content {
+  flex: 1;
+  padding-top: 4px;
+}
+
+.step-content-centered {
+  text-align: center;
+  margin-top: 8px;
+}
+
+.step-content strong {
+  display: block;
+  margin-bottom: 4px;
+  color: rgb(var(--v-theme-on-surface));
+}
+
+.modern-input {
+  transition: all 0.3s ease;
+}
+
+.modern-input:hover {
+  transform: translateY(-1px);
+}
+
+.validation-progress {
+  background: rgba(42, 42, 42, 0.8) !important;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow:
+    0 4px 16px rgba(0, 0, 0, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05);
+}
+
+.modern-btn {
+  font-weight: 600;
+  text-transform: none;
+  letter-spacing: 0.025em;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  height: 48px;
+  border: 1px solid rgba(255, 255, 255, 0.05) !important;
+  box-shadow:
+    0 2px 8px rgba(0, 0, 0, 0.15),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05);
+}
+
+.modern-btn:hover {
+  transform: translateY(-2px);
+  box-shadow:
+    0 4px 16px rgba(0, 0, 0, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+.primary-action {
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%) !important;
+  color: white !important;
+}
+
+.primary-action:hover {
+  box-shadow: 0 8px 25px rgba(16, 185, 129, 0.4);
+}
+
+.setup-footer {
+  padding: 16px 24px 24px 24px;
+}
+
+.security-info {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  align-items: center;
+  text-align: center;
+}
+
+.security-item {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0.8;
+  transition: opacity 0.3s ease;
+}
+
+.security-item:hover {
+  opacity: 1;
+}
+
+/* Responsive adjustments */
+@media (max-width: 600px) {
+  .welcome-title {
+    font-size: 2rem;
+  }
+
+  .features-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .instruction-step {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .step-number {
+    align-self: center;
+  }
+}
+</style>
 
 <style scoped>
 .v-card {

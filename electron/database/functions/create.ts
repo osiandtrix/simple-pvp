@@ -1,6 +1,8 @@
 import MigrationChanges from "../../types/MigrationChanges";
 
 const create = ({ table, params }: MigrationChanges) => {
+  if (!params) return;
+
   global.db
     .prepare(
       `CREATE TABLE ${table} (${params

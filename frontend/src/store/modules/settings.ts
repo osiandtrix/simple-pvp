@@ -1,5 +1,6 @@
 type State = {
   maxLevel: number;
+  minLevel: number;
   apiKey: string;
   keyBinds: any;
   version_max: string;
@@ -15,6 +16,7 @@ export default {
   namespaced: true,
   state: {
     maxLevel: null,
+    minLevel: null,
     apiKey: null,
     keyBinds: [],
     version_max: null,
@@ -22,6 +24,7 @@ export default {
   },
   getters: {
     maxLevel: (state: State) => state.maxLevel,
+    minLevel: (state: State) => state.minLevel,
     apiKey: (state: State) => state.apiKey,
     keyBinds: (state: State) => state.keyBinds,
     version_max: (state: State) => state.version_max,
@@ -30,9 +33,10 @@ export default {
   mutations: {
     UPDATE_USERSETTINGS(
       state: State,
-      { maxLevel, api_key }: { maxLevel: string; api_key: string }
+      { maxLevel, minLevel, api_key }: { maxLevel: string; minLevel: string; api_key: string }
     ) {
       if (maxLevel) state.maxLevel = +maxLevel;
+      if (minLevel !== undefined) state.minLevel = +minLevel;
       if (api_key) state.apiKey = api_key;
     },
     UPDATE_APIKEY(state: State, { api_key }: { api_key: string }) {
@@ -44,6 +48,12 @@ export default {
     ) {
       state.maxLevel = +maxLevel;
     },
+    UPDATE_MINLEVEL(
+      state: State,
+      { minLevel }: { minLevel: string }
+    ) {
+      state.minLevel = +minLevel;
+    },
     UPDATE_KEYBINDS(state: State, data: any) {
       state.keyBinds = data;
     },
@@ -54,14 +64,19 @@ export default {
   },
   actions: {
     init({ commit }: any) {
-      window.api.send("fetchVersion");
-      window.api.receive("resolveVersion", (data) => {
-        commit("SET_VERSION", data);
-      });
+      // First, run any pending database migrations
+      window.api.send("runVersionUpdate");
+      window.api.receive("resolveVersionUpdate", () => {
+        // After migrations are complete, fetch version and settings
+        window.api.send("fetchVersion");
+        window.api.receive("resolveVersion", (data) => {
+          commit("SET_VERSION", data);
+        });
 
-      window.api.send("fetchUsersettings");
-      window.api.receive("resolveUsersettings", (data) => {
-        commit("UPDATE_USERSETTINGS", data);
+        window.api.send("fetchUsersettings");
+        window.api.receive("resolveUsersettings", (data) => {
+          commit("UPDATE_USERSETTINGS", data);
+        });
       });
     },
     saveAPIKey({ commit }: any, data: { apiKey: string }) {
@@ -71,6 +86,10 @@ export default {
     saveMaxLevel({ commit }: any, data: { maxLevel: string }) {
       window.api.send("updateSettings", data);
       commit("UPDATE_MAXLEVEL", data);
+    },
+    saveMinLevel({ commit }: any, data: { minLevel: string }) {
+      window.api.send("updateSettings", data);
+      commit("UPDATE_MINLEVEL", data);
     },
     async fetchKeybinds({ commit }: any) {
       window.api.send("fetchKeybinds");

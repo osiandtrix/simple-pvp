@@ -44,6 +44,7 @@ db.prepare(
 db.prepare(
   `CREATE TABLE IF NOT EXISTS settings(
       maxLevel INT,
+      minLevel INT DEFAULT 0,
       api_key TEXT
     )`
 ).run();
@@ -74,7 +75,8 @@ db.prepare(
     ('0001', null),
     ('0002', null),
     ('0003', null),
-    ('0004', null)`
+    ('0004', null),
+    ('0005', null)`
 ).run();
 
 db.prepare(

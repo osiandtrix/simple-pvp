@@ -13,6 +13,7 @@ const runVersionUpdate = async (event: any) => {
 
     for (const change of version.default.changes) {
       if (change.type === "create") DBFunctions.create(change);
+      if (change.type === "alter") DBFunctions.alter(change);
     }
 
     DBFunctions.versionUpdate(version.default.version);
