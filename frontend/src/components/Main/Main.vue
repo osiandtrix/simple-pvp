@@ -244,10 +244,11 @@ export default {
         userId: this.currentTarget.user_id,
         hit: 1,
       });
+
       this.newEvent({
         userId: this.currentTarget.user_id,
         userName: this.currentTarget.name,
-        type: "attack",
+        type: "attack" as const,
       });
 
       this.$store.dispatch("wars/changeTargetIndex", 1);

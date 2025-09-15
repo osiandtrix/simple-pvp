@@ -105,6 +105,7 @@ export default {
       resetIn: 0,
       isHovering: false,
       refreshInterval: null as any,
+      showEventLog: true, // Add missing property for the switch
     };
   },
   watch: {
