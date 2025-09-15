@@ -32,7 +32,7 @@ for (const job of cronjobs) {
 let mainWindow: BrowserWindow;
 async function createWindow() {
   const { width, height } = screen.getPrimaryDisplay().workAreaSize;
-  const appBounds: any = appConfig.get("setting.appBounds");
+  const appBounds: any = (appConfig as any).get("setting.appBounds");
 
   const BrowserWindowOptions: BrowserWindowConstructorOptions = {
     width: 500,
@@ -133,7 +133,7 @@ app.on("window-all-closed", () => {
 
 app.on("will-quit", () => {
   // Unregister all shortcuts.
-  db.prepare(
+  global.db.prepare(
     `UPDATE stats SET end='${Math.floor(
       new Date().getTime() / 1000
     )}' WHERE end is null`
