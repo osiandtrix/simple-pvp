@@ -11,7 +11,6 @@ A powerful desktop application for managing PvP activities in Simple MMO. Built 
 - **Level Filtering**: Set minimum and maximum level ranges for optimal target selection
 
 ### ⚔️ **Combat System**
-- **Spacebar Attack**: Press spacebar to attack the current target and automatically move to the next
 - **Event Logging**: Real-time event tracking showing all your attacks interactions
 
 ### 🏰 **Guild War Management**
