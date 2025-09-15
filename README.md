@@ -79,4 +79,4 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ---
 
-**Made with ❤️ for the Simple MMO community**
+**Made with ❤️ for the SimpleMMO community**
