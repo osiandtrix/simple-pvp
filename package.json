@@ -49,6 +49,11 @@
     "appId": "com.simple-pvp.app",
     "productName": "Simple PvP",
     "copyright": "Copyright © 2025 ${author}",
+    "win": {
+      "icon": "assets/app-logo.png",
+      "target": "nsis",
+      "requestedExecutionLevel": "asInvoker"
+    },
     "publish": [
       {
         "provider": "github",

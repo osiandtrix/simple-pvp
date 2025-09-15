@@ -23,6 +23,7 @@
     "@types/webfontloader": "^1.0.0",
     "@vitejs/plugin-vue": "^4.2.3",
     "@vue/cli-plugin-vuex": "~5.0.0",
+    "terser": "^5.44.0",
     "typescript": "^5.0.2",
     "vite": "^4.4.5",
     "vite-plugin-vuetify": "^1.0.0-alpha.12",
