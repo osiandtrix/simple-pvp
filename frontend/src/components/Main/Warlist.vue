@@ -98,10 +98,7 @@
               {{ getSortIcon('theirKills') }}
             </v-icon>
           </div>
-          <div class="header-cell action-header">
-            <v-icon size="16" color="on-surface-variant" class="mr-1">mdi-crosshairs-gps</v-icon>
-            Target
-          </div>
+
         </div>
 
         <!-- Table Body -->
@@ -130,21 +127,7 @@
                   {{ war.guild_2.kills }}
                 </div>
               </div>
-              <div class="row-cell action-cell">
-                <v-btn
-                  @click="targetGuild(war.guild_2)"
-                  icon
-                  size="small"
-                  variant="text"
-                  color="primary"
-                  class="aim-button"
-                >
-                  <v-icon size="18">mdi-crosshairs-gps</v-icon>
-                  <v-tooltip activator="parent" location="left">
-                    Target {{ war.guild_2.name }}
-                  </v-tooltip>
-                </v-btn>
-              </div>
+
             </template>
 
             <!-- Your guild is guild_2 -->
@@ -165,21 +148,7 @@
                   {{ war.guild_1.kills }}
                 </div>
               </div>
-              <div class="row-cell action-cell">
-                <v-btn
-                  @click="targetGuild(war.guild_1)"
-                  icon
-                  size="small"
-                  variant="text"
-                  color="primary"
-                  class="aim-button"
-                >
-                  <v-icon size="18">mdi-crosshairs-gps</v-icon>
-                  <v-tooltip activator="parent" location="left">
-                    Target {{ war.guild_1.name }}
-                  </v-tooltip>
-                </v-btn>
-              </div>
+
             </template>
           </div>
         </div>
@@ -288,10 +257,7 @@ export default {
         JSON.parse(JSON.stringify(this.warlist))
       );
     },
-    targetGuild(guild: any) {
-      // Emit event to parent component to start targeting this specific guild
-      this.$emit('targetSpecificGuild', guild);
-    },
+
   },
   props: {
     keySet: {
@@ -313,6 +279,13 @@ export default {
   box-shadow:
     0 8px 32px rgba(0, 0, 0, 0.3),
     inset 0 1px 0 rgba(255, 255, 255, 0.05);
+}
+
+.modern-warlist-card .v-card-text {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
 }
 
 .modern-warlist-header {
@@ -447,21 +420,7 @@ export default {
   justify-content: center;
 }
 
-.action-cell {
-  width: 150px;
-  justify-content: center;
-}
 
-.aim-button {
-  opacity: 0.7;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.aim-button:hover {
-  opacity: 1;
-  transform: scale(1.1);
-  background: rgba(var(--v-theme-primary), 0.1) !important;
-}
 
 .square-badge {
   display: inline-flex;

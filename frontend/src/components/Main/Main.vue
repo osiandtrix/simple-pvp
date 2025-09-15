@@ -131,7 +131,7 @@
       <!-- Main Content Area -->
       <div class="modern-content-area">
         <EventLog v-if="inCombat" />
-        <Warlist v-else :keySet="!!setAPIKey" @targetSpecificGuild="handleTargetSpecificGuild" />
+        <Warlist v-else :keySet="!!setAPIKey" />
       </div>
     </v-container>
   </v-main>
@@ -396,33 +396,7 @@ export default {
 
       this.$toast.success("Level filters saved successfully.");
     },
-    async handleTargetSpecificGuild(guild: any) {
-      // Clear existing targets and reset target index
-      this.$store.commit("wars/UPDATE_TARGETS", []);
-      this.$store.commit("wars/SET_TARGET_INDEX", 0);
 
-      // Show loading message
-      this.$toast.info(`Generating targets for ${guild.name}...`);
-
-      try {
-        // Fetch targets specifically for this guild
-        await this.$store.dispatch("wars/fetchTargets", {
-          guildId: guild.id,
-          apiKey: this.setAPIKey,
-          maxLevel: this.maxLevelInput,
-          minLevel: this.minLevelInput,
-        });
-
-        if (this.targets.length > 0) {
-          this.$toast.success(`Found ${this.targets.length} targets in ${guild.name}`);
-        } else {
-          this.$toast.warning(`No valid targets found in ${guild.name}`);
-        }
-      } catch (error) {
-        this.$toast.error(`Failed to fetch targets for ${guild.name}`);
-        this.$store.dispatch("process/setApiLimit", 40);
-      }
-    },
   },
 };
 </script>
