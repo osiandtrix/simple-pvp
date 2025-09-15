@@ -1,7 +1,7 @@
 {
-  "name": "smmo-yaka",
+  "name": "simple-pvp",
   "version": "1.0.0",
-  "description": "SMMO PvP Tool",
+  "description": "Simple PvP Tool",
   "main": "./dist/main.js",
   "license": "MIT",
   "author": "osiandtrix",
@@ -19,8 +19,8 @@
     "electron:builder": "electron-builder --publish always",
     "app:build": "yarn prod:rename && yarn build:front && yarn electron:build && yarn electron:builder",
     "app:build:nightly": "set APP_IS_NIGHTLY=yes && set APP_IS_DEV=no && yarn nightly:rename && yarn build:front && yarn electron:build && yarn electron:builder",
-    "nightly:rename": "json -I -f package.json -e \"this.name='smmo-yaka'\" && json -I -f package.json -e \"this.build.productName='SMMO Yaka'\" && json -I -f package.json -e \"this.build.appId='com.smmo-aka.app'\"",
-    "prod:rename": "json -I -f package.json -e \"this.name='smmo-yaka'\" && json -I -f package.json -e \"this.build.productName='SMMO Yaka'\" && json -I -f package.json -e \"this.build.appId='com.smmo-aka.app'\"",
+    "nightly:rename": "json -I -f package.json -e \"this.name='simple-pvp'\" && json -I -f package.json -e \"this.build.productName='Simple PvP'\" && json -I -f package.json -e \"this.build.appId='com.simple-pvp.app'\"",
+    "prod:rename": "json -I -f package.json -e \"this.name='simple-pvp'\" && json -I -f package.json -e \"this.build.productName='Simple PvP'\" && json -I -f package.json -e \"this.build.appId='com.simple-pvp.app'\"",
     "electron-rebuild": "./node_modules/.bin/electron-rebuild",
     "sqlite-rebuild": "cd node_modules/better-sqlite3 && npm run build-release",
     "postinstall": "electron-builder install-app-deps",
@@ -46,8 +46,8 @@
     "electron-updater": "^5.3.0"
   },
   "build": {
-    "appId": "com.smmo-aka.app",
-    "productName": "SMMO Yaka",
+    "appId": "com.simple-pvp.app",
+    "productName": "Simple PvP",
     "copyright": "Copyright © 2025 ${author}",
     "publish": [
       {

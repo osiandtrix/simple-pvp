@@ -3,7 +3,7 @@
     <v-layout style="width: 100vw">
       <v-navigation-drawer style="position: fixed" v-model="drawer" temporary>
         <v-container
-          style="height: 90vh; margin-top: 10vh"
+          style="height: 91vh; margin-top: 9vh"
           fill-height
           class="pa-0"
         >
@@ -26,7 +26,15 @@
       </v-navigation-drawer>
 
       <v-main>
-        <component @reload="reload" :is="activePage"></component>
+        <ApiKeySetup
+          v-if="!hasApiKey"
+          @apiKeyConfigured="onApiKeyConfigured"
+        />
+        <component
+          v-else
+          @reload="reload"
+          :is="activePage"
+        ></component>
       </v-main>
     </v-layout>
   </v-card>
@@ -37,6 +45,8 @@ import Main from "../Main/Main.vue";
 import Settings from "../Settings/Settings.vue";
 import Profile from "../Profile/Profile.vue";
 import Migrations from "../Migrations/Migrations.vue";
+import ApiKeySetup from "../Setup/ApiKeySetup.vue";
+import { mapGetters } from "vuex";
 
 export default {
   name: "navdrawer",
@@ -51,6 +61,15 @@ export default {
     Settings,
     Profile,
     Migrations,
+    ApiKeySetup,
+  },
+  computed: {
+    ...mapGetters({
+      apiKey: "settings/apiKey",
+    }),
+    hasApiKey() {
+      return this.apiKey && this.apiKey.length > 0;
+    },
   },
   methods: {
     updateActiveElement(val: string) {
@@ -63,6 +82,10 @@ export default {
       if (val === Main.name) location.reload();
     },
     reload() {
+      location.reload();
+    },
+    onApiKeyConfigured() {
+      // Force a reload to refresh the store state
       location.reload();
     },
   },

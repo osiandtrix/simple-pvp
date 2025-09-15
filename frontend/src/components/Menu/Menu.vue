@@ -1,11 +1,11 @@
 <template>
-  <div class="wrapper" style="height: 10vh">
-    <v-app-bar :elevation="3" rounded>
+  <div class="wrapper" style="height: 9vh">
+    <v-app-bar :elevation="3" rounded height="56">
       <v-app-bar-nav-icon @click="() => (drawerOpen = !drawerOpen)">
-        <v-icon>mdi-menu</v-icon>
+        <v-icon size="22">mdi-menu</v-icon>
       </v-app-bar-nav-icon>
 
-      <v-app-bar-title>SMMO Yaka</v-app-bar-title>
+      <v-app-bar-title class="text-h6">Simple PvP</v-app-bar-title>
 
       <v-menu>
         <template v-slot:activator="{ props }">

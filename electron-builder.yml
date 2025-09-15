@@ -1,5 +1,5 @@
-appId: com.smmo-aka.app
-productName: SMMO Yaka
+appId: com.simple-pvp.app
+productName: Simple PvP
 copyright: Copyright © 2023 ${author}
 win:
   publish:
