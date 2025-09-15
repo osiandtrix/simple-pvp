@@ -183,7 +183,7 @@ export default {
         (e: any) => e.user_id === event.userId
       );
 
-      if (!index) return this.$toast.error("Could not find target");
+      if (index === -1) return this.$toast.error("Could not find target");
 
       await this.$store.dispatch("wars/setTargetIndex", index);
 

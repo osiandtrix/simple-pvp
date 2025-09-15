@@ -155,11 +155,21 @@ export default {
   },
   components: { Warlist, EventLog },
   mounted() {
+    // Clean up any existing listeners first
+    window.api.removeAllListeners("spacebar");
+    window.api.removeAllListeners("Control+Space");
+
+    // Register new listeners
     window.api.receive("spacebar", this.handleSpaceBar);
     window.api.receive("Control+Space", this.handleCtrlSpaceBar);
 
     this.maxLevelInput = this.savedMaxLevel;
     this.minLevelInput = this.savedMinLevel;
+  },
+  beforeUnmount() {
+    // Clean up event listeners to prevent duplicates
+    window.api.removeAllListeners("spacebar");
+    window.api.removeAllListeners("Control+Space");
   },
   watch: {
     savedMaxLevel(val) {
@@ -223,7 +233,6 @@ export default {
       window.api.send("updateCurrentTarget", this.currentTarget.user_id);
     },
     async handleSpaceBar() {
-      console.log("SPACEBAR");
       if (this.apiLimitReached) return this.showAPILimitError();
       if (
         this.activeGuildIndex >= this.warlist.length &&
