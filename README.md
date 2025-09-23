@@ -51,7 +51,7 @@ A powerful desktop application for managing PvP activities in Simple MMO. Built 
 
 | Key | Action |
 |-----|--------|
-| `Spacebar` | Attack current target and move to next |
+| `Spacebar` | Go to next target |
 | `Ctrl + Space` | Go back to previous target |
 
 *All keybinds can be customized in Settings*
