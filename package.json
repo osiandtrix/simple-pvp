@@ -1,6 +1,6 @@
 {
   "name": "simple-pvp",
-  "version": "1.0.2",
+  "version": "1.0.4",
   "description": "Simple PvP Tool",
   "main": "./dist/main.js",
   "license": "MIT",

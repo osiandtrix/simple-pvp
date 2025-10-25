@@ -1,14 +1,31 @@
 import Database from "better-sqlite3";
 import fs from "node:fs";
+import path from "node:path";
+import { app } from "electron";
 
 let db;
-if (!fs.existsSync("database")) fs.mkdirSync("database");
 
-if (!fs.existsSync("database/data.db")) {
-  fs.writeFileSync("./database/data.db", "");
+// Determine a persistent, writable location for the database
+let baseDir: string;
+try {
+  // Prefer Electron's userData directory so data persists reliably across sessions
+  const userData = app.getPath("userData");
+  baseDir = path.join(userData, "database");
+} catch (e) {
+  // Fallback to a relative folder if app.getPath is not yet available
+  baseDir = path.resolve("database");
+}
 
-  db = new Database("./database/data.db");
-} else db = new Database("./database/data.db");
+if (!fs.existsSync(baseDir)) fs.mkdirSync(baseDir, { recursive: true });
+
+const dbPath = path.join(baseDir, "data.db");
+
+if (!fs.existsSync(dbPath)) {
+  fs.writeFileSync(dbPath, "");
+  db = new Database(dbPath);
+} else {
+  db = new Database(dbPath);
+}
 
 db.pragma("journal_mode = WAL");
 
