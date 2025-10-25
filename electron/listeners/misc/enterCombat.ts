@@ -26,6 +26,20 @@ const enterCombat = (event: any, target: any) => {
       unregisterKeybinds();
     });
 
+    // Apply saved Always-on-top preference to the combat window
+    try {
+      const row = global.db
+        .prepare("SELECT alwaysOnTop FROM settings LIMIT 1")
+        .get();
+      const flag = row ? !!(+row.alwaysOnTop) : false;
+      global.combatWindow.setAlwaysOnTop(
+        flag,
+        flag ? ("screen-saver" as any) : ("normal" as any)
+      );
+    } catch (e) {
+      // Ignore if column doesn't exist yet or DB is unavailable
+    }
+
     global.combatWindow.webContents.on(
       "did-fail-load",
       (event, errorCode, errorDescription, url) => {
@@ -60,7 +74,7 @@ const enterCombat = (event: any, target: any) => {
   global.db
     .prepare(
       `INSERT INTO stats(start) VALUES('${Math.floor(
-        new Date().getTime() / 100
+        new Date().getTime() / 1000
       )}')`
     )
     .run();

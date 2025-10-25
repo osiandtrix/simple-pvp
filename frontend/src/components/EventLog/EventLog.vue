@@ -36,6 +36,30 @@
 
           <v-spacer></v-spacer>
 
+          <!-- Session Kills -->
+          <div class="indicatorText">
+            {{ sessionKills || 0 }}
+          </div>
+          <v-tooltip text="Session Kills" location="top">
+            <template v-slot:activator="{ props }">
+              <v-icon color="green" v-bind="props">mdi-sword-cross</v-icon>
+            </template>
+          </v-tooltip>
+
+          <v-spacer></v-spacer>
+
+          <!-- Kills per Hour -->
+          <div class="indicatorText">
+            {{ (killsPerHour || 0).toFixed(1) }}
+          </div>
+          <v-tooltip text="Kills per Hour" location="top">
+            <template v-slot:activator="{ props }">
+              <v-icon color="purple" v-bind="props">mdi-speedometer</v-icon>
+            </template>
+          </v-tooltip>
+
+          <v-spacer></v-spacer>
+
           <div class="indicatorText">
             {{ 40 - apiLimit }}
           </div>
@@ -140,6 +164,9 @@ export default {
 
       apiLimit: "process/apiLimit",
       apiLimit_Stamp: "process/apiLimit_Stamp",
+
+      sessionKills: "stats/sessionKills",
+      killsPerHour: "stats/killsPerHour",
     }),
     currentTarget() {
       return this.targets[this.targetIndex];

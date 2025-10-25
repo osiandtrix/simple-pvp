@@ -245,6 +245,9 @@ export default {
         hit: 1,
       });
 
+      // Optimistically reflect the kill in session stats
+      this.$store.dispatch("stats/increment");
+
       this.newEvent({
         userId: this.currentTarget.user_id,
         userName: this.currentTarget.name,

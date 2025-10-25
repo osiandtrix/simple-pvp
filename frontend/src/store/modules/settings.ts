@@ -2,6 +2,7 @@ type State = {
   maxLevel: number;
   minLevel: number;
   apiKey: string;
+  alwaysOnTop: boolean;
   keyBinds: any;
   version_max: string;
   version_current: string;
@@ -18,6 +19,7 @@ export default {
     maxLevel: null,
     minLevel: null,
     apiKey: null,
+    alwaysOnTop: false,
     keyBinds: [],
     version_max: null,
     version_current: null,
@@ -29,15 +31,20 @@ export default {
     keyBinds: (state: State) => state.keyBinds,
     version_max: (state: State) => state.version_max,
     version_current: (state: State) => state.version_current,
+    alwaysOnTop: (state: State) => state.alwaysOnTop,
   },
   mutations: {
     UPDATE_USERSETTINGS(
       state: State,
-      { maxLevel, minLevel, api_key }: { maxLevel: string; minLevel: string; api_key: string }
+      { maxLevel, minLevel, api_key, alwaysOnTop }: { maxLevel?: string; minLevel?: string; api_key?: string; alwaysOnTop?: number | boolean }
     ) {
       if (maxLevel) state.maxLevel = +maxLevel;
       if (minLevel !== undefined) state.minLevel = +minLevel;
       if (api_key) state.apiKey = api_key;
+      if (alwaysOnTop !== undefined) state.alwaysOnTop = !!(+alwaysOnTop as any);
+    },
+    UPDATE_ALWAYS_ON_TOP(state: State, enabled: boolean) {
+      state.alwaysOnTop = !!enabled;
     },
     UPDATE_APIKEY(state: State, { api_key }: { api_key: string }) {
       state.apiKey = api_key;
@@ -63,11 +70,11 @@ export default {
     },
   },
   actions: {
-    init({ commit }: any) {
-      // Check if window.api is available
+    init({ commit, dispatch }: any) {
+      // Ensure preload API is available; retry if not yet injected
       if (!window.api) {
         setTimeout(() => {
-          this.init({ commit });
+          dispatch("init");
         }, 100);
         return;
       }
@@ -84,6 +91,10 @@ export default {
         window.api.send("fetchUsersettings");
         window.api.receive("resolveUsersettings", (data) => {
           commit("UPDATE_USERSETTINGS", data);
+          // Apply window on-top state at startup
+          try {
+            window.api.send("setAlwaysOnTop", !!(data?.alwaysOnTop));
+          } catch {}
         });
       });
     },
@@ -109,12 +120,16 @@ export default {
         });
       });
     },
+    saveAlwaysOnTop({ commit }: any, enabled: boolean) {
+      const payload = { alwaysOnTop: enabled ? 1 : 0 } as any;
+      window.api.send("updateSettings", payload);
+      window.api.send("setAlwaysOnTop", !!enabled);
+      commit("UPDATE_ALWAYS_ON_TOP", !!enabled);
+    },
     async newKeybind({ commit }: any, data: any) {
       return new Promise(async (resolve) => {
         window.api.send("updateKeybind", data);
-
         window.api.send("fetchKeybinds");
-
         window.api.receive("resolveKeybinds", (data) => {
           commit("UPDATE_KEYBINDS", data);
           resolve(data);

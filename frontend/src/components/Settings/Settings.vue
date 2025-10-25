@@ -14,6 +14,18 @@
         ></v-text-field>
       </div>
 
+      <v-row class="mx-2">
+        <v-col cols="12" md="6">
+          <v-switch
+            hide-details
+            inset
+            :model-value="alwaysOnTop"
+            @update:model-value="toggleAlwaysOnTop"
+            label="Always on top"
+          />
+        </v-col>
+      </v-row>
+
       <v-card-actions>
         <v-spacer></v-spacer>
         <v-btn @click="saveAPIKey" variant="outlined" color="green">
@@ -118,6 +130,9 @@ export default {
       savedAPIKey: "settings/apiKey",
       keyBinds: "settings/keyBinds",
     }),
+    alwaysOnTop() {
+      return this.$store.getters["settings/alwaysOnTop"];
+    },
   },
   methods: {
     mod(n: number, m: number) {
@@ -168,6 +183,10 @@ export default {
       document.removeEventListener("keydown", this.onKeyDown);
       document.removeEventListener("keyup", this.onKeyUp);
     },
+    toggleAlwaysOnTop(val: boolean) {
+      this.$store.dispatch("settings/saveAlwaysOnTop", val);
+    },
+
     async saveAPIKey() {
       const url = `https://api.simple-mmo.com/v1/player/me`;
       const res = await axios

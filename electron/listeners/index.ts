@@ -16,6 +16,8 @@ import fetchVersion from "./fetch/fetchVersion";
 import runVersionUpdate from "./misc/runVersionUpdate";
 import installMigration from "./misc/installMigration";
 import ignoreKeybinds from "./misc/ignoreKeybinds";
+import fetchSessionStats from "./fetch/fetchSessionStats";
+import setAlwaysOnTop from "./misc/setAlwaysOnTop";
 
 export default {
   fetchUserdata,
@@ -36,4 +38,6 @@ export default {
   runVersionUpdate,
   installMigration,
   ignoreKeybinds,
+  fetchSessionStats,
+  setAlwaysOnTop,
 };

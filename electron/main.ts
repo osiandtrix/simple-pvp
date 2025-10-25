@@ -64,6 +64,17 @@ async function createWindow() {
   mainWindow = new BrowserWindow(BrowserWindowOptions);
   global.mainWindow = mainWindow;
 
+  // Apply saved Always-on-top preference to main window at startup
+  try {
+    const row = (global as any).db
+      .prepare("SELECT alwaysOnTop FROM settings LIMIT 1")
+      .get();
+    const flag = row ? !!(+row.alwaysOnTop) : false;
+    mainWindow.setAlwaysOnTop(flag, flag ? ("screen-saver" as any) : ("normal" as any));
+  } catch (e) {
+    // Ignore if column doesn't exist yet or DB not ready; renderer will apply later
+  }
+
   // auto updated
   if (!isDev) AppUpdater();
 
@@ -82,10 +93,6 @@ async function createWindow() {
     mainWindow.maximize();
   else mainWindow.show();
 
-  // this will turn off always on top after opening the application
-  setTimeout(() => {
-    mainWindow.setAlwaysOnTop(false);
-  }, 1000);
 
   // Open the DevTools.
   // if (isDev) mainWindow.webContents.openDevTools();

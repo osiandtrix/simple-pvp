@@ -9,6 +9,16 @@ const updateSettings = (event: any, data: any) => {
     }
   }
 
+  // Ensure alwaysOnTop column exists (migration safety)
+  try {
+    global.db.prepare(`SELECT alwaysOnTop FROM settings LIMIT 1`).get();
+  } catch (error: any) {
+    if (error.message.includes("no such column: alwaysOnTop")) {
+      console.log("Adding missing alwaysOnTop column to settings table");
+      global.db.prepare(`ALTER TABLE settings ADD COLUMN alwaysOnTop INT DEFAULT 0`).run();
+    }
+  }
+
   const keys = Object.keys(data);
   const values = Object.values(data).map((e: any) =>
     typeof e === "string" ? `'${e}'` : e
