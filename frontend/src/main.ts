@@ -11,18 +11,20 @@ import AppLogo from "./components/misc/AppLogo.vue";
 loadFonts();
 
 // Initialize core store modules before mounting so saved settings (like API key) are ready
-init(store);
+// Wait for settings to load before mounting the app
+init(store).then(() => {
+  createApp(App)
+    .use(store)
+    .use(ToastPlugin)
+    .use(vuetify)
+    .component('AppLogo', AppLogo)
+    .mount("#app");
+});
 
-createApp(App)
-  .use(store)
-  .use(ToastPlugin)
-  .use(vuetify)
-  .component('AppLogo', AppLogo)
-  .mount("#app");
-
-function init(store: Store<unknown>) {
+async function init(store: Store<unknown>) {
   store.dispatch("user/init");
-  store.dispatch("settings/init");
+  // Wait for settings to load (especially API key) before mounting
+  await store.dispatch("settings/init");
   store.dispatch("wars/init");
   store.dispatch("process/init");
   store.dispatch("stats/init");

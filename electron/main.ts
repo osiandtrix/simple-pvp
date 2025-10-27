@@ -16,7 +16,7 @@ import unregisterKeybinds from "./listeners/misc/unregisterKeybinds";
 import cronjobs from "./cronjobs";
 import { CronJob } from "cron";
 import Logger from "./ext/Logger";
-import "./database/functions/init";
+import initDatabase from "./database/functions/init";
 
 // Register all listeners
 for (const [event, callback] of Object.entries(listeners)) {
@@ -124,6 +124,9 @@ async function createWindow() {
 }
 
 app.whenReady().then(async () => {
+  // Initialize database first, now that app.getPath("userData") is available
+  initDatabase();
+
   if (isDev) {
     try {
       const { installExt } = await import("./setup/installDevTools");

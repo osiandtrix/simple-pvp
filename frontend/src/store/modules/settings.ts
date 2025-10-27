@@ -71,30 +71,35 @@ export default {
   },
   actions: {
     init({ commit, dispatch }: any) {
-      // Ensure preload API is available; retry if not yet injected
-      if (!window.api) {
-        setTimeout(() => {
-          dispatch("init");
-        }, 100);
-        return;
-      }
+      // Return a Promise so the app can wait for settings to load before mounting
+      return new Promise<void>((resolve) => {
+        // Ensure preload API is available; retry if not yet injected
+        if (!window.api) {
+          setTimeout(() => {
+            dispatch("init").then(resolve);
+          }, 100);
+          return;
+        }
 
-      // First, run any pending database migrations
-      window.api.send("runVersionUpdate");
-      window.api.receive("resolveVersionUpdate", () => {
-        // After migrations are complete, fetch version and settings
-        window.api.send("fetchVersion");
-        window.api.receive("resolveVersion", (data) => {
-          commit("SET_VERSION", data);
-        });
+        // First, run any pending database migrations
+        window.api.send("runVersionUpdate");
+        window.api.receive("resolveVersionUpdate", () => {
+          // After migrations are complete, fetch version and settings
+          window.api.send("fetchVersion");
+          window.api.receive("resolveVersion", (data) => {
+            commit("SET_VERSION", data);
+          });
 
-        window.api.send("fetchUsersettings");
-        window.api.receive("resolveUsersettings", (data) => {
-          commit("UPDATE_USERSETTINGS", data);
-          // Apply window on-top state at startup
-          try {
-            window.api.send("setAlwaysOnTop", !!(data?.alwaysOnTop));
-          } catch {}
+          window.api.send("fetchUsersettings");
+          window.api.receive("resolveUsersettings", (data) => {
+            commit("UPDATE_USERSETTINGS", data);
+            // Apply window on-top state at startup
+            try {
+              window.api.send("setAlwaysOnTop", !!(data?.alwaysOnTop));
+            } catch {}
+            // Resolve the promise now that settings are loaded
+            resolve();
+          });
         });
       });
     },
