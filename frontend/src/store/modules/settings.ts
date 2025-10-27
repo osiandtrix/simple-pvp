@@ -23,6 +23,7 @@ export default {
     keyBinds: [],
     version_max: null,
     version_current: null,
+    settingsLoaded: false,
   },
   getters: {
     maxLevel: (state: State) => state.maxLevel,
@@ -32,6 +33,7 @@ export default {
     version_max: (state: State) => state.version_max,
     version_current: (state: State) => state.version_current,
     alwaysOnTop: (state: State) => state.alwaysOnTop,
+    settingsLoaded: (state: State) => (state as any).settingsLoaded === true,
   },
   mutations: {
     UPDATE_USERSETTINGS(
@@ -40,8 +42,11 @@ export default {
     ) {
       if (maxLevel) state.maxLevel = +maxLevel;
       if (minLevel !== undefined) state.minLevel = +minLevel;
-      if (api_key) state.apiKey = api_key;
+      if (api_key !== undefined) state.apiKey = api_key;
       if (alwaysOnTop !== undefined) state.alwaysOnTop = !!(+alwaysOnTop as any);
+    },
+    SET_SETTINGS_LOADED(state: State, value: boolean) {
+      (state as any).settingsLoaded = !!value;
     },
     UPDATE_ALWAYS_ON_TOP(state: State, enabled: boolean) {
       state.alwaysOnTop = !!enabled;
@@ -72,35 +77,49 @@ export default {
   actions: {
     init({ commit, dispatch }: any) {
       // Return a Promise so the app can wait for settings to load before mounting
-      return new Promise<void>((resolve) => {
+      return new Promise<void>((resolve, reject) => {
         // Ensure preload API is available; retry if not yet injected
         if (!window.api) {
           setTimeout(() => {
-            dispatch("init").then(resolve);
+            dispatch("init").then(resolve).catch(reject);
           }, 100);
           return;
         }
 
-        // First, run any pending database migrations
-        window.api.send("runVersionUpdate");
-        window.api.receive("resolveVersionUpdate", () => {
-          // After migrations are complete, fetch version and settings
-          window.api.send("fetchVersion");
-          window.api.receive("resolveVersion", (data) => {
-            commit("SET_VERSION", data);
-          });
+        // Fallback timer: mark as loaded in case IPC never responds
+        const fallback = setTimeout(() => {
+          commit("SET_SETTINGS_LOADED", true);
+          resolve();
+        }, 4000);
 
-          window.api.send("fetchUsersettings");
-          window.api.receive("resolveUsersettings", (data) => {
-            commit("UPDATE_USERSETTINGS", data);
-            // Apply window on-top state at startup
-            try {
-              window.api.send("setAlwaysOnTop", !!(data?.alwaysOnTop));
-            } catch {}
-            // Resolve the promise now that settings are loaded
-            resolve();
+        try {
+          // First, run any pending database migrations
+          window.api.send("runVersionUpdate");
+          window.api.receive("resolveVersionUpdate", () => {
+            // After migrations are complete, fetch version and settings
+            window.api.send("fetchVersion");
+            window.api.receive("resolveVersion", (data) => {
+              commit("SET_VERSION", data);
+            });
+
+            window.api.send("fetchUsersettings");
+            window.api.receive("resolveUsersettings", (data) => {
+              commit("UPDATE_USERSETTINGS", data);
+              // Apply window on-top state at startup
+              try {
+                window.api.send("setAlwaysOnTop", !!(data?.alwaysOnTop));
+              } catch {}
+              clearTimeout(fallback);
+              commit("SET_SETTINGS_LOADED", true);
+              resolve();
+            });
           });
-        });
+        } catch (error) {
+          console.error("Error initializing settings:", error);
+          clearTimeout(fallback);
+          commit("SET_SETTINGS_LOADED", true);
+          reject(error);
+        }
       });
     },
     saveAPIKey({ commit }: any, data: { api_key: string }) {

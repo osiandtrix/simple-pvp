@@ -26,8 +26,14 @@
       </v-navigation-drawer>
 
       <v-main>
+        <!-- Loader while settings load -->
+        <div v-if="!settingsLoaded" class="d-flex align-center justify-center" style="height: calc(100vh - 64px);">
+          <v-progress-circular indeterminate color="primary" size="48" />
+        </div>
+
+        <!-- Show API key setup only after we know settings are loaded -->
         <ApiKeySetup
-          v-if="!hasApiKey"
+          v-else-if="!hasApiKey"
           @apiKeyConfigured="onApiKeyConfigured"
         />
         <component
@@ -66,6 +72,7 @@ export default {
   computed: {
     ...mapGetters({
       apiKey: "settings/apiKey",
+      settingsLoaded: "settings/settingsLoaded",
     }),
     hasApiKey() {
       return this.apiKey && this.apiKey.length > 0;

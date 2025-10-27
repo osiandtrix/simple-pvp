@@ -10,20 +10,22 @@ import AppLogo from "./components/misc/AppLogo.vue";
 
 loadFonts();
 
-// Initialize core store modules before mounting so saved settings (like API key) are ready
-// Wait for settings to load before mounting the app
-init(store).then(() => {
-  createApp(App)
-    .use(store)
-    .use(ToastPlugin)
-    .use(vuetify)
-    .component('AppLogo', AppLogo)
-    .mount("#app");
+// Mount immediately; show loader until settings are ready
+createApp(App)
+  .use(store)
+  .use(ToastPlugin)
+  .use(vuetify)
+  .component('AppLogo', AppLogo)
+  .mount("#app");
+
+// Initialize stores in the background
+init(store).catch((error) => {
+  console.error("Failed to initialize app:", error);
 });
 
 async function init(store: Store<unknown>) {
   store.dispatch("user/init");
-  // Wait for settings to load (especially API key) before mounting
+  // Load settings (renderer will show loader until this resolves or fallback fires)
   await store.dispatch("settings/init");
   store.dispatch("wars/init");
   store.dispatch("process/init");

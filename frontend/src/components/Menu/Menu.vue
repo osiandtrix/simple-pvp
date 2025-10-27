@@ -8,7 +8,7 @@
     >
       <!-- Navigation Icon -->
       <v-app-bar-nav-icon
-        v-if="hasApiKey"
+        v-if="settingsLoaded && hasApiKey"
         @click="() => (drawerOpen = !drawerOpen)"
         class="modern-nav-icon"
       >
@@ -26,7 +26,7 @@
       <v-spacer></v-spacer>
 
       <!-- Status Indicator (when API key is set) -->
-      <div v-if="hasApiKey" class="d-flex align-center mr-4">
+      <div v-if="settingsLoaded && hasApiKey" class="d-flex align-center mr-4">
         <v-chip
           size="small"
           color="success"
@@ -39,7 +39,7 @@
       </div>
 
       <!-- Action Menu -->
-      <v-menu v-if="hasApiKey" offset-y>
+      <v-menu v-if="settingsLoaded && hasApiKey" offset-y>
         <template v-slot:activator="{ props }">
           <v-btn
             v-bind="props"
@@ -102,6 +102,7 @@ export default {
   computed: {
     ...mapGetters({
       apiKey: "settings/apiKey",
+      settingsLoaded: "settings/settingsLoaded",
     }),
     hasApiKey() {
       return this.apiKey && this.apiKey.length > 0;
