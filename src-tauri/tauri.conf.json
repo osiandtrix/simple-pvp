@@ -2,7 +2,7 @@
   "$schema": "https://raw.githubusercontent.com/nicerapp/tauri/refs/heads/dev/crates/tauri-cli/schema.json",
   "productName": "Simple Companion PvP",
   "version": "1.1.0",
-  "identifier": "com.simple-companion-pvp.app",
+  "identifier": "com.simple-companion-pvp",
   "build": {
     "frontendDist": "../dist",
     "devUrl": "http://localhost:3000",
