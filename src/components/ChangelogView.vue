@@ -15,6 +15,17 @@ interface ChangelogEntry {
 
 const changelog: ChangelogEntry[] = [
   {
+    version: "1.2.0",
+    date: "2026-02-08",
+    changes: [
+      { type: "changed", text: "Persistent HTTP client for faster API calls via connection reuse" },
+      { type: "changed", text: "Parallel guild fetching — up to 3 guilds loaded concurrently" },
+      { type: "fixed", text: "Duplicate targets from guild batch wrapping causing doubled combat logs" },
+      { type: "fixed", text: "Global shortcut events now target main window only instead of all webviews" },
+      { type: "removed", text: "Removed mark hit/not-hit keybinds and related code" },
+    ],
+  },
+  {
     version: "1.1.0",
     date: "2026-02-08",
     changes: [
@@ -28,7 +39,6 @@ const changelog: ChangelogEntry[] = [
       { type: "fixed", text: "Duplicate combat log entries caused by concurrent keypress handling" },
       { type: "fixed", text: "Global shortcut handler accumulation causing repeated events" },
       { type: "removed", text: "Removed always-on-top window feature" },
-      { type: "removed", text: "Removed mark hit/not-hit keybinds" },
     ],
   },
   {
