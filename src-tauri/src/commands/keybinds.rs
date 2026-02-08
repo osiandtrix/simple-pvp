@@ -4,9 +4,6 @@ use crate::db::models::Keybind;
 const DEFAULT_KEYBINDS: &[(&str, &str)] = &[
     ("Space", "Next Target"),
     ("Control+Space", "Previous Target"),
-    ("f", "Open Food Inventory"),
-    ("h", "Open Healer"),
-    ("r", "Open Energy Refills"),
 ];
 
 #[tauri::command]

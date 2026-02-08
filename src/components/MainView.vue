@@ -41,9 +41,6 @@ onMounted(async () => {
   unlisteners.push(
     await listen("Space", handleSpaceBar),
     await listen("Control+Space", handleCtrlSpace),
-    await listen("f", () => navigateCombat("https://web.simple-mmo.com/inventory/items?itemname=&minlevel=&maxlevel=&type%5B%5D=Food")),
-    await listen("h", () => navigateCombat("https://web.simple-mmo.com/healer")),
-    await listen("r", () => navigateCombat("https://web.simple-mmo.com/diamondstore/rewards/energy-points")),
   );
 
   const interval = setInterval(() => process.checkApiReset(), 100);
@@ -171,20 +168,19 @@ async function fetchTargets() {
 async function openCombatWindow(userId: number) {
   const url = `https://web.simple-mmo.com/user/attack/${userId}`;
 
-  // If window already exists, navigate via Rust eval
+  // If window already exists, navigate
   if (combatWindow) {
     await invoke("navigate_combat", { url });
     return;
   }
 
-  // Create new combat window via JS API (per Tauri v2 docs)
+  // Create combat window from JS
   combatWindow = new WebviewWindow("combat", {
     url,
     title: "Combat",
     width: 500,
-    height: 750,
-    minWidth: 500,
-    minHeight: 750,
+    height: 700,
+    center: true,
   });
 
   combatWindow.once("tauri://error", (e) => {
@@ -198,10 +194,11 @@ async function openCombatWindow(userId: number) {
       exitCombat();
     }
   });
+
 }
 
 async function navigateCombat(url: string) {
-  if (!process.inCombat || !combatWindow) return;
+  if (!combatWindow) return;
   await invoke("navigate_combat", { url });
 }
 
@@ -359,6 +356,33 @@ async function exitCombat() {
     </Card>
 
     <EventLog v-if="process.inCombat" class="animate-slide-up" />
+
+    <div v-if="process.inCombat" class="flex gap-1.5 animate-slide-up">
+      <Button
+        variant="outline"
+        size="sm"
+        class="h-7 flex-1 text-xs border-border/60 text-muted-foreground hover:text-foreground hover:bg-secondary transition-all"
+        @click="navigateCombat('https://web.simple-mmo.com/inventory/items?itemname=&minlevel=&maxlevel=&type%5B%5D=Food')"
+      >
+        Food
+      </Button>
+      <Button
+        variant="outline"
+        size="sm"
+        class="h-7 flex-1 text-xs border-border/60 text-muted-foreground hover:text-foreground hover:bg-secondary transition-all"
+        @click="navigateCombat('https://web.simple-mmo.com/healer')"
+      >
+        Healer
+      </Button>
+      <Button
+        variant="outline"
+        size="sm"
+        class="h-7 flex-1 text-xs border-border/60 text-muted-foreground hover:text-foreground hover:bg-secondary transition-all"
+        @click="navigateCombat('https://web.simple-mmo.com/diamondstore/rewards/energy-points')"
+      >
+        Energy
+      </Button>
+    </div>
     <WarlistTable v-else class="animate-in" @target-guild="enterCombatForGuild" />
   </div>
 </template>
