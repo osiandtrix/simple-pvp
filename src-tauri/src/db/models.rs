@@ -12,6 +12,7 @@ pub struct Settings {
     pub max_level: Option<i64>,
     pub api_key: Option<String>,
     pub always_on_top: bool,
+    pub keybinds_enabled: bool,
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
@@ -29,6 +30,7 @@ pub struct Keybind {
     pub original_key: String,
     pub new_key: String,
     pub description: String,
+    pub locked: bool,
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone)]

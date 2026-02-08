@@ -82,6 +82,7 @@ function cancelRemap() {
         >
           <span class="text-xs text-foreground/80">{{ kb.description }}</span>
           <Button
+            v-if="!kb.locked"
             variant="outline"
             size="sm"
             class="h-6 border-border/60 text-xs hover:bg-secondary hover:border-border transition-all"
@@ -90,6 +91,9 @@ function cancelRemap() {
           >
             <KeyboardKey :keys="kb.new_key" />
           </Button>
+          <span v-else class="flex items-center gap-1.5 text-[11px] text-muted-foreground/60">
+            <KeyboardKey :keys="kb.new_key" />
+          </span>
         </div>
       </div>
     </CardContent>

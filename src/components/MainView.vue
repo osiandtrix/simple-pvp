@@ -48,7 +48,6 @@ onMounted(async () => {
 
   unlisteners.push(
     await listen("Space", handleSpaceBar),
-    await listen("Control+Space", handleCtrlSpace),
   );
 
   const interval = setInterval(() => process.checkApiReset(), 100);
@@ -338,12 +337,6 @@ async function handleSpaceBar() {
   if (!keybindsActive.value) return;
   if (await isOnBlockedPage()) return;
   await advanceTarget();
-}
-
-async function handleCtrlSpace() {
-  if (!keybindsActive.value) return;
-  if (await isOnBlockedPage()) return;
-  goBackTarget();
 }
 
 function sleep(ms: number) {

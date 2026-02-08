@@ -1,9 +1,9 @@
 use crate::db;
 use crate::db::models::Keybind;
 
-const DEFAULT_KEYBINDS: &[(&str, &str)] = &[
-    ("Space", "Next Target"),
-    ("Control+Space", "Previous Target"),
+// (key, description, locked)
+const DEFAULT_KEYBINDS: &[(&str, &str, bool)] = &[
+    ("Space", "Next Target", true),
 ];
 
 #[tauri::command]
@@ -18,15 +18,20 @@ pub fn fetch_keybinds() -> Result<Vec<Keybind>, String> {
 
         let keybinds: Vec<Keybind> = DEFAULT_KEYBINDS
             .iter()
-            .map(|(key, desc)| {
-                let new_key = remaps
-                    .get(*key)
-                    .cloned()
-                    .unwrap_or_else(|| key.to_string());
+            .map(|(key, desc, locked)| {
+                let new_key = if *locked {
+                    key.to_string()
+                } else {
+                    remaps
+                        .get(*key)
+                        .cloned()
+                        .unwrap_or_else(|| key.to_string())
+                };
                 Keybind {
                     original_key: key.to_string(),
                     new_key,
                     description: desc.to_string(),
+                    locked: *locked,
                 }
             })
             .collect();

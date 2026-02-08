@@ -49,6 +49,14 @@ pub fn run_all(conn: &Connection) -> Result<(), rusqlite::Error> {
         );"
     )?;
 
+    // Migration: add keybinds_enabled column if missing
+    let has_keybinds_enabled: bool = conn
+        .prepare("SELECT keybinds_enabled FROM settings LIMIT 1")
+        .is_ok();
+    if !has_keybinds_enabled {
+        conn.execute_batch("ALTER TABLE settings ADD COLUMN keybinds_enabled INTEGER DEFAULT 1")?;
+    }
+
     // Migration: add min_level column if missing
     let has_min_level: bool = conn
         .prepare("SELECT min_level FROM settings LIMIT 1")

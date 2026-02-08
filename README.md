@@ -13,6 +13,8 @@ A lightweight desktop companion app for [SimpleMMO](https://web.simple-mmo.com) 
 - Opens an attack window and lets you move through targets with a single keypress
 - Filters targets by level so you only fight who you want
 - Tracks your attacks in a live combat log
+- Block guilds from the war list so they're skipped during combat
+- Floating overlay with Back/Next buttons when keybinds are off
 - Handles API rate limits in the background so you don't have to worry about them
 
 ## Getting Started
@@ -58,12 +60,15 @@ If you want to focus on one guild:
 
 ### Keyboard Shortcuts
 
-| Key               | Action          |
-| ----------------- | --------------- |
-| **Space**         | Next target     |
-| **Ctrl + Space**  | Previous target |
+| Key       | Action      |
+| --------- | ----------- |
+| **Space** | Next target |
 
-You can remap these in **Settings** under Keybinds. Click any key button and press your preferred key.
+This keybind is locked and cannot be remapped.
+
+You can toggle keybinds on/off during combat by clicking the keybind indicator. When keybinds are off, a floating overlay with Back/Next buttons appears over the combat window.
+
+To set whether keybinds start on or off when entering combat, go to **Settings** > **Combat Preferences**.
 
 ## During Combat
 
@@ -80,6 +85,8 @@ The app handles rate limits automatically. If you hit the limit, it waits for th
 - **Sort the war list** by clicking column headers (guild name, your kills, their kills) to prioritize which guilds to attack
 - **Shuffle** the war list to randomize your attack order
 - **Update** the war list to refresh kill counts and pick up new wars
+- **Block guilds** you don't want to fight by clicking the ban icon in the war list — unblock them from the **Blocked** page
+- Use the **Food**, **Healer**, and **Energy** quick-nav buttons during combat to access those pages without leaving the combat window
 - Keep an eye on the API counter during long sessions
 
 ## Building From Source

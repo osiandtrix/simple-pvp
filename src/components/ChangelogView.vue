@@ -15,6 +15,14 @@ interface ChangelogEntry {
 
 const changelog: ChangelogEntry[] = [
   {
+    version: "1.3.2",
+    date: "2026-02-08",
+    changes: [
+      { type: "removed", text: "Previous Target keybind removed - use the floating overlay Back button instead" },
+      { type: "changed", text: "Next Target keybind (Space) is now locked and cannot be remapped" },
+    ],
+  },
+  {
     version: "1.3.1",
     date: "2026-02-08",
     changes: [
