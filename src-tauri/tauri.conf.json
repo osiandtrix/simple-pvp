@@ -1,0 +1,32 @@
+{
+  "$schema": "https://raw.githubusercontent.com/nicerapp/tauri/refs/heads/dev/crates/tauri-cli/schema.json",
+  "productName": "Simple Companion PvP",
+  "version": "1.0.0",
+  "identifier": "com.simple-companion-pvp.app",
+  "build": {
+    "frontendDist": "../dist",
+    "devUrl": "http://localhost:3000",
+    "beforeDevCommand": "npm run dev",
+    "beforeBuildCommand": "npm run build"
+  },
+  "app": {
+    "windows": [
+      {
+        "title": "Simple Companion PvP",
+        "width": 500,
+        "height": 750,
+        "minWidth": 500,
+        "minHeight": 200,
+        "resizable": true
+      }
+    ],
+    "security": {
+      "csp": "default-src 'self'; connect-src 'self' https://api.simple-mmo.com; style-src 'self' 'unsafe-inline'"
+    }
+  },
+  "plugins": {
+    "global-shortcut": {
+      "enabled": true
+    }
+  }
+}

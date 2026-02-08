@@ -1,4 +1,0 @@
-{
-    "watch": ["Electron/*"],
-    "ext": "js,css,ts,json"
-}
