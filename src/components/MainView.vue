@@ -199,7 +199,7 @@ async function handleSpaceBar() {
   try {
     const target = wars.currentTarget;
 
-    await openCombatWindow(target.user_id);
+    // Log the attack on the currently displayed target
     await invoke("update_target_hit", { userId: target.user_id, hit: 1 });
     events.push({
       userId: target.user_id,
@@ -216,6 +216,11 @@ async function handleSpaceBar() {
     }
 
     wars.nextTarget();
+
+    // Navigate to the NEXT target so the user always sees a fresh target
+    if (wars.currentTarget) {
+      await openCombatWindow(wars.currentTarget.user_id);
+    }
 
     if (!singleGuildMode.value && wars.targets.length - wars.targetIndex < 5) {
       fetchTargets();

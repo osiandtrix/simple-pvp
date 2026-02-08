@@ -15,13 +15,20 @@ interface ChangelogEntry {
 
 const changelog: ChangelogEntry[] = [
   {
+    version: "1.2.1",
+    date: "2026-02-08",
+    changes: [
+      { type: "fixed", text: "Double combat log entries on Windows without admin due to global shortcut double-fire" },
+      { type: "fixed", text: "Duplicate targets in queue — targets are now deduplicated by user ID" },
+    ],
+  },
+  {
     version: "1.2.0",
     date: "2026-02-08",
     changes: [
       { type: "changed", text: "Persistent HTTP client for faster API calls via connection reuse" },
       { type: "changed", text: "Parallel guild fetching — up to 3 guilds loaded concurrently" },
       { type: "fixed", text: "Duplicate targets from guild batch wrapping causing doubled combat logs" },
-      { type: "fixed", text: "Global shortcut events now target main window only instead of all webviews" },
       { type: "removed", text: "Removed mark hit/not-hit keybinds and related code" },
     ],
   },
