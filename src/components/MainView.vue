@@ -29,6 +29,7 @@ const maxLevel = ref(settings.maxLevel ?? 0);
 const initiatingCombat = ref(false);
 const singleGuildMode = ref(false);
 let combatWindow: WebviewWindow | null = null;
+let attackInProgress = false;
 
 const unlisteners: UnlistenFn[] = [];
 
@@ -184,29 +185,35 @@ async function openCombatWindow(userId: number) {
 }
 
 async function handleSpaceBar() {
-  if (!process.inCombat || !wars.currentTarget) return;
-  const target = wars.currentTarget;
+  if (!process.inCombat || !wars.currentTarget || attackInProgress) return;
+  attackInProgress = true;
 
-  await openCombatWindow(target.user_id);
-  await invoke("update_target_hit", { userId: target.user_id, hit: 1 });
-  events.push({
-    userId: target.user_id,
-    userName: target.name,
-    type: "attack",
-  });
+  try {
+    const target = wars.currentTarget;
 
-  const isLastTarget = wars.targetIndex >= wars.targets.length - 1;
+    await openCombatWindow(target.user_id);
+    await invoke("update_target_hit", { userId: target.user_id, hit: 1 });
+    events.push({
+      userId: target.user_id,
+      userName: target.name,
+      type: "attack",
+    });
 
-  if (singleGuildMode.value && isLastTarget) {
-    toast.success("All targets done for this guild");
-    exitCombat();
-    return;
-  }
+    const isLastTarget = wars.targetIndex >= wars.targets.length - 1;
 
-  wars.nextTarget();
+    if (singleGuildMode.value && isLastTarget) {
+      toast.success("All targets done for this guild");
+      exitCombat();
+      return;
+    }
 
-  if (wars.targets.length - wars.targetIndex < 5) {
-    fetchTargets();
+    wars.nextTarget();
+
+    if (!singleGuildMode.value && wars.targets.length - wars.targetIndex < 5) {
+      fetchTargets();
+    }
+  } finally {
+    attackInProgress = false;
   }
 }
 
