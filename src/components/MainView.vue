@@ -61,11 +61,11 @@ watch(() => settings.maxLevel, (val) => {
   maxLevel.value = val ?? 0;
 });
 
-async function isOnLoginPage(): Promise<boolean> {
+async function isOnBlockedPage(): Promise<boolean> {
   if (!combatWindow) return false;
   try {
     const url = await invoke<string>("get_combat_url");
-    return url.includes("/login");
+    return url.includes("/login") || url.includes("/chat/private");
   } catch {
     return false;
   }
@@ -250,7 +250,7 @@ async function navigateCombat(url: string) {
 async function handleSpaceBar() {
   const now = Date.now();
   if (!process.inCombat || !keybindsActive.value || !wars.currentTarget || attackInProgress || now - lastAttackTime < 150) return;
-  if (await isOnLoginPage()) return;
+  if (await isOnBlockedPage()) return;
   attackInProgress = true;
   lastAttackTime = now;
 
@@ -300,7 +300,7 @@ async function handleSpaceBar() {
 
 async function handleCtrlSpace() {
   if (!process.inCombat || !keybindsActive.value) return;
-  if (await isOnLoginPage()) return;
+  if (await isOnBlockedPage()) return;
   wars.previousTarget();
 }
 

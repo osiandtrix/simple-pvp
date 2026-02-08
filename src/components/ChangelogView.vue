@@ -21,7 +21,7 @@ const changelog: ChangelogEntry[] = [
       { type: "added", text: "Guild blocklist - block guilds from the war list so they are skipped during combat" },
       { type: "added", text: "Blocked Guilds page to view and unblock guilds" },
       { type: "added", text: "Clickable keybinds indicator to toggle keybinds on/off during combat" },
-      { type: "fixed", text: "Keybinds no longer fire on SimpleMMO login pages" },
+      { type: "fixed", text: "Keybinds no longer fire on SimpleMMO login and direct message pages" },
     ],
   },
   {
