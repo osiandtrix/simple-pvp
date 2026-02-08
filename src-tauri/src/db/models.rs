@@ -8,6 +8,7 @@ pub struct UserData {
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct Settings {
+    pub min_level: i64,
     pub max_level: Option<i64>,
     pub api_key: Option<String>,
     pub always_on_top: bool,

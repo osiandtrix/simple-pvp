@@ -27,9 +27,6 @@ pub fn run() {
                 }
             }
 
-            // Register global shortcuts
-            hotkeys::register_all(&app_handle).ok();
-
             // Start background scheduler
             let handle = app_handle.clone();
             tauri::async_runtime::spawn(async move {
@@ -46,6 +43,7 @@ pub fn run() {
             commands::wars::fetch_war_entries,
             commands::wars::update_warlist,
             commands::wars::fetch_targets,
+            commands::combat::navigate_combat,
             commands::combat::update_target_hit,
             commands::combat::fetch_target_logs,
             commands::keybinds::fetch_keybinds,

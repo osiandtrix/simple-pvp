@@ -42,6 +42,7 @@ pub fn update_warlist(wars: Vec<War>) -> Result<(), String> {
 pub async fn fetch_targets(
     guild_id: i64,
     api_key: String,
+    min_level: Option<i64>,
     max_level: Option<i64>,
 ) -> Result<Vec<crate::db::models::Target>, String> {
     // Fetch guild members from API
@@ -81,6 +82,7 @@ pub async fn fetch_targets(
                 && (m.level > 200 || m.last_activity.map_or(false, |la| (now - la) < 600))
                 && m.max_hp > 0
                 && (m.current_hp as f64 / m.max_hp as f64) >= 0.5
+                && min_level.map_or(true, |ml| m.level >= ml)
                 && max_level.map_or(true, |ml| m.level <= ml)
                 && log_map.get(&m.user_id).map_or(true, |hits| *hits < 3)
         })

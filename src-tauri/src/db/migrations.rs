@@ -45,9 +45,17 @@ pub fn run_all(conn: &Connection) -> Result<(), rusqlite::Error> {
         );"
     )?;
 
+    // Migration: add min_level column if missing
+    let has_min_level: bool = conn
+        .prepare("SELECT min_level FROM settings LIMIT 1")
+        .is_ok();
+    if !has_min_level {
+        conn.execute_batch("ALTER TABLE settings ADD COLUMN min_level INTEGER DEFAULT 0")?;
+    }
+
     // Insert default settings row if not exists
     conn.execute(
-        "INSERT OR IGNORE INTO settings (id, max_level, api_key, always_on_top) VALUES (1, NULL, NULL, 0)",
+        "INSERT OR IGNORE INTO settings (id, max_level, api_key, always_on_top, min_level) VALUES (1, NULL, NULL, 0, 0)",
         [],
     )?;
 

@@ -2,6 +2,7 @@ import { defineStore } from "pinia";
 import { invoke } from "@tauri-apps/api/core";
 
 interface Settings {
+  min_level: number;
   max_level: number | null;
   api_key: string | null;
   always_on_top: boolean;
@@ -15,6 +16,7 @@ interface Keybind {
 
 export const useSettingsStore = defineStore("settings", {
   state: () => ({
+    minLevel: 0 as number,
     maxLevel: null as number | null,
     apiKey: null as string | null,
     alwaysOnTop: false,
@@ -28,6 +30,7 @@ export const useSettingsStore = defineStore("settings", {
         invoke<Settings>("fetch_settings"),
         invoke<string>("fetch_version"),
       ]);
+      this.minLevel = settings.min_level;
       this.maxLevel = settings.max_level;
       this.apiKey = settings.api_key;
       this.alwaysOnTop = settings.always_on_top;
@@ -35,12 +38,17 @@ export const useSettingsStore = defineStore("settings", {
     },
 
     async saveApiKey(apiKey: string) {
-      await invoke("update_settings", { maxLevel: null, apiKey });
+      await invoke("update_settings", { minLevel: null, maxLevel: null, apiKey });
       this.apiKey = apiKey;
     },
 
+    async saveMinLevel(minLevel: number) {
+      await invoke("update_settings", { minLevel, maxLevel: null, apiKey: null });
+      this.minLevel = minLevel;
+    },
+
     async saveMaxLevel(maxLevel: number) {
-      await invoke("update_settings", { maxLevel, apiKey: null });
+      await invoke("update_settings", { minLevel: null, maxLevel, apiKey: null });
       this.maxLevel = maxLevel;
     },
 

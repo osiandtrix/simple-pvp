@@ -1,4 +1,16 @@
 use crate::db;
+use tauri::{AppHandle, Manager};
+
+#[tauri::command]
+pub fn navigate_combat(app: AppHandle, url: String) -> Result<(), String> {
+    if let Some(window) = app.get_webview_window("combat") {
+        window
+            .eval(&format!("window.location.href = '{}';", url.replace('\'', "\\'")))
+            .map_err(|e| e.to_string())?;
+        window.set_focus().map_err(|e| e.to_string())?;
+    }
+    Ok(())
+}
 
 #[tauri::command]
 pub fn update_target_hit(user_id: i64, hit: i64) -> Result<(), String> {

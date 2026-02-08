@@ -56,10 +56,11 @@ export const useWarsStore = defineStore("wars", {
       }
     },
 
-    async fetchTargets(guildId: number, apiKey: string, maxLevel: number | null) {
+    async fetchTargets(guildId: number, apiKey: string, minLevel: number | null, maxLevel: number | null) {
       const newTargets = await invoke<Target[]>("fetch_targets", {
         guildId,
         apiKey,
+        minLevel,
         maxLevel,
       });
       this.targets.push(...newTargets);

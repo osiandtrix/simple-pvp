@@ -28,7 +28,7 @@ const changelog: ChangelogEntry[] = [
       { type: "changed", text: "Replaced Vuetify with shadcn-vue + Tailwind CSS" },
       { type: "changed", text: "Replaced Vuex with Pinia for state management" },
       { type: "changed", text: "API calls moved to Rust backend with proper rate limiting" },
-      { type: "removed", text: "Removed separate combat browser window (now in-app)" },
+      { type: "changed", text: "Combat browser window now uses Tauri webview" },
       { type: "removed", text: "Removed Electron and all legacy code" },
     ],
   },

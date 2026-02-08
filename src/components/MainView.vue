@@ -2,6 +2,7 @@
 import { ref, watch, onMounted, onUnmounted } from "vue";
 import { invoke } from "@tauri-apps/api/core";
 import { listen, type UnlistenFn } from "@tauri-apps/api/event";
+import { WebviewWindow } from "@tauri-apps/api/webviewWindow";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -24,13 +25,16 @@ const wars = useWarsStore();
 const process = useProcessStore();
 const events = useEventsStore();
 
+const minLevel = ref(settings.minLevel ?? 0);
 const maxLevel = ref(settings.maxLevel ?? 0);
-const keybindsActive = ref(true);
+const keybindsActive = ref(false);
 const initiatingCombat = ref(false);
+let combatWindow: WebviewWindow | null = null;
 
 const unlisteners: UnlistenFn[] = [];
 
 onMounted(async () => {
+  minLevel.value = settings.minLevel ?? 0;
   maxLevel.value = settings.maxLevel ?? 0;
 
   unlisteners.push(
@@ -50,13 +54,26 @@ onUnmounted(() => {
   unlisteners.forEach((fn) => fn());
 });
 
+watch(() => settings.minLevel, (val) => {
+  minLevel.value = val ?? 0;
+});
 watch(() => settings.maxLevel, (val) => {
   maxLevel.value = val ?? 0;
 });
 
-async function saveMaxLevel() {
+watch(keybindsActive, async (active) => {
+  if (!process.inCombat) return;
+  if (active) {
+    await invoke("register_shortcuts");
+  } else {
+    await invoke("unregister_shortcuts");
+  }
+});
+
+async function saveLevels() {
+  await settings.saveMinLevel(minLevel.value);
   await settings.saveMaxLevel(maxLevel.value);
-  toast.success("Max level saved");
+  toast.success("Level filters saved");
 }
 
 async function enterCombat() {
@@ -67,6 +84,11 @@ async function enterCombat() {
     await fetchTargets();
     process.setInCombat(true);
     events.clear();
+    if (wars.currentTarget) {
+      await openCombatWindow(wars.currentTarget.user_id);
+    }
+    await invoke("register_shortcuts");
+    keybindsActive.value = true;
   } catch (e) {
     toast.error("Failed to enter combat");
   } finally {
@@ -95,7 +117,7 @@ async function fetchTargets() {
 
     try {
       process.trackApiCall();
-      await wars.fetchTargets(guildId, settings.apiKey!, settings.maxLevel);
+      await wars.fetchTargets(guildId, settings.apiKey!, settings.minLevel, settings.maxLevel);
       wars.nextGuild();
     } catch {
       process.trackApiCall();
@@ -103,10 +125,43 @@ async function fetchTargets() {
   }
 }
 
+async function openCombatWindow(userId: number) {
+  const url = `https://web.simple-mmo.com/user/attack/${userId}`;
+
+  // If window already exists, navigate via Rust eval
+  if (combatWindow) {
+    await invoke("navigate_combat", { url });
+    return;
+  }
+
+  // Create new combat window via JS API (per Tauri v2 docs)
+  combatWindow = new WebviewWindow("combat", {
+    url,
+    title: "Combat",
+    width: 500,
+    height: 750,
+    minWidth: 500,
+    minHeight: 750,
+  });
+
+  combatWindow.once("tauri://error", (e) => {
+    console.error("Combat window error:", e);
+    combatWindow = null;
+  });
+
+  combatWindow.once("tauri://destroyed", () => {
+    combatWindow = null;
+    if (process.inCombat) {
+      exitCombat();
+    }
+  });
+}
+
 async function handleSpaceBar() {
   if (!process.inCombat || !wars.currentTarget) return;
   const target = wars.currentTarget;
 
+  await openCombatWindow(target.user_id);
   await invoke("update_target_hit", { userId: target.user_id, hit: 1 });
   events.push({
     userId: target.user_id,
@@ -160,7 +215,13 @@ function sleep(ms: number) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
-function exitCombat() {
+async function exitCombat() {
+  if (combatWindow) {
+    try { await combatWindow.close(); } catch { /* already closed */ }
+    combatWindow = null;
+  }
+  await invoke("unregister_shortcuts");
+  keybindsActive.value = false;
   process.setInCombat(false);
   wars.reset();
   wars.init();
@@ -177,10 +238,14 @@ function exitCombat() {
       <CardContent class="space-y-4">
         <div class="flex items-end gap-3">
           <div class="flex-1">
+            <label class="mb-1 block text-xs text-muted-foreground">Min Level</label>
+            <Input v-model.number="minLevel" type="number" placeholder="0" />
+          </div>
+          <div class="flex-1">
             <label class="mb-1 block text-xs text-muted-foreground">Max Level</label>
             <Input v-model.number="maxLevel" type="number" placeholder="Max target level" />
           </div>
-          <Button variant="outline" size="sm" :disabled="!maxLevel" @click="saveMaxLevel">
+          <Button variant="outline" size="sm" :disabled="!maxLevel" @click="saveLevels">
             <Save class="mr-2 h-3 w-3" /> Save
           </Button>
         </div>

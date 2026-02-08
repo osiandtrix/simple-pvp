@@ -5,20 +5,24 @@ use tauri::{AppHandle, Manager};
 #[tauri::command]
 pub fn fetch_settings() -> Result<Settings, String> {
     db::with_conn(|conn| {
-        let mut stmt = conn.prepare("SELECT max_level, api_key, always_on_top FROM settings LIMIT 1")?;
+        let mut stmt = conn.prepare("SELECT min_level, max_level, api_key, always_on_top FROM settings LIMIT 1")?;
         stmt.query_row([], |row| {
             Ok(Settings {
-                max_level: row.get(0)?,
-                api_key: row.get(1)?,
-                always_on_top: row.get::<_, i64>(2).unwrap_or(0) != 0,
+                min_level: row.get::<_, i64>(0).unwrap_or(0),
+                max_level: row.get(1)?,
+                api_key: row.get(2)?,
+                always_on_top: row.get::<_, i64>(3).unwrap_or(0) != 0,
             })
         })
     })
 }
 
 #[tauri::command]
-pub fn update_settings(max_level: Option<i64>, api_key: Option<String>) -> Result<(), String> {
+pub fn update_settings(min_level: Option<i64>, max_level: Option<i64>, api_key: Option<String>) -> Result<(), String> {
     db::with_conn(|conn| {
+        if let Some(level) = min_level {
+            conn.execute("UPDATE settings SET min_level = ?1", [level])?;
+        }
         if let Some(level) = max_level {
             conn.execute("UPDATE settings SET max_level = ?1", [level])?;
         }
