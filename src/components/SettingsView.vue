@@ -5,8 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
-import { Switch } from "@/components/ui/switch";
-import { Save, Check, Pin, Key, Settings, Loader2 } from "lucide-vue-next";
+import { Save, Check, Key, Loader2 } from "lucide-vue-next";
 import { toast } from "vue-sonner";
 import KeybindsList from "./KeybindsList.vue";
 import { useSettingsStore } from "@/stores/settings";
@@ -76,27 +75,6 @@ async function saveApiKey() {
         <p v-if="settings.apiKey" class="mt-2 flex items-center gap-1 text-[11px] text-emerald-400">
           <Check class="h-3 w-3" /> API key configured
         </p>
-      </CardContent>
-    </Card>
-
-    <Card class="border-border/60 bg-card">
-      <CardHeader class="px-4 py-3">
-        <CardTitle class="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-          <Settings class="h-3.5 w-3.5 text-primary" />
-          Window
-        </CardTitle>
-      </CardHeader>
-      <CardContent class="px-4 pb-4">
-        <div class="flex items-center justify-between">
-          <div class="flex items-center gap-2">
-            <Pin class="h-3.5 w-3.5 text-muted-foreground" />
-            <span class="text-xs font-medium">Always on top</span>
-          </div>
-          <Switch
-            :checked="settings.alwaysOnTop"
-            @update:checked="settings.setAlwaysOnTop($event)"
-          />
-        </div>
       </CardContent>
     </Card>
 

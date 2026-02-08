@@ -4,11 +4,28 @@ mod api;
 mod hotkeys;
 mod scheduler;
 
-use tauri::Manager;
+use tauri::{Emitter, Manager};
+use tauri_plugin_global_shortcut::ShortcutState;
 
 pub fn run() {
     tauri::Builder::default()
-        .plugin(tauri_plugin_global_shortcut::Builder::new().build())
+        .plugin(
+            tauri_plugin_global_shortcut::Builder::new()
+                .with_handler(|app, shortcut, event| {
+                    if event.state() == ShortcutState::Pressed {
+                        let key_str = shortcut.to_string();
+                        if let Ok(binds) = crate::commands::keybinds::fetch_keybinds() {
+                            for bind in &binds {
+                                if bind.new_key == key_str || bind.original_key == key_str {
+                                    let _ = app.emit(&bind.original_key, ());
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                })
+                .build(),
+        )
         .plugin(tauri_plugin_shell::init())
         .setup(|app| {
             let app_handle = app.handle().clone();
@@ -17,15 +34,6 @@ pub fn run() {
             let db_path = app.path().app_data_dir().unwrap().join("data.db");
             std::fs::create_dir_all(db_path.parent().unwrap()).ok();
             db::init(&db_path).expect("Failed to initialize database");
-
-            // Apply always-on-top from saved settings
-            if let Ok(settings) = commands::settings::fetch_settings() {
-                if settings.always_on_top {
-                    if let Some(window) = app.get_webview_window("main") {
-                        window.set_always_on_top(true).ok();
-                    }
-                }
-            }
 
             // Start background scheduler
             let handle = app_handle.clone();
@@ -51,7 +59,6 @@ pub fn run() {
             commands::api_client::validate_api_key,
             commands::api_client::fetch_guild_wars,
             commands::api_client::fetch_guild_members,
-            commands::settings::set_always_on_top,
             commands::version::fetch_version,
             commands::version::run_migrations,
             hotkeys::register_shortcuts,

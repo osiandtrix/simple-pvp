@@ -3,7 +3,7 @@ import { computed } from "vue";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Swords, Eye, EyeOff, Activity, Radio } from "lucide-vue-next";
+import { Swords, Eye, EyeOff, Zap, Radio } from "lucide-vue-next";
 import { useEventsStore } from "@/stores/events";
 import { useWarsStore } from "@/stores/wars";
 import { useProcessStore } from "@/stores/process";
@@ -44,19 +44,21 @@ const bgMap: Record<string, string> = {
           Combat Log
         </CardTitle>
         <div class="flex gap-1.5">
-          <Badge variant="secondary" class="h-5 rounded px-1.5 text-[10px] font-mono bg-secondary/80 text-muted-foreground border-0">
-            T {{ wars.targetIndex + 1 }}/{{ wars.targets.length }}
+          <Badge variant="secondary" class="h-5 rounded px-1.5 text-[10px] font-mono bg-primary/10 border-0">
+            <span class="text-primary mr-1">Targets</span>
+            <span class="text-foreground">{{ wars.targetIndex + 1 }}/{{ wars.targets.length }}</span>
           </Badge>
-          <Badge variant="secondary" class="h-5 rounded px-1.5 text-[10px] font-mono bg-secondary/80 text-muted-foreground border-0">
-            G {{ wars.activeGuildIndex + 1 }}/{{ wars.warlist.length }}
+          <Badge variant="secondary" class="h-5 rounded px-1.5 text-[10px] font-mono bg-emerald-500/10 border-0">
+            <span class="text-emerald-400 mr-1">Guilds</span>
+            <span class="text-foreground">{{ wars.activeGuildIndex + 1 }}/{{ wars.warlist.length }}</span>
           </Badge>
           <Badge
             variant="secondary"
             class="h-5 rounded px-1.5 text-[10px] font-mono border-0"
-            :class="process.apiLimitReached ? 'bg-red-500/10 text-red-400' : 'bg-secondary/80 text-muted-foreground'"
+            :class="process.apiLimitReached ? 'bg-red-500/10' : 'bg-amber-500/10'"
           >
-            <Activity class="mr-1 h-2.5 w-2.5" />
-            {{ process.apiRemaining }}/40
+            <Zap class="mr-1 h-2.5 w-2.5" :class="process.apiLimitReached ? 'text-red-400' : 'text-amber-400'" />
+            <span :class="process.apiLimitReached ? 'text-red-400' : 'text-amber-400'">{{ process.apiRemaining }}/40</span>
           </Badge>
         </div>
       </div>

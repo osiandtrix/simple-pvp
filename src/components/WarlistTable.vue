@@ -3,7 +3,7 @@ import { ref, computed } from "vue";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Shuffle, RefreshCw, ArrowUp, ArrowDown, ArrowUpDown, Shield } from "lucide-vue-next";
+import { Shuffle, RefreshCw, ArrowUp, ArrowDown, ArrowUpDown, Shield, Crosshair } from "lucide-vue-next";
 import { useWarsStore, type War } from "@/stores/wars";
 import { useUserStore } from "@/stores/user";
 import { useSettingsStore } from "@/stores/settings";
@@ -13,11 +13,15 @@ const wars = useWarsStore();
 const user = useUserStore();
 const settings = useSettingsStore();
 
+const emit = defineEmits<{
+  targetGuild: [war: War];
+}>();
+
 type SortKey = "name" | "you" | "them";
 type SortDir = "asc" | "desc";
 
-const sortKey = ref<SortKey>("name");
-const sortDir = ref<SortDir>("asc");
+const sortKey = ref<SortKey>("you");
+const sortDir = ref<SortDir>("desc");
 
 function getOpponent(war: War) {
   if (war.attacker_id === user.guildId) {
@@ -153,6 +157,7 @@ function shuffleWars() {
                   <ArrowUpDown v-else class="h-3 w-3 opacity-20" />
                 </span>
               </th>
+              <th class="pb-2 w-8"></th>
             </tr>
           </thead>
           <tbody>
@@ -167,6 +172,15 @@ function shuffleWars() {
               </td>
               <td class="py-1.5 text-right font-mono text-xs text-red-400">
                 {{ row.them }}
+              </td>
+              <td class="py-1.5 text-right">
+                <button
+                  class="inline-flex h-5 w-5 items-center justify-center rounded text-muted-foreground/40 opacity-0 transition-all group-hover:opacity-100 hover:bg-primary/10 hover:text-primary"
+                  title="Target this guild only"
+                  @click="emit('targetGuild', row.war)"
+                >
+                  <Crosshair class="h-3 w-3" />
+                </button>
               </td>
             </tr>
           </tbody>

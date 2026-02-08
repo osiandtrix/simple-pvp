@@ -6,7 +6,6 @@ import { WebviewWindow } from "@tauri-apps/api/webviewWindow";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Switch } from "@/components/ui/switch";
 import { Separator } from "@/components/ui/separator";
 import { Swords, Save, Keyboard, LogOut, Loader2 } from "lucide-vue-next";
 import { toast } from "vue-sonner";
@@ -15,7 +14,7 @@ import EventLog from "./EventLog.vue";
 
 import { useUserStore } from "@/stores/user";
 import { useSettingsStore } from "@/stores/settings";
-import { useWarsStore } from "@/stores/wars";
+import { useWarsStore, type War } from "@/stores/wars";
 import { useProcessStore } from "@/stores/process";
 import { useEventsStore } from "@/stores/events";
 
@@ -27,8 +26,8 @@ const events = useEventsStore();
 
 const minLevel = ref(settings.minLevel ?? 0);
 const maxLevel = ref(settings.maxLevel ?? 0);
-const keybindsActive = ref(false);
 const initiatingCombat = ref(false);
+const singleGuildMode = ref(false);
 let combatWindow: WebviewWindow | null = null;
 
 const unlisteners: UnlistenFn[] = [];
@@ -61,15 +60,6 @@ watch(() => settings.maxLevel, (val) => {
   maxLevel.value = val ?? 0;
 });
 
-watch(keybindsActive, async (active) => {
-  if (!process.inCombat) return;
-  if (active) {
-    await invoke("register_shortcuts");
-  } else {
-    await invoke("unregister_shortcuts");
-  }
-});
-
 async function saveLevels() {
   await settings.saveMinLevel(minLevel.value);
   await settings.saveMaxLevel(maxLevel.value);
@@ -79,6 +69,7 @@ async function saveLevels() {
 async function enterCombat() {
   if (!settings.apiKey || wars.warlist.length === 0) return;
   initiatingCombat.value = true;
+  singleGuildMode.value = false;
 
   try {
     await fetchTargets();
@@ -88,9 +79,44 @@ async function enterCombat() {
       await openCombatWindow(wars.currentTarget.user_id);
     }
     await invoke("register_shortcuts");
-    keybindsActive.value = true;
   } catch (e) {
     toast.error("Failed to enter combat");
+  } finally {
+    initiatingCombat.value = false;
+  }
+}
+
+async function enterCombatForGuild(war: War) {
+  if (!settings.apiKey) return;
+  initiatingCombat.value = true;
+  singleGuildMode.value = true;
+
+  const guildId =
+    war.attacker_id === user.guildId ? war.defender_id : war.attacker_id;
+
+  try {
+    process.checkApiReset();
+    if (process.apiLimitReached) {
+      toast.warning("API limit reached. Try again later.");
+      return;
+    }
+
+    process.trackApiCall();
+    wars.targets = [];
+    wars.targetIndex = 0;
+    await wars.fetchTargets(guildId, settings.apiKey, settings.minLevel, settings.maxLevel);
+
+    if (!wars.currentTarget) {
+      toast.warning("No targets found in that guild");
+      return;
+    }
+
+    process.setInCombat(true);
+    events.clear();
+    await openCombatWindow(wars.currentTarget.user_id);
+    await invoke("register_shortcuts");
+  } catch (e) {
+    toast.error("Failed to load targets");
   } finally {
     initiatingCombat.value = false;
   }
@@ -169,6 +195,14 @@ async function handleSpaceBar() {
     type: "attack",
   });
 
+  const isLastTarget = wars.targetIndex >= wars.targets.length - 1;
+
+  if (singleGuildMode.value && isLastTarget) {
+    toast.success("All targets done for this guild");
+    exitCombat();
+    return;
+  }
+
   wars.nextTarget();
 
   if (wars.targets.length - wars.targetIndex < 5) {
@@ -221,7 +255,6 @@ async function exitCombat() {
     combatWindow = null;
   }
   await invoke("unregister_shortcuts");
-  keybindsActive.value = false;
   process.setInCombat(false);
   wars.reset();
   wars.init();
@@ -272,15 +305,16 @@ async function exitCombat() {
         <Separator class="bg-border/40" />
 
         <div class="flex items-center justify-between">
-          <div class="flex items-center gap-2.5">
-            <Switch
-              v-model:checked="keybindsActive"
-              :disabled="!process.inCombat"
+          <div class="flex items-center gap-2">
+            <div
+              class="h-2 w-2 rounded-full transition-colors"
+              :class="process.inCombat ? 'bg-emerald-400 shadow-[0_0_6px_1px_rgba(52,211,153,0.4)]' : 'bg-red-400/60'"
             />
-            <div class="flex items-center gap-1.5">
-              <Keyboard class="h-3.5 w-3.5 text-muted-foreground" />
-              <span class="text-xs font-medium">Keybinds</span>
-            </div>
+            <Keyboard class="h-3.5 w-3.5 text-muted-foreground" />
+            <span class="text-xs font-medium">Keybinds</span>
+            <span class="text-[10px] font-mono" :class="process.inCombat ? 'text-emerald-400' : 'text-red-400/60'">
+              {{ process.inCombat ? "ACTIVE" : "OFF" }}
+            </span>
           </div>
 
           <div class="flex gap-1.5">
@@ -310,6 +344,6 @@ async function exitCombat() {
     </Card>
 
     <EventLog v-if="process.inCombat" class="animate-slide-up" />
-    <WarlistTable v-else class="animate-in" />
+    <WarlistTable v-else class="animate-in" @target-guild="enterCombatForGuild" />
   </div>
 </template>

@@ -19,7 +19,6 @@ export const useSettingsStore = defineStore("settings", {
     minLevel: 0 as number,
     maxLevel: null as number | null,
     apiKey: null as string | null,
-    alwaysOnTop: false,
     keybinds: [] as Keybind[],
     appVersion: "",
   }),
@@ -33,7 +32,6 @@ export const useSettingsStore = defineStore("settings", {
       this.minLevel = settings.min_level;
       this.maxLevel = settings.max_level;
       this.apiKey = settings.api_key;
-      this.alwaysOnTop = settings.always_on_top;
       this.appVersion = version;
     },
 
@@ -50,11 +48,6 @@ export const useSettingsStore = defineStore("settings", {
     async saveMaxLevel(maxLevel: number) {
       await invoke("update_settings", { minLevel: null, maxLevel, apiKey: null });
       this.maxLevel = maxLevel;
-    },
-
-    async setAlwaysOnTop(enabled: boolean) {
-      await invoke("set_always_on_top", { enabled });
-      this.alwaysOnTop = enabled;
     },
 
     async fetchKeybinds() {
