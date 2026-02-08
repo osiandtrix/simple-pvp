@@ -30,6 +30,7 @@ const initiatingCombat = ref(false);
 const singleGuildMode = ref(false);
 let combatWindow: WebviewWindow | null = null;
 let attackInProgress = false;
+let lastAttackTime = 0;
 
 const unlisteners: UnlistenFn[] = [];
 
@@ -190,8 +191,10 @@ async function openCombatWindow(userId: number) {
 }
 
 async function handleSpaceBar() {
-  if (!process.inCombat || !wars.currentTarget || attackInProgress) return;
+  const now = Date.now();
+  if (!process.inCombat || !wars.currentTarget || attackInProgress || now - lastAttackTime < 150) return;
   attackInProgress = true;
+  lastAttackTime = now;
 
   try {
     const target = wars.currentTarget;
