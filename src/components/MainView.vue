@@ -7,7 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
-import { Swords, Save, Keyboard, LogOut, Loader2, UtensilsCrossed, HeartPulse, Zap } from "lucide-vue-next";
+import { Swords, Save, Keyboard, LogOut, Loader2, UtensilsCrossed, HeartPulse, Zap, ArrowLeft, ArrowRight } from "lucide-vue-next";
 import { toast } from "vue-sonner";
 import WarlistTable from "./WarlistTable.vue";
 import EventLog from "./EventLog.vue";
@@ -32,6 +32,7 @@ const initiatingCombat = ref(false);
 const singleGuildMode = ref(false);
 const keybindsActive = ref(false);
 let combatWindow: WebviewWindow | null = null;
+let overlayWindow: WebviewWindow | null = null;
 let attackInProgress = false;
 let lastAttackTime = 0;
 
@@ -40,6 +41,10 @@ const unlisteners: UnlistenFn[] = [];
 onMounted(async () => {
   minLevel.value = settings.minLevel ?? 0;
   maxLevel.value = settings.maxLevel ?? 0;
+
+  // Expose overlay handlers so Rust can eval() them on this window
+  (window as any).__overlayNext = () => advanceTarget();
+  (window as any).__overlayBack = () => goBackTarget();
 
   unlisteners.push(
     await listen("Space", handleSpaceBar),
@@ -52,6 +57,8 @@ onMounted(async () => {
 
 onUnmounted(() => {
   unlisteners.forEach((fn) => fn());
+  delete (window as any).__overlayNext;
+  delete (window as any).__overlayBack;
 });
 
 watch(() => settings.minLevel, (val) => {
@@ -71,12 +78,37 @@ async function isOnBlockedPage(): Promise<boolean> {
   }
 }
 
+async function showOverlay() {
+  if (overlayWindow) return;
+  overlayWindow = new WebviewWindow("overlay", {
+    url: "overlay.html",
+    title: "Controls",
+    width: 150,
+    height: 50,
+    decorations: false,
+    alwaysOnTop: true,
+    resizable: false,
+    skipTaskbar: true,
+  });
+  overlayWindow.once("tauri://destroyed", () => {
+    overlayWindow = null;
+  });
+}
+
+async function hideOverlay() {
+  if (!overlayWindow) return;
+  try { await overlayWindow.close(); } catch { /* already gone */ }
+  overlayWindow = null;
+}
+
 async function toggleKeybinds() {
   if (!process.inCombat) return;
   if (keybindsActive.value) {
     await invoke("unregister_shortcuts");
     keybindsActive.value = false;
+    await showOverlay();
   } else {
+    await hideOverlay();
     await invoke("register_shortcuts");
     keybindsActive.value = true;
   }
@@ -247,10 +279,9 @@ async function navigateCombat(url: string) {
   await invoke("navigate_combat", { url });
 }
 
-async function handleSpaceBar() {
+async function advanceTarget() {
   const now = Date.now();
-  if (!process.inCombat || !keybindsActive.value || !wars.currentTarget || attackInProgress || now - lastAttackTime < 150) return;
-  if (await isOnBlockedPage()) return;
+  if (!process.inCombat || !wars.currentTarget || attackInProgress || now - lastAttackTime < 150) return;
   attackInProgress = true;
   lastAttackTime = now;
 
@@ -298,10 +329,21 @@ async function handleSpaceBar() {
   }
 }
 
-async function handleCtrlSpace() {
-  if (!process.inCombat || !keybindsActive.value) return;
-  if (await isOnBlockedPage()) return;
+function goBackTarget() {
+  if (!process.inCombat) return;
   wars.previousTarget();
+}
+
+async function handleSpaceBar() {
+  if (!keybindsActive.value) return;
+  if (await isOnBlockedPage()) return;
+  await advanceTarget();
+}
+
+async function handleCtrlSpace() {
+  if (!keybindsActive.value) return;
+  if (await isOnBlockedPage()) return;
+  goBackTarget();
 }
 
 function sleep(ms: number) {
@@ -309,6 +351,7 @@ function sleep(ms: number) {
 }
 
 async function exitCombat() {
+  await hideOverlay();
   if (combatWindow) {
     try { await combatWindow.close(); } catch { /* already closed */ }
     combatWindow = null;
@@ -409,6 +452,26 @@ async function exitCombat() {
     </Card>
 
     <EventLog v-if="process.inCombat" class="animate-slide-up" />
+
+    <div v-if="process.inCombat && !keybindsActive" class="flex gap-1.5 animate-slide-up">
+      <Button
+        variant="outline"
+        size="sm"
+        class="h-7 flex-1 text-xs border-border/60 text-muted-foreground hover:text-foreground hover:bg-secondary transition-all"
+        @click="goBackTarget"
+      >
+        <ArrowLeft class="mr-1.5 h-3 w-3" />
+        Back
+      </Button>
+      <Button
+        size="sm"
+        class="h-7 flex-1 text-xs bg-primary text-primary-foreground hover:bg-primary/90 transition-all"
+        @click="advanceTarget"
+      >
+        <ArrowRight class="mr-1.5 h-3 w-3" />
+        Next
+      </Button>
+    </div>
 
     <div v-if="process.inCombat" class="flex gap-1.5 animate-slide-up">
       <Button

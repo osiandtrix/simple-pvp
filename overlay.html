@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Controls</title>
+    <style>
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+
+      html, body {
+        height: 100%;
+        overflow: hidden;
+        background: hsl(0 0% 6%);
+        font-family: 'DM Sans', system-ui, -apple-system, sans-serif;
+        user-select: none;
+        -webkit-user-select: none;
+      }
+
+      body {
+        padding: 4px;
+      }
+
+      #overlay {
+        display: flex;
+        align-items: center;
+        gap: 3px;
+        width: 100%;
+        height: 100%;
+      }
+
+      .grip {
+        width: 12px;
+        flex-shrink: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: hsl(0 0% 25%);
+        font-size: 10px;
+        cursor: grab;
+        transition: color 0.15s;
+      }
+
+      .grip:hover {
+        color: hsl(0 0% 40%);
+      }
+
+      .btn {
+        flex: 1;
+        height: 100%;
+        border: 1px solid hsl(0 0% 15%);
+        border-radius: 6px;
+        background: hsl(0 0% 9%);
+        color: hsl(0 0% 60%);
+        font-size: 14px;
+        font-family: inherit;
+        cursor: pointer;
+        transition: all 0.15s;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 4px;
+        outline: none;
+      }
+
+      .btn:hover {
+        background: hsl(0 0% 13%);
+        color: hsl(0 0% 93%);
+        border-color: hsl(0 0% 22%);
+      }
+
+      .btn:active {
+        background: hsl(0 0% 16%);
+        transform: scale(0.96);
+      }
+
+      .btn svg {
+        width: 14px;
+        height: 14px;
+        stroke: currentColor;
+        stroke-width: 2;
+        fill: none;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="overlay">
+      <div class="grip" id="grip">&#8942;</div>
+      <button class="btn" id="back-btn" title="Previous target">
+        <svg viewBox="0 0 24 24"><path d="M19 12H5"/><path d="M12 19l-7-7 7-7"/></svg>
+      </button>
+      <button class="btn" id="next-btn" title="Next target">
+        <svg viewBox="0 0 24 24"><path d="M5 12h14"/><path d="M12 5l7 7-7 7"/></svg>
+      </button>
+    </div>
+    <script type="module" src="/src/overlay.ts"></script>
+  </body>
+</html>

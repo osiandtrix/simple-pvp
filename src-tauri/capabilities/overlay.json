@@ -1,0 +1,10 @@
+{
+  "identifier": "overlay",
+  "description": "Capability for the combat overlay window",
+  "windows": ["overlay"],
+  "permissions": [
+    "core:default",
+    "core:window:allow-start-dragging",
+    "core:window:allow-close"
+  ]
+}

@@ -74,6 +74,7 @@ pub fn run() {
             commands::wars::update_warlist,
             commands::wars::fetch_targets,
             commands::combat::get_combat_url,
+            commands::combat::combat_overlay_action,
             commands::combat::navigate_combat,
             commands::combat::update_target_hit,
             commands::combat::fetch_target_logs,
