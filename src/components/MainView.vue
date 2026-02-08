@@ -120,31 +120,40 @@ async function enterCombatForGuild(war: War) {
 }
 
 async function fetchTargets() {
-  const initialCount = wars.targets.length === 0 ? -1 : wars.targets.length;
-
-  while (wars.targets.length <= initialCount || !wars.currentTarget) {
+  while (!wars.currentTarget) {
     process.checkApiReset();
     if (process.apiLimitReached) {
       const resetIn = process.resetInSeconds;
       toast.warning(`API limit reached. Retrying in ${resetIn}s`);
       await sleep(resetIn * 1000);
+      continue;
     }
 
-    const currentWar = wars.currentWar;
-    if (!currentWar) break;
-
-    const guildId =
-      currentWar.attacker_id === user.guildId
-        ? currentWar.defender_id
-        : currentWar.attacker_id;
-
-    try {
-      process.trackApiCall();
-      await wars.fetchTargets(guildId, settings.apiKey!, settings.minLevel, settings.maxLevel);
+    // Collect up to 3 unique guilds to fetch in parallel
+    const batch = new Set<number>();
+    const maxBatch = Math.min(3, wars.warlist.length);
+    for (let i = 0; i < maxBatch; i++) {
+      const war = wars.currentWar;
+      if (!war) break;
+      const guildId =
+        war.attacker_id === user.guildId ? war.defender_id : war.attacker_id;
+      batch.add(guildId);
       wars.nextGuild();
-    } catch {
-      process.trackApiCall();
     }
+
+    if (batch.size === 0) break;
+
+    // Fire all requests in parallel
+    const guildIds = [...batch];
+    const results = await Promise.allSettled(
+      guildIds.map((guildId) => {
+        process.trackApiCall();
+        return wars.fetchTargets(guildId, settings.apiKey!, settings.minLevel, settings.maxLevel);
+      })
+    );
+
+    // If all failed, break to avoid infinite loop
+    if (results.every((r) => r.status === "rejected")) break;
   }
 }
 

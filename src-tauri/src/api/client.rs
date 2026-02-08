@@ -2,6 +2,13 @@ use reqwest::Client;
 use std::sync::Mutex;
 use once_cell::sync::Lazy;
 
+static HTTP_CLIENT: Lazy<Client> = Lazy::new(|| {
+    Client::builder()
+        .pool_max_idle_per_host(4)
+        .build()
+        .expect("Failed to build HTTP client")
+});
+
 static RATE_LIMIT: Lazy<Mutex<RateLimit>> = Lazy::new(|| {
     Mutex::new(RateLimit {
         remaining: 40,
@@ -46,8 +53,7 @@ pub async fn post(url: &str, api_key: &str) -> Result<reqwest::Response, reqwest
         limit.reset_at = None;
     }
 
-    let client = Client::new();
-    let response = client
+    let response = HTTP_CLIENT
         .post(url)
         .json(&serde_json::json!({ "api_key": api_key }))
         .send()

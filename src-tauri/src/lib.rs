@@ -17,7 +17,7 @@ pub fn run() {
                         if let Ok(binds) = crate::commands::keybinds::fetch_keybinds() {
                             for bind in &binds {
                                 if bind.new_key == key_str || bind.original_key == key_str {
-                                    let _ = app.emit(&bind.original_key, ());
+                                    let _ = app.emit_to("main", &bind.original_key, ());
                                     break;
                                 }
                             }
