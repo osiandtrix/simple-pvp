@@ -15,6 +15,14 @@ interface ChangelogEntry {
 
 const changelog: ChangelogEntry[] = [
   {
+    version: "1.3.1",
+    date: "2026-02-08",
+    changes: [
+      { type: "added", text: "Floating overlay with Back/Next buttons when keybinds are toggled off during combat" },
+      { type: "removed", text: "Inline Back/Next buttons replaced by the floating overlay" },
+    ],
+  },
+  {
     version: "1.3.0",
     date: "2026-02-08",
     changes: [

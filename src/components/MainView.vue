@@ -7,7 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
-import { Swords, Save, Keyboard, LogOut, Loader2, UtensilsCrossed, HeartPulse, Zap, ArrowLeft, ArrowRight } from "lucide-vue-next";
+import { Swords, Save, Keyboard, LogOut, Loader2, UtensilsCrossed, HeartPulse, Zap } from "lucide-vue-next";
 import { toast } from "vue-sonner";
 import WarlistTable from "./WarlistTable.vue";
 import EventLog from "./EventLog.vue";
@@ -452,26 +452,6 @@ async function exitCombat() {
     </Card>
 
     <EventLog v-if="process.inCombat" class="animate-slide-up" />
-
-    <div v-if="process.inCombat && !keybindsActive" class="flex gap-1.5 animate-slide-up">
-      <Button
-        variant="outline"
-        size="sm"
-        class="h-7 flex-1 text-xs border-border/60 text-muted-foreground hover:text-foreground hover:bg-secondary transition-all"
-        @click="goBackTarget"
-      >
-        <ArrowLeft class="mr-1.5 h-3 w-3" />
-        Back
-      </Button>
-      <Button
-        size="sm"
-        class="h-7 flex-1 text-xs bg-primary text-primary-foreground hover:bg-primary/90 transition-all"
-        @click="advanceTarget"
-      >
-        <ArrowRight class="mr-1.5 h-3 w-3" />
-        Next
-      </Button>
-    </div>
 
     <div v-if="process.inCombat" class="flex gap-1.5 animate-slide-up">
       <Button
