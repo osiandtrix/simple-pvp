@@ -2,15 +2,11 @@ use crate::db;
 use crate::db::models::Keybind;
 
 const DEFAULT_KEYBINDS: &[(&str, &str)] = &[
-    ("Space", "Next target"),
-    ("Control+Space", "Previous target"),
-    ("Shift+ArrowDown", "Mark current as hit"),
-    ("Shift+ArrowLeft", "Mark prior as hit"),
-    ("Control+ArrowDown", "Mark current as not hit"),
-    ("Control+ArrowLeft", "Mark prior as not hit"),
-    ("f", "Open food inventory"),
-    ("h", "Open healer"),
-    ("r", "Open energy refills"),
+    ("Space", "Next Target"),
+    ("Control+Space", "Previous Target"),
+    ("f", "Open Food Inventory"),
+    ("h", "Open Healer"),
+    ("r", "Open Energy Refills"),
 ];
 
 #[tauri::command]

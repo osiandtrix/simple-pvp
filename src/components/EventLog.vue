@@ -3,7 +3,7 @@ import { computed } from "vue";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Swords, Eye, EyeOff, Zap, Radio } from "lucide-vue-next";
+import { Swords, Zap, Radio } from "lucide-vue-next";
 import { useEventsStore } from "@/stores/events";
 import { useWarsStore } from "@/stores/wars";
 import { useProcessStore } from "@/stores/process";
@@ -18,20 +18,14 @@ const recentEvents = computed(() =>
 
 const iconMap = {
   attack: Swords,
-  hit: Eye,
-  nothit: EyeOff,
 };
 
 const colorMap: Record<string, string> = {
   attack: "text-primary",
-  hit: "text-emerald-400",
-  nothit: "text-red-400",
 };
 
 const bgMap: Record<string, string> = {
   attack: "bg-primary/5",
-  hit: "bg-emerald-400/5",
-  nothit: "bg-red-400/5",
 };
 </script>
 

@@ -40,10 +40,6 @@ onMounted(async () => {
   unlisteners.push(
     await listen("Space", handleSpaceBar),
     await listen("Control+Space", handleCtrlSpace),
-    await listen("Control+ArrowLeft", handleCtrlArrowLeft),
-    await listen("Shift+ArrowLeft", handleShiftArrowLeft),
-    await listen("Shift+ArrowDown", handleShiftArrowDown),
-    await listen("Control+ArrowDown", handleCtrlArrowDown),
   );
 
   const interval = setInterval(() => process.checkApiReset(), 100);
@@ -220,36 +216,6 @@ async function handleSpaceBar() {
 function handleCtrlSpace() {
   if (!process.inCombat) return;
   wars.previousTarget();
-}
-
-async function handleShiftArrowLeft() {
-  if (!process.inCombat || wars.targetIndex === 0) return;
-  const prev = wars.targets[wars.targetIndex - 1];
-  if (!prev) return;
-  await invoke("update_target_hit", { userId: prev.user_id, hit: 1 });
-  events.push({ userId: prev.user_id, userName: prev.name, type: "hit" });
-}
-
-async function handleCtrlArrowLeft() {
-  if (!process.inCombat || wars.targetIndex === 0) return;
-  const prev = wars.targets[wars.targetIndex - 1];
-  if (!prev) return;
-  await invoke("update_target_hit", { userId: prev.user_id, hit: -1 });
-  events.push({ userId: prev.user_id, userName: prev.name, type: "nothit" });
-}
-
-async function handleShiftArrowDown() {
-  if (!process.inCombat || !wars.currentTarget) return;
-  const target = wars.currentTarget;
-  await invoke("update_target_hit", { userId: target.user_id, hit: 1 });
-  events.push({ userId: target.user_id, userName: target.name, type: "hit" });
-}
-
-async function handleCtrlArrowDown() {
-  if (!process.inCombat || !wars.currentTarget) return;
-  const target = wars.currentTarget;
-  await invoke("update_target_hit", { userId: target.user_id, hit: -1 });
-  events.push({ userId: target.user_id, userName: target.name, type: "nothit" });
 }
 
 function sleep(ms: number) {
