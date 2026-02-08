@@ -63,7 +63,9 @@ export const useWarsStore = defineStore("wars", {
         minLevel,
         maxLevel,
       });
-      this.targets.push(...newTargets);
+      const existing = new Set(this.targets.map((t) => t.user_id));
+      const unique = newTargets.filter((t) => !existing.has(t.user_id));
+      this.targets.push(...unique);
     },
 
     nextTarget() {
