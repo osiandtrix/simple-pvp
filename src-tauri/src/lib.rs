@@ -4,8 +4,18 @@ mod api;
 mod hotkeys;
 mod scheduler;
 
+use std::collections::HashMap;
+use std::sync::Mutex;
+use std::time::Instant;
+
+use once_cell::sync::Lazy;
 use tauri::{Emitter, Manager};
 use tauri_plugin_global_shortcut::ShortcutState;
+
+// Debounce map: tracks last fire time per shortcut key to suppress
+// Windows duplicate global shortcut events (fires twice without admin).
+static SHORTCUT_DEBOUNCE: Lazy<Mutex<HashMap<String, Instant>>> =
+    Lazy::new(|| Mutex::new(HashMap::new()));
 
 pub fn run() {
     tauri::Builder::default()
@@ -14,9 +24,21 @@ pub fn run() {
                 .with_handler(|app, shortcut, event| {
                     if event.state() == ShortcutState::Pressed {
                         let key_str = shortcut.to_string();
+
+                        // Debounce: ignore duplicate fires within 300ms
+                        {
+                            let mut map = SHORTCUT_DEBOUNCE.lock().unwrap();
+                            if let Some(last) = map.get(&key_str) {
+                                if last.elapsed().as_millis() < 300 {
+                                    return;
+                                }
+                            }
+                            map.insert(key_str.clone(), Instant::now());
+                        }
+
                         if let Ok(binds) = crate::commands::keybinds::fetch_keybinds() {
                             for bind in &binds {
-                                if bind.new_key == key_str || bind.original_key == key_str {
+                                if bind.new_key.eq_ignore_ascii_case(&key_str) || bind.original_key.eq_ignore_ascii_case(&key_str) {
                                     let _ = app.emit(&bind.original_key, ());
                                     break;
                                 }

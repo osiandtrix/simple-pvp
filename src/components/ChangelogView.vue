@@ -15,6 +15,28 @@ interface ChangelogEntry {
 
 const changelog: ChangelogEntry[] = [
   {
+    version: "1.2.7",
+    date: "2026-02-08",
+    changes: [
+      { type: "fixed", text: "Single-letter keybinds (F, H, R) not firing due to case mismatch in shortcut handler" },
+      { type: "added", text: "Keybinds for food inventory (F), healer (H), and energy refills (R) now navigate the combat window" },
+    ],
+  },
+  {
+    version: "1.2.5",
+    date: "2026-02-08",
+    changes: [
+      { type: "fixed", text: "Combat failing to start when first few guilds have no valid targets - now tries all guilds before giving up" },
+    ],
+  },
+  {
+    version: "1.2.4",
+    date: "2026-02-08",
+    changes: [
+      { type: "fixed", text: "Double combat log entries when targeting a specific guild - shortcut debounce moved to Rust for reliability" },
+    ],
+  },
+  {
     version: "1.2.3",
     date: "2026-02-08",
     changes: [

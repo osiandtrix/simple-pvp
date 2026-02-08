@@ -41,6 +41,9 @@ onMounted(async () => {
   unlisteners.push(
     await listen("Space", handleSpaceBar),
     await listen("Control+Space", handleCtrlSpace),
+    await listen("f", () => navigateCombat("https://web.simple-mmo.com/inventory/items?itemname=&minlevel=&maxlevel=&type%5B%5D=Food")),
+    await listen("h", () => navigateCombat("https://web.simple-mmo.com/healer")),
+    await listen("r", () => navigateCombat("https://web.simple-mmo.com/diamondstore/rewards/energy-points")),
   );
 
   const interval = setInterval(() => process.checkApiReset(), 100);
@@ -121,6 +124,8 @@ async function enterCombatForGuild(war: War) {
 }
 
 async function fetchTargets() {
+  let guildsFetched = 0;
+
   while (wars.targets.length - wars.targetIndex < 5) {
     process.checkApiReset();
     if (process.apiLimitReached) {
@@ -144,8 +149,9 @@ async function fetchTargets() {
 
     if (batch.size === 0) break;
 
+    guildsFetched += batch.size;
+
     // Fire all requests in parallel
-    const before = wars.targets.length;
     const guildIds = [...batch];
     const results = await Promise.allSettled(
       guildIds.map((guildId) => {
@@ -157,8 +163,8 @@ async function fetchTargets() {
     // If all failed, break to avoid infinite loop
     if (results.every((r) => r.status === "rejected")) break;
 
-    // No new targets added despite successful fetches — guilds exhausted
-    if (wars.targets.length === before) break;
+    // Tried all guilds at least once — stop even if buffer isn't full
+    if (guildsFetched >= wars.warlist.length) break;
   }
 }
 
@@ -192,6 +198,11 @@ async function openCombatWindow(userId: number) {
       exitCombat();
     }
   });
+}
+
+async function navigateCombat(url: string) {
+  if (!process.inCombat || !combatWindow) return;
+  await invoke("navigate_combat", { url });
 }
 
 async function handleSpaceBar() {
