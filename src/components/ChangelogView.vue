@@ -15,13 +15,29 @@ interface ChangelogEntry {
 
 const changelog: ChangelogEntry[] = [
   {
+    version: "1.1.0",
+    date: "2026-02-08",
+    changes: [
+      { type: "added", text: "Single-guild targeting via crosshair button in war list" },
+      { type: "added", text: "Auto-exit combat when all single-guild targets are done" },
+      { type: "added", text: "App logo in header" },
+      { type: "changed", text: "Redesigned UI with purple accent theme" },
+      { type: "changed", text: "War list now sorted by your kills (descending) by default" },
+      { type: "changed", text: "Keybind status is now an automatic indicator instead of a toggle" },
+      { type: "changed", text: "Keybind labels use proper capitalization" },
+      { type: "fixed", text: "Duplicate combat log entries caused by concurrent keypress handling" },
+      { type: "fixed", text: "Global shortcut handler accumulation causing repeated events" },
+      { type: "removed", text: "Removed always-on-top window feature" },
+      { type: "removed", text: "Removed mark hit/not-hit keybinds" },
+    ],
+  },
+  {
     version: "1.0.0",
     date: "2026-02-08",
     changes: [
       { type: "added", text: "Complete rewrite with Tauri v2 backend" },
       { type: "added", text: "Modern UI with shadcn-vue components and dark theme" },
       { type: "added", text: "Server-side API rate limiting with header tracking" },
-      { type: "added", text: "Always-on-top window option" },
       { type: "added", text: "Changelog page" },
       { type: "added", text: "Customizable keybinds with live remapping" },
       { type: "added", text: "Combat event log with target/guild/API counters" },
@@ -55,7 +71,7 @@ const badgeColors: Record<string, string> = {
               v-if="entry.version === settings.appVersion"
               class="h-4 rounded px-1.5 text-[10px] font-mono bg-primary/10 text-primary border-0"
             >
-              current
+              Current
             </Badge>
           </CardTitle>
           <span class="text-[10px] font-mono text-muted-foreground/60">{{ entry.date }}</span>
@@ -71,7 +87,7 @@ const badgeColors: Record<string, string> = {
               :style="{ animationDelay: `${i * 30}ms` }"
             >
               <Badge :class="badgeColors[change.type]" class="mt-0.5 shrink-0 text-[10px] px-1.5 py-0 rounded font-medium">
-                {{ change.type }}
+                {{ change.type.charAt(0).toUpperCase() + change.type.slice(1) }}
               </Badge>
               <span class="text-foreground/80">{{ change.text }}</span>
             </li>
