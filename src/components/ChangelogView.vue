@@ -26,7 +26,7 @@ const changelog: ChangelogEntry[] = [
     version: "1.2.2",
     date: "2026-02-08",
     changes: [
-      { type: "fixed", text: "Getting stuck on 0 HP targets — Space now advances to the next target before navigating" },
+      { type: "fixed", text: "Getting stuck on 0 HP targets - Space now advances to the next target before navigating" },
     ],
   },
   {
