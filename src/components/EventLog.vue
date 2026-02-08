@@ -3,7 +3,7 @@ import { computed } from "vue";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Swords, Zap, Radio } from "lucide-vue-next";
+import { Swords, Gauge, Radio } from "lucide-vue-next";
 import { useEventsStore } from "@/stores/events";
 import { useWarsStore } from "@/stores/wars";
 import { useProcessStore } from "@/stores/process";
@@ -49,10 +49,12 @@ const bgMap: Record<string, string> = {
           <Badge
             variant="secondary"
             class="h-5 rounded px-1.5 text-[10px] font-mono border-0"
-            :class="process.apiLimitReached ? 'bg-red-500/10' : 'bg-amber-500/10'"
+            :class="process.apiLimitReached ? 'bg-red-500/10' : 'bg-sky-500/10'"
           >
-            <Zap class="mr-1 h-2.5 w-2.5" :class="process.apiLimitReached ? 'text-red-400' : 'text-amber-400'" />
-            <span :class="process.apiLimitReached ? 'text-red-400' : 'text-amber-400'">{{ process.apiRemaining }}/40</span>
+            <Gauge class="mr-1 h-2.5 w-2.5" :class="process.apiLimitReached ? 'text-red-400' : 'text-sky-400'" />
+            <span :class="process.apiLimitReached ? 'text-red-400' : 'text-sky-400'">
+              {{ process.apiLimitReached ? `${process.resetInSeconds}s` : `${process.apiRemaining}/40` }}
+            </span>
           </Badge>
         </div>
       </div>

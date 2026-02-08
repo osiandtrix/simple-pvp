@@ -7,7 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
-import { Swords, Save, Keyboard, LogOut, Loader2 } from "lucide-vue-next";
+import { Swords, Save, Keyboard, LogOut, Loader2, UtensilsCrossed, HeartPulse, Zap } from "lucide-vue-next";
 import { toast } from "vue-sonner";
 import WarlistTable from "./WarlistTable.vue";
 import EventLog from "./EventLog.vue";
@@ -168,10 +168,23 @@ async function fetchTargets() {
 async function openCombatWindow(userId: number) {
   const url = `https://web.simple-mmo.com/user/attack/${userId}`;
 
-  // If window already exists, navigate
+  // If window reference exists, try to navigate; if it fails the window is dead
   if (combatWindow) {
-    await invoke("navigate_combat", { url });
-    return;
+    try {
+      await invoke("navigate_combat", { url });
+      return;
+    } catch {
+      combatWindow = null;
+    }
+  }
+
+  // Also check if Tauri still has the window (stale JS reference)
+  const existing = await WebviewWindow.getByLabel("combat");
+  if (existing) {
+    try {
+      await existing.close();
+    } catch { /* already gone */ }
+    await sleep(200);
   }
 
   // Create combat window from JS
@@ -361,25 +374,28 @@ async function exitCombat() {
       <Button
         variant="outline"
         size="sm"
-        class="h-7 flex-1 text-xs border-border/60 text-muted-foreground hover:text-foreground hover:bg-secondary transition-all"
+        class="h-7 flex-1 text-xs border-amber-500/30 text-amber-400 hover:bg-amber-500/10 hover:text-amber-300 transition-all"
         @click="navigateCombat('https://web.simple-mmo.com/inventory/items?itemname=&minlevel=&maxlevel=&type%5B%5D=Food')"
       >
+        <UtensilsCrossed class="mr-1.5 h-3 w-3" />
         Food
       </Button>
       <Button
         variant="outline"
         size="sm"
-        class="h-7 flex-1 text-xs border-border/60 text-muted-foreground hover:text-foreground hover:bg-secondary transition-all"
+        class="h-7 flex-1 text-xs border-rose-500/30 text-rose-400 hover:bg-rose-500/10 hover:text-rose-300 transition-all"
         @click="navigateCombat('https://web.simple-mmo.com/healer')"
       >
+        <HeartPulse class="mr-1.5 h-3 w-3" />
         Healer
       </Button>
       <Button
         variant="outline"
         size="sm"
-        class="h-7 flex-1 text-xs border-border/60 text-muted-foreground hover:text-foreground hover:bg-secondary transition-all"
+        class="h-7 flex-1 text-xs border-yellow-500/30 text-yellow-400 hover:bg-yellow-500/10 hover:text-yellow-300 transition-all"
         @click="navigateCombat('https://web.simple-mmo.com/diamondstore/rewards/energy-points')"
       >
+        <Zap class="mr-1.5 h-3 w-3" />
         Energy
       </Button>
     </div>

@@ -15,11 +15,12 @@ interface ChangelogEntry {
 
 const changelog: ChangelogEntry[] = [
   {
-    version: "1.2.7",
+    version: "1.2.6",
     date: "2026-02-08",
     changes: [
-      { type: "fixed", text: "Single-letter keybinds (F, H, R) not firing due to case mismatch in shortcut handler" },
-      { type: "added", text: "Keybinds for food inventory (F), healer (H), and energy refills (R) now navigate the combat window" },
+      { type: "added", text: "Quick-nav buttons for Food, Healer, and Energy pages below the combat log" },
+      { type: "added", text: "API limit counter now shows a live countdown timer when the limit is reached" },
+      { type: "fixed", text: "Combat window not reopening after being closed - stale window references are now cleaned up" },
     ],
   },
   {
