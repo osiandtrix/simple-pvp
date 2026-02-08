@@ -184,7 +184,7 @@ async function enterCombatForGuild(war: War) {
 async function fetchTargets() {
   let guildsFetched = 0;
 
-  while (wars.targets.length - wars.targetIndex < 5) {
+  while (wars.targets.length - wars.targetIndex < 3) {
     process.checkApiReset();
     if (process.apiLimitReached) {
       const resetIn = process.resetInSeconds;
@@ -193,35 +193,31 @@ async function fetchTargets() {
       continue;
     }
 
-    // Collect up to 3 unique non-blocked guilds to fetch in parallel
-    const batch = new Set<number>();
+    // Find next non-blocked guild
+    let guildId: number | null = null;
     let attempts = 0;
-    while (batch.size < 3 && attempts < wars.warlist.length) {
+    while (attempts < wars.warlist.length) {
       const war = wars.currentWar;
       if (!war) break;
-      const guildId =
+      const id =
         war.attacker_id === user.guildId ? war.defender_id : war.attacker_id;
       wars.nextGuild();
       attempts++;
-      if (blocklist.isBlocked(guildId)) continue;
-      batch.add(guildId);
+      if (blocklist.isBlocked(id)) continue;
+      guildId = id;
+      break;
     }
 
-    if (batch.size === 0) break;
+    if (guildId === null) break;
 
-    guildsFetched += batch.size;
+    guildsFetched++;
+    process.trackApiCall();
 
-    // Fire all requests in parallel
-    const guildIds = [...batch];
-    const results = await Promise.allSettled(
-      guildIds.map((guildId) => {
-        process.trackApiCall();
-        return wars.fetchTargets(guildId, settings.apiKey!, settings.minLevel, settings.maxLevel);
-      })
-    );
-
-    // If all failed, break to avoid infinite loop
-    if (results.every((r) => r.status === "rejected")) break;
+    try {
+      await wars.fetchTargets(guildId, settings.apiKey!, settings.minLevel, settings.maxLevel);
+    } catch {
+      // Guild fetch failed, continue to next
+    }
 
     // Tried all guilds at least once — stop even if buffer isn't full
     if (guildsFetched >= wars.warlist.length) break;
@@ -320,7 +316,7 @@ async function advanceTarget() {
     }
 
     // Prefetch when running low
-    if (!singleGuildMode.value && wars.targets.length - wars.targetIndex < 5) {
+    if (!singleGuildMode.value && wars.targets.length - wars.targetIndex < 3) {
       fetchTargets();
     }
   } finally {

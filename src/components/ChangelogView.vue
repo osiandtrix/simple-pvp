@@ -20,6 +20,8 @@ const changelog: ChangelogEntry[] = [
     changes: [
       { type: "removed", text: "Previous Target keybind removed - use the floating overlay Back button instead" },
       { type: "changed", text: "Next Target keybind (Space) is now locked and cannot be remapped" },
+      { type: "changed", text: "Target fetching is now sequential (1 guild at a time) to reduce API usage" },
+      { type: "changed", text: "Prefetch threshold lowered from 5 to 3 targets to conserve API calls" },
     ],
   },
   {
