@@ -49,7 +49,7 @@ pub async fn post(url: &str, api_key: &str) -> Result<reqwest::Response, reqwest
     let client = Client::new();
     let response = client
         .post(url)
-        .form(&[("api_key", api_key)])
+        .json(&serde_json::json!({ "api_key": api_key }))
         .send()
         .await?;
 

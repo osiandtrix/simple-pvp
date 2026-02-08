@@ -5,6 +5,15 @@ pub async fn fetch_me(api_key: &str) -> Result<PlayerMeResponse, Box<dyn std::er
         "https://api.simple-mmo.com/v1/player/me",
         api_key,
     ).await?;
-    let data: PlayerMeResponse = response.json().await?;
+
+    let status = response.status();
+    let body = response.text().await?;
+
+    if !status.is_success() {
+        return Err(format!("API returned {}: {}", status, body).into());
+    }
+
+    let data: PlayerMeResponse = serde_json::from_str(&body)
+        .map_err(|e| format!("Failed to parse response: {} - body: {}", e, body))?;
     Ok(data)
 }

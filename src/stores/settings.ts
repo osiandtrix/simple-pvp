@@ -35,12 +35,12 @@ export const useSettingsStore = defineStore("settings", {
     },
 
     async saveApiKey(apiKey: string) {
-      await invoke("update_settings", { max_level: null, api_key: apiKey });
+      await invoke("update_settings", { maxLevel: null, apiKey });
       this.apiKey = apiKey;
     },
 
     async saveMaxLevel(maxLevel: number) {
-      await invoke("update_settings", { max_level: maxLevel, api_key: null });
+      await invoke("update_settings", { maxLevel, apiKey: null });
       this.maxLevel = maxLevel;
     },
 
@@ -54,7 +54,7 @@ export const useSettingsStore = defineStore("settings", {
     },
 
     async updateKeybind(originalKey: string, newKey: string) {
-      await invoke("update_keybind", { original_key: originalKey, new_key: newKey });
+      await invoke("update_keybind", { originalKey, newKey });
       await invoke("register_shortcuts");
       await this.fetchKeybinds();
     },

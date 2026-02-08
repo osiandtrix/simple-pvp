@@ -27,14 +27,14 @@ async function saveApiKey() {
       id: number;
       name: string;
       guild?: { id: number; name: string };
-    }>("validate_api_key", { api_key: apiKeyInput.value });
+    }>("validate_api_key", { apiKey: apiKeyInput.value });
 
     await settings.saveApiKey(apiKeyInput.value);
     await user.setUser(player.id, player.guild?.id ?? 0);
 
     toast.success(`Logged in as ${player.name}`);
-  } catch {
-    toast.error("Invalid API key");
+  } catch (e: any) {
+    toast.error(e?.toString() ?? "Invalid API key");
   } finally {
     saving.value = false;
   }

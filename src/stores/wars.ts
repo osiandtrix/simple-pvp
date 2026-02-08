@@ -37,7 +37,7 @@ export const useWarsStore = defineStore("wars", {
     },
 
     async updateWars(guildId: number, apiKey: string) {
-      const wars = await invoke<any[]>("fetch_guild_wars", { guild_id: guildId, api_key: apiKey });
+      const wars = await invoke<any[]>("fetch_guild_wars", { guildId, apiKey });
       this.warlist = wars.map((w) => ({
         attacker: w.guild_1.name,
         attacker_id: w.guild_1.id,
@@ -58,9 +58,9 @@ export const useWarsStore = defineStore("wars", {
 
     async fetchTargets(guildId: number, apiKey: string, maxLevel: number | null) {
       const newTargets = await invoke<Target[]>("fetch_targets", {
-        guild_id: guildId,
-        api_key: apiKey,
-        max_level: maxLevel,
+        guildId,
+        apiKey,
+        maxLevel,
       });
       this.targets.push(...newTargets);
     },

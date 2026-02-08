@@ -24,9 +24,5 @@
       "csp": "default-src 'self'; connect-src 'self' https://api.simple-mmo.com; style-src 'self' 'unsafe-inline'"
     }
   },
-  "plugins": {
-    "global-shortcut": {
-      "enabled": true
-    }
-  }
+  "plugins": {}
 }
