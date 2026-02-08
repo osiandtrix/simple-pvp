@@ -5,3 +5,4 @@ pub mod combat;
 pub mod keybinds;
 pub mod api_client;
 pub mod version;
+pub mod blocklist;

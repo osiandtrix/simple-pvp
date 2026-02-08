@@ -42,6 +42,10 @@ pub fn run_all(conn: &Connection) -> Result<(), rusqlite::Error> {
             start TEXT,
             end_time TEXT,
             kills INTEGER DEFAULT 0
+        );
+        CREATE TABLE IF NOT EXISTS blocked_guilds (
+            guild_id INTEGER PRIMARY KEY,
+            guild_name TEXT NOT NULL
         );"
     )?;
 

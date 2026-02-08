@@ -3,15 +3,17 @@ import { ref, computed } from "vue";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Shuffle, RefreshCw, ArrowUp, ArrowDown, ArrowUpDown, Shield, Crosshair } from "lucide-vue-next";
+import { Shuffle, RefreshCw, ArrowUp, ArrowDown, ArrowUpDown, Shield, Crosshair, Ban } from "lucide-vue-next";
 import { useWarsStore, type War } from "@/stores/wars";
 import { useUserStore } from "@/stores/user";
 import { useSettingsStore } from "@/stores/settings";
+import { useBlocklistStore } from "@/stores/blocklist";
 import { toast } from "vue-sonner";
 
 const wars = useWarsStore();
 const user = useUserStore();
 const settings = useSettingsStore();
+const blocklist = useBlocklistStore();
 
 const emit = defineEmits<{
   targetGuild: [war: War];
@@ -31,10 +33,15 @@ function getOpponent(war: War) {
 }
 
 const sortedWars = computed(() => {
-  const mapped = wars.warlist.map((war) => ({
-    war,
-    ...getOpponent(war),
-  }));
+  const mapped = wars.warlist
+    .filter((war) => {
+      const opponentId = war.attacker_id === user.guildId ? war.defender_id : war.attacker_id;
+      return !blocklist.isBlocked(opponentId);
+    })
+    .map((war) => ({
+      war,
+      ...getOpponent(war),
+    }));
 
   mapped.sort((a, b) => {
     let cmp = 0;
@@ -80,6 +87,13 @@ async function updateWars() {
 function shuffleWars() {
   wars.shuffleWars();
 }
+
+async function handleBlock(war: War) {
+  const opponentId = war.attacker_id === user.guildId ? war.defender_id : war.attacker_id;
+  const opponentName = war.attacker_id === user.guildId ? war.defender : war.attacker;
+  await blocklist.blockGuild(opponentId, opponentName);
+  toast.success(`Blocked ${opponentName}`);
+}
 </script>
 
 <template>
@@ -92,10 +106,10 @@ function shuffleWars() {
             Active Wars
           </CardTitle>
           <Badge
-            v-if="wars.warlist.length > 0"
+            v-if="sortedWars.length > 0"
             class="h-4 rounded px-1.5 text-[10px] font-mono bg-primary/10 text-primary border-0"
           >
-            {{ wars.warlist.length }}
+            {{ sortedWars.length }}
           </Badge>
         </div>
         <div class="flex gap-1.5">
@@ -157,7 +171,7 @@ function shuffleWars() {
                   <ArrowUpDown v-else class="h-3 w-3 opacity-20" />
                 </span>
               </th>
-              <th class="pb-2 w-8"></th>
+              <th class="pb-2 w-16"></th>
             </tr>
           </thead>
           <tbody>
@@ -174,18 +188,27 @@ function shuffleWars() {
                 {{ row.them }}
               </td>
               <td class="py-1.5 text-right">
-                <button
-                  class="inline-flex h-5 w-5 items-center justify-center rounded text-muted-foreground/40 opacity-0 transition-all group-hover:opacity-100 hover:bg-primary/10 hover:text-primary"
-                  title="Target this guild only"
-                  @click="emit('targetGuild', row.war)"
-                >
-                  <Crosshair class="h-3 w-3" />
-                </button>
+                <div class="inline-flex gap-0.5">
+                  <button
+                    class="inline-flex h-5 w-5 items-center justify-center rounded text-muted-foreground/40 opacity-0 transition-all group-hover:opacity-100 hover:bg-primary/10 hover:text-primary"
+                    title="Target this guild only"
+                    @click="emit('targetGuild', row.war)"
+                  >
+                    <Crosshair class="h-3 w-3" />
+                  </button>
+                  <button
+                    class="inline-flex h-5 w-5 items-center justify-center rounded text-muted-foreground/40 opacity-0 transition-all group-hover:opacity-100 hover:bg-red-500/10 hover:text-red-400"
+                    title="Block this guild"
+                    @click="handleBlock(row.war)"
+                  >
+                    <Ban class="h-3 w-3" />
+                  </button>
+                </div>
               </td>
             </tr>
           </tbody>
         </table>
-        <div v-if="wars.warlist.length === 0" class="flex flex-col items-center justify-center py-12 text-muted-foreground">
+        <div v-if="sortedWars.length === 0" class="flex flex-col items-center justify-center py-12 text-muted-foreground">
           <Shield class="mb-2 h-6 w-6 opacity-20" />
           <p class="text-xs">No active wars</p>
           <p class="mt-1 text-[10px] text-muted-foreground/60">Set your API key and update</p>

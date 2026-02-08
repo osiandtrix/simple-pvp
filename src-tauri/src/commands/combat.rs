@@ -2,6 +2,15 @@ use crate::db;
 use tauri::{AppHandle, Manager};
 
 #[tauri::command]
+pub fn get_combat_url(app: AppHandle) -> Result<String, String> {
+    if let Some(window) = app.get_webview_window("combat") {
+        window.url().map(|u| u.to_string()).map_err(|e| e.to_string())
+    } else {
+        Err("Combat window not found".into())
+    }
+}
+
+#[tauri::command]
 pub fn navigate_combat(app: AppHandle, url: String) -> Result<(), String> {
     if let Some(window) = app.get_webview_window("combat") {
         window

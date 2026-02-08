@@ -5,16 +5,19 @@ import AppSidebar from "./components/AppSidebar.vue";
 import MainView from "./components/MainView.vue";
 import SettingsView from "./components/SettingsView.vue";
 import ChangelogView from "./components/ChangelogView.vue";
+import BlockedView from "./components/BlockedView.vue";
 import { Toaster } from "vue-sonner";
 import { useUserStore } from "./stores/user";
 import { useSettingsStore } from "./stores/settings";
 import { useWarsStore } from "./stores/wars";
 import { useProcessStore } from "./stores/process";
+import { useBlocklistStore } from "./stores/blocklist";
 
 const user = useUserStore();
 const settings = useSettingsStore();
 const wars = useWarsStore();
 const process = useProcessStore();
+const blocklist = useBlocklistStore();
 
 const sidebarOpen = ref(false);
 const activePage = ref("main");
@@ -25,12 +28,14 @@ onMounted(async () => {
     settings.init(),
     wars.init(),
     process.init(),
+    blocklist.init(),
   ]);
 });
 
 const pages: Record<string, any> = {
   main: MainView,
   settings: SettingsView,
+  blocked: BlockedView,
   changelog: ChangelogView,
 };
 </script>

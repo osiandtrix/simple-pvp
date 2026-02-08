@@ -15,6 +15,16 @@ interface ChangelogEntry {
 
 const changelog: ChangelogEntry[] = [
   {
+    version: "1.3.0",
+    date: "2026-02-08",
+    changes: [
+      { type: "added", text: "Guild blocklist - block guilds from the war list so they are skipped during combat" },
+      { type: "added", text: "Blocked Guilds page to view and unblock guilds" },
+      { type: "added", text: "Clickable keybinds indicator to toggle keybinds on/off during combat" },
+      { type: "fixed", text: "Keybinds no longer fire on SimpleMMO login pages" },
+    ],
+  },
+  {
     version: "1.2.6",
     date: "2026-02-08",
     changes: [

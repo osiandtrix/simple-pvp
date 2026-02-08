@@ -59,3 +59,10 @@ pub struct Target {
     pub current_hp: i64,
     pub max_hp: i64,
 }
+
+#[derive(Debug, Serialize, Deserialize, Clone)]
+#[allow(dead_code)]
+pub struct BlockedGuild {
+    pub guild_id: i64,
+    pub guild_name: String,
+}

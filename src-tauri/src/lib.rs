@@ -73,6 +73,7 @@ pub fn run() {
             commands::wars::fetch_war_entries,
             commands::wars::update_warlist,
             commands::wars::fetch_targets,
+            commands::combat::get_combat_url,
             commands::combat::navigate_combat,
             commands::combat::update_target_hit,
             commands::combat::fetch_target_logs,
@@ -83,6 +84,9 @@ pub fn run() {
             commands::api_client::fetch_guild_members,
             commands::version::fetch_version,
             commands::version::run_migrations,
+            commands::blocklist::fetch_blocked_guilds,
+            commands::blocklist::block_guild,
+            commands::blocklist::unblock_guild,
             hotkeys::register_shortcuts,
             hotkeys::unregister_shortcuts,
         ])

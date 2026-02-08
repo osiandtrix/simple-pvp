@@ -1,6 +1,5 @@
 <script setup lang="ts">
-import { Swords, Settings, FileText, X } from "lucide-vue-next";
-import { Button } from "@/components/ui/button";
+import { Swords, Settings, FileText, Ban } from "lucide-vue-next";
 import {
   Sheet,
   SheetContent,
@@ -22,6 +21,7 @@ const emit = defineEmits<{
 const navItems = [
   { id: "main", label: "Combat", icon: Swords, description: "Battle management" },
   { id: "settings", label: "Settings", icon: Settings, description: "API & preferences" },
+  { id: "blocked", label: "Blocked", icon: Ban, description: "Blocked guilds" },
   { id: "changelog", label: "Changelog", icon: FileText, description: "Version history" },
 ];
 
@@ -35,16 +35,8 @@ function navigateTo(page: string) {
 <template>
   <Sheet :open="open" @update:open="$emit('update:open', $event)">
     <SheetContent side="left" class="w-60 border-r border-border/60 bg-card p-0">
-      <div class="flex h-11 items-center justify-between border-b border-border/60 px-3">
+      <div class="flex h-11 items-center border-b border-border/60 px-3">
         <span class="text-xs font-semibold tracking-wide text-muted-foreground uppercase">Navigation</span>
-        <Button
-          variant="ghost"
-          size="icon"
-          class="h-6 w-6 text-muted-foreground hover:text-foreground"
-          @click="$emit('update:open', false)"
-        >
-          <X class="h-3.5 w-3.5" />
-        </Button>
       </div>
 
       <nav class="flex flex-col gap-0.5 p-2">

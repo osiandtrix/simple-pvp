@@ -17,17 +17,20 @@ import { useSettingsStore } from "@/stores/settings";
 import { useWarsStore, type War } from "@/stores/wars";
 import { useProcessStore } from "@/stores/process";
 import { useEventsStore } from "@/stores/events";
+import { useBlocklistStore } from "@/stores/blocklist";
 
 const user = useUserStore();
 const settings = useSettingsStore();
 const wars = useWarsStore();
 const process = useProcessStore();
 const events = useEventsStore();
+const blocklist = useBlocklistStore();
 
 const minLevel = ref(settings.minLevel ?? 0);
 const maxLevel = ref(settings.maxLevel ?? 0);
 const initiatingCombat = ref(false);
 const singleGuildMode = ref(false);
+const keybindsActive = ref(false);
 let combatWindow: WebviewWindow | null = null;
 let attackInProgress = false;
 let lastAttackTime = 0;
@@ -58,6 +61,27 @@ watch(() => settings.maxLevel, (val) => {
   maxLevel.value = val ?? 0;
 });
 
+async function isOnLoginPage(): Promise<boolean> {
+  if (!combatWindow) return false;
+  try {
+    const url = await invoke<string>("get_combat_url");
+    return url.includes("/login");
+  } catch {
+    return false;
+  }
+}
+
+async function toggleKeybinds() {
+  if (!process.inCombat) return;
+  if (keybindsActive.value) {
+    await invoke("unregister_shortcuts");
+    keybindsActive.value = false;
+  } else {
+    await invoke("register_shortcuts");
+    keybindsActive.value = true;
+  }
+}
+
 async function saveLevels() {
   await settings.saveMinLevel(minLevel.value);
   await settings.saveMaxLevel(maxLevel.value);
@@ -65,7 +89,11 @@ async function saveLevels() {
 }
 
 async function enterCombat() {
-  if (!settings.apiKey || wars.warlist.length === 0) return;
+  const hasUnblockedWars = wars.warlist.some((w) => {
+    const opponentId = w.attacker_id === user.guildId ? w.defender_id : w.attacker_id;
+    return !blocklist.isBlocked(opponentId);
+  });
+  if (!settings.apiKey || !hasUnblockedWars) return;
   initiatingCombat.value = true;
   singleGuildMode.value = false;
 
@@ -77,6 +105,7 @@ async function enterCombat() {
       await openCombatWindow(wars.currentTarget.user_id);
     }
     await invoke("register_shortcuts");
+    keybindsActive.value = true;
   } catch (e) {
     toast.error("Failed to enter combat");
   } finally {
@@ -113,6 +142,7 @@ async function enterCombatForGuild(war: War) {
     events.clear();
     await openCombatWindow(wars.currentTarget.user_id);
     await invoke("register_shortcuts");
+    keybindsActive.value = true;
   } catch (e) {
     toast.error("Failed to load targets");
   } finally {
@@ -132,16 +162,18 @@ async function fetchTargets() {
       continue;
     }
 
-    // Collect up to 3 unique guilds to fetch in parallel
+    // Collect up to 3 unique non-blocked guilds to fetch in parallel
     const batch = new Set<number>();
-    const maxBatch = Math.min(3, wars.warlist.length);
-    for (let i = 0; i < maxBatch; i++) {
+    let attempts = 0;
+    while (batch.size < 3 && attempts < wars.warlist.length) {
       const war = wars.currentWar;
       if (!war) break;
       const guildId =
         war.attacker_id === user.guildId ? war.defender_id : war.attacker_id;
-      batch.add(guildId);
       wars.nextGuild();
+      attempts++;
+      if (blocklist.isBlocked(guildId)) continue;
+      batch.add(guildId);
     }
 
     if (batch.size === 0) break;
@@ -217,7 +249,8 @@ async function navigateCombat(url: string) {
 
 async function handleSpaceBar() {
   const now = Date.now();
-  if (!process.inCombat || !wars.currentTarget || attackInProgress || now - lastAttackTime < 150) return;
+  if (!process.inCombat || !keybindsActive.value || !wars.currentTarget || attackInProgress || now - lastAttackTime < 150) return;
+  if (await isOnLoginPage()) return;
   attackInProgress = true;
   lastAttackTime = now;
 
@@ -265,8 +298,9 @@ async function handleSpaceBar() {
   }
 }
 
-function handleCtrlSpace() {
-  if (!process.inCombat) return;
+async function handleCtrlSpace() {
+  if (!process.inCombat || !keybindsActive.value) return;
+  if (await isOnLoginPage()) return;
   wars.previousTarget();
 }
 
@@ -280,6 +314,7 @@ async function exitCombat() {
     combatWindow = null;
   }
   await invoke("unregister_shortcuts");
+  keybindsActive.value = false;
   process.setInCombat(false);
   wars.reset();
   wars.init();
@@ -330,17 +365,22 @@ async function exitCombat() {
         <Separator class="bg-border/40" />
 
         <div class="flex items-center justify-between">
-          <div class="flex items-center gap-2">
+          <button
+            class="flex items-center gap-2 rounded px-1 -mx-1 transition-colors"
+            :class="process.inCombat ? 'hover:bg-secondary/50 cursor-pointer' : 'cursor-default'"
+            :title="process.inCombat ? (keybindsActive ? 'Click to disable keybinds' : 'Click to enable keybinds') : ''"
+            @click="toggleKeybinds"
+          >
             <div
               class="h-2 w-2 rounded-full transition-colors"
-              :class="process.inCombat ? 'bg-emerald-400 shadow-[0_0_6px_1px_rgba(52,211,153,0.4)]' : 'bg-red-400/60'"
+              :class="keybindsActive ? 'bg-emerald-400 shadow-[0_0_6px_1px_rgba(52,211,153,0.4)]' : 'bg-red-400/60'"
             />
             <Keyboard class="h-3.5 w-3.5 text-muted-foreground" />
             <span class="text-xs font-medium">Keybinds</span>
-            <span class="text-[10px] font-mono" :class="process.inCombat ? 'text-emerald-400' : 'text-red-400/60'">
-              {{ process.inCombat ? "ACTIVE" : "OFF" }}
+            <span class="text-[10px] font-mono" :class="keybindsActive ? 'text-emerald-400' : 'text-red-400/60'">
+              {{ keybindsActive ? "ACTIVE" : "OFF" }}
             </span>
-          </div>
+          </button>
 
           <div class="flex gap-1.5">
             <Button
@@ -374,7 +414,7 @@ async function exitCombat() {
       <Button
         variant="outline"
         size="sm"
-        class="h-7 flex-1 text-xs border-amber-500/30 text-amber-400 hover:bg-amber-500/10 hover:text-amber-300 transition-all"
+        class="h-7 flex-1 text-xs border-border/60 text-muted-foreground hover:text-foreground hover:bg-secondary transition-all"
         @click="navigateCombat('https://web.simple-mmo.com/inventory/items?itemname=&minlevel=&maxlevel=&type%5B%5D=Food')"
       >
         <UtensilsCrossed class="mr-1.5 h-3 w-3" />
@@ -383,7 +423,7 @@ async function exitCombat() {
       <Button
         variant="outline"
         size="sm"
-        class="h-7 flex-1 text-xs border-rose-500/30 text-rose-400 hover:bg-rose-500/10 hover:text-rose-300 transition-all"
+        class="h-7 flex-1 text-xs border-border/60 text-muted-foreground hover:text-foreground hover:bg-secondary transition-all"
         @click="navigateCombat('https://web.simple-mmo.com/healer')"
       >
         <HeartPulse class="mr-1.5 h-3 w-3" />
@@ -392,7 +432,7 @@ async function exitCombat() {
       <Button
         variant="outline"
         size="sm"
-        class="h-7 flex-1 text-xs border-yellow-500/30 text-yellow-400 hover:bg-yellow-500/10 hover:text-yellow-300 transition-all"
+        class="h-7 flex-1 text-xs border-border/60 text-muted-foreground hover:text-foreground hover:bg-secondary transition-all"
         @click="navigateCombat('https://web.simple-mmo.com/diamondstore/rewards/energy-points')"
       >
         <Zap class="mr-1.5 h-3 w-3" />
