@@ -36,16 +36,29 @@ const pages: Record<string, any> = {
 </script>
 
 <template>
-  <div class="flex h-screen flex-col">
+  <div class="flex h-screen flex-col bg-background">
     <AppHeader @toggle-sidebar="sidebarOpen = !sidebarOpen" />
     <AppSidebar
       v-model:open="sidebarOpen"
       :active-page="activePage"
       @navigate="activePage = $event"
     />
-    <main class="flex-1 overflow-auto p-4">
-      <component :is="pages[activePage]" />
+    <main class="flex-1 overflow-auto p-3">
+      <div class="animate-in">
+        <component :is="pages[activePage]" />
+      </div>
     </main>
-    <Toaster position="bottom-right" theme="dark" />
+    <Toaster
+      position="bottom-right"
+      theme="dark"
+      :toast-options="{
+        style: {
+          background: 'hsl(0 0% 4%)',
+          border: '1px solid hsl(0 0% 12%)',
+          color: 'hsl(0 0% 93%)',
+          fontFamily: 'DM Sans, sans-serif',
+        },
+      }"
+    />
   </div>
 </template>

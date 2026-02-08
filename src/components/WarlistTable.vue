@@ -2,9 +2,8 @@
 import { ref, computed } from "vue";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { ScrollArea } from "@/components/ui/scroll-area";
 import { Badge } from "@/components/ui/badge";
-import { Shuffle, RefreshCw, ArrowUpDown, ArrowUp, ArrowDown } from "lucide-vue-next";
+import { Shuffle, RefreshCw, ArrowUp, ArrowDown, ArrowUpDown, Shield } from "lucide-vue-next";
 import { useWarsStore, type War } from "@/stores/wars";
 import { useUserStore } from "@/stores/user";
 import { useSettingsStore } from "@/stores/settings";
@@ -80,61 +79,78 @@ function shuffleWars() {
 </script>
 
 <template>
-  <Card>
-    <CardHeader class="pb-3">
+  <Card class="border-border/60 bg-card">
+    <CardHeader class="px-4 py-3">
       <div class="flex items-center justify-between">
         <div class="flex items-center gap-2">
-          <CardTitle class="text-sm font-medium">Active Wars</CardTitle>
-          <Badge v-if="wars.warlist.length > 0" variant="secondary" class="text-[10px] px-1.5 py-0">
+          <CardTitle class="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+            <Shield class="h-3.5 w-3.5 text-primary" />
+            Active Wars
+          </CardTitle>
+          <Badge
+            v-if="wars.warlist.length > 0"
+            class="h-4 rounded px-1.5 text-[10px] font-mono bg-primary/10 text-primary border-0"
+          >
             {{ wars.warlist.length }}
           </Badge>
         </div>
-        <div class="flex gap-2">
-          <Button variant="outline" size="sm" @click="shuffleWars" :disabled="wars.warlist.length === 0">
-            <Shuffle class="mr-2 h-3 w-3" /> Shuffle
+        <div class="flex gap-1.5">
+          <Button
+            variant="outline"
+            size="sm"
+            class="h-7 text-xs border-border/60 text-muted-foreground hover:text-foreground hover:bg-secondary transition-all"
+            :disabled="wars.warlist.length === 0"
+            @click="shuffleWars"
+          >
+            <Shuffle class="mr-1.5 h-3 w-3" /> Shuffle
           </Button>
-          <Button variant="outline" size="sm" @click="updateWars">
-            <RefreshCw class="mr-2 h-3 w-3" /> Update
+          <Button
+            variant="outline"
+            size="sm"
+            class="h-7 text-xs border-border/60 text-muted-foreground hover:text-foreground hover:bg-secondary transition-all"
+            @click="updateWars"
+          >
+            <RefreshCw class="mr-1.5 h-3 w-3" /> Update
           </Button>
         </div>
       </div>
     </CardHeader>
-    <CardContent>
-      <ScrollArea class="h-[40vh]">
+    <CardContent class="px-4 pb-4">
+      <div class="max-h-[50vh] overflow-y-auto">
         <table class="w-full text-sm">
           <thead>
-            <tr class="border-b text-muted-foreground">
+            <tr class="border-b border-border/40">
               <th
-                class="pb-2 text-left font-medium cursor-pointer select-none hover:text-foreground transition-colors"
+                class="pb-2 text-left text-[11px] font-semibold uppercase tracking-wider text-muted-foreground cursor-pointer select-none hover:text-foreground transition-colors"
                 @click="toggleSort('name')"
               >
                 <span class="inline-flex items-center gap-1">
                   Guild
-                  <ArrowUp v-if="sortKey === 'name' && sortDir === 'asc'" class="h-3 w-3" />
-                  <ArrowDown v-else-if="sortKey === 'name' && sortDir === 'desc'" class="h-3 w-3" />
-                  <ArrowUpDown v-else class="h-3 w-3 opacity-30" />
+                  <ArrowUp v-if="sortKey === 'name' && sortDir === 'asc'" class="h-3 w-3 text-primary" />
+                  <ArrowDown v-else-if="sortKey === 'name' && sortDir === 'desc'" class="h-3 w-3 text-primary" />
+                  <ArrowUpDown v-else class="h-3 w-3 opacity-20" />
                 </span>
               </th>
               <th
-                class="pb-2 text-right font-medium cursor-pointer select-none hover:text-foreground transition-colors"
+                class="pb-2 text-right text-[11px] font-semibold uppercase tracking-wider text-muted-foreground cursor-pointer select-none hover:text-foreground transition-colors"
                 @click="toggleSort('you')"
               >
                 <span class="inline-flex items-center justify-end gap-1">
                   You
-                  <ArrowUp v-if="sortKey === 'you' && sortDir === 'asc'" class="h-3 w-3" />
-                  <ArrowDown v-else-if="sortKey === 'you' && sortDir === 'desc'" class="h-3 w-3" />
-                  <ArrowUpDown v-else class="h-3 w-3 opacity-30" />
+                  <ArrowUp v-if="sortKey === 'you' && sortDir === 'asc'" class="h-3 w-3 text-primary" />
+                  <ArrowDown v-else-if="sortKey === 'you' && sortDir === 'desc'" class="h-3 w-3 text-primary" />
+                  <ArrowUpDown v-else class="h-3 w-3 opacity-20" />
                 </span>
               </th>
               <th
-                class="pb-2 text-right font-medium cursor-pointer select-none hover:text-foreground transition-colors"
+                class="pb-2 text-right text-[11px] font-semibold uppercase tracking-wider text-muted-foreground cursor-pointer select-none hover:text-foreground transition-colors"
                 @click="toggleSort('them')"
               >
                 <span class="inline-flex items-center justify-end gap-1">
                   Them
-                  <ArrowUp v-if="sortKey === 'them' && sortDir === 'asc'" class="h-3 w-3" />
-                  <ArrowDown v-else-if="sortKey === 'them' && sortDir === 'desc'" class="h-3 w-3" />
-                  <ArrowUpDown v-else class="h-3 w-3 opacity-30" />
+                  <ArrowUp v-if="sortKey === 'them' && sortDir === 'asc'" class="h-3 w-3 text-primary" />
+                  <ArrowDown v-else-if="sortKey === 'them' && sortDir === 'desc'" class="h-3 w-3 text-primary" />
+                  <ArrowUpDown v-else class="h-3 w-3 opacity-20" />
                 </span>
               </th>
             </tr>
@@ -143,22 +159,24 @@ function shuffleWars() {
             <tr
               v-for="(row, i) in sortedWars"
               :key="i"
-              class="border-b border-border/50 hover:bg-muted/50 transition-colors"
+              class="group border-b border-border/20 transition-colors hover:bg-secondary/30"
             >
-              <td class="py-2 font-medium">{{ row.name }}</td>
-              <td class="py-2 text-right tabular-nums text-green-400">
+              <td class="py-1.5 text-xs font-medium">{{ row.name }}</td>
+              <td class="py-1.5 text-right font-mono text-xs text-emerald-400">
                 {{ row.you }}
               </td>
-              <td class="py-2 text-right tabular-nums text-red-400">
+              <td class="py-1.5 text-right font-mono text-xs text-red-400">
                 {{ row.them }}
               </td>
             </tr>
           </tbody>
         </table>
-        <p v-if="wars.warlist.length === 0" class="py-8 text-center text-muted-foreground">
-          No active wars. Set your API key and update.
-        </p>
-      </ScrollArea>
+        <div v-if="wars.warlist.length === 0" class="flex flex-col items-center justify-center py-12 text-muted-foreground">
+          <Shield class="mb-2 h-6 w-6 opacity-20" />
+          <p class="text-xs">No active wars</p>
+          <p class="mt-1 text-[10px] text-muted-foreground/60">Set your API key and update</p>
+        </div>
+      </div>
     </CardContent>
   </Card>
 </template>

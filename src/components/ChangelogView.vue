@@ -2,6 +2,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { FileText } from "lucide-vue-next";
 import { useSettingsStore } from "@/stores/settings";
 
 const settings = useSettingsStore();
@@ -34,40 +35,45 @@ const changelog: ChangelogEntry[] = [
   },
 ];
 
-const badgeVariant: Record<string, string> = {
-  added: "text-green-400 border-green-400/30",
-  changed: "text-blue-400 border-blue-400/30",
-  fixed: "text-yellow-400 border-yellow-400/30",
-  removed: "text-red-400 border-red-400/30",
+const badgeColors: Record<string, string> = {
+  added: "bg-emerald-500/10 text-emerald-400 border-0",
+  changed: "bg-primary/10 text-primary border-0",
+  fixed: "bg-yellow-500/10 text-yellow-400 border-0",
+  removed: "bg-red-500/10 text-red-400 border-0",
 };
 </script>
 
 <template>
-  <div class="space-y-4">
-    <Card v-for="entry in changelog" :key="entry.version">
-      <CardHeader class="pb-3">
+  <div class="space-y-3">
+    <Card v-for="entry in changelog" :key="entry.version" class="border-border/60 bg-card">
+      <CardHeader class="px-4 py-3">
         <div class="flex items-center justify-between">
-          <CardTitle class="text-sm font-medium">
-            v{{ entry.version }}
-            <Badge v-if="entry.version === settings.appVersion" variant="secondary" class="ml-2">
+          <CardTitle class="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+            <FileText class="h-3.5 w-3.5 text-primary" />
+            <span class="font-mono">v{{ entry.version }}</span>
+            <Badge
+              v-if="entry.version === settings.appVersion"
+              class="h-4 rounded px-1.5 text-[10px] font-mono bg-primary/10 text-primary border-0"
+            >
               current
             </Badge>
           </CardTitle>
-          <span class="text-xs text-muted-foreground">{{ entry.date }}</span>
+          <span class="text-[10px] font-mono text-muted-foreground/60">{{ entry.date }}</span>
         </div>
       </CardHeader>
-      <CardContent>
+      <CardContent class="px-4 pb-4">
         <ScrollArea class="max-h-[60vh]">
-          <ul class="space-y-2">
+          <ul class="space-y-1.5">
             <li
               v-for="(change, i) in entry.changes"
               :key="i"
-              class="flex items-start gap-2 text-sm"
+              class="flex items-start gap-2 text-xs animate-in"
+              :style="{ animationDelay: `${i * 30}ms` }"
             >
-              <Badge variant="outline" :class="badgeVariant[change.type]" class="mt-0.5 shrink-0 text-[10px] px-1.5 py-0">
+              <Badge :class="badgeColors[change.type]" class="mt-0.5 shrink-0 text-[10px] px-1.5 py-0 rounded font-medium">
                 {{ change.type }}
               </Badge>
-              <span>{{ change.text }}</span>
+              <span class="text-foreground/80">{{ change.text }}</span>
             </li>
           </ul>
         </ScrollArea>

@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { computed } from "vue";
-import { Badge } from "@/components/ui/badge";
 
 const props = defineProps<{ keys: string }>();
 
@@ -19,10 +18,10 @@ const keyParts = computed(() =>
 <template>
   <span class="inline-flex items-center gap-0.5">
     <template v-for="(key, i) in keyParts" :key="i">
-      <span v-if="i > 0" class="text-xs text-muted-foreground">+</span>
-      <Badge variant="outline" class="px-1.5 py-0.5 font-mono text-xs">
+      <span v-if="i > 0" class="text-[10px] text-muted-foreground/40">+</span>
+      <span class="inline-flex items-center justify-center rounded bg-secondary/80 px-1.5 py-0.5 font-mono text-[10px] text-muted-foreground border border-border/40">
         {{ key }}
-      </Badge>
+      </span>
     </template>
   </span>
 </template>

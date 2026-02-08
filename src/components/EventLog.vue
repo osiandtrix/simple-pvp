@@ -3,7 +3,7 @@ import { computed } from "vue";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Swords, Eye, EyeOff, Activity } from "lucide-vue-next";
+import { Swords, Eye, EyeOff, Activity, Radio } from "lucide-vue-next";
 import { useEventsStore } from "@/stores/events";
 import { useWarsStore } from "@/stores/wars";
 import { useProcessStore } from "@/stores/process";
@@ -22,50 +22,65 @@ const iconMap = {
   nothit: EyeOff,
 };
 
-const colorMap = {
-  attack: "text-blue-400",
-  hit: "text-green-400",
+const colorMap: Record<string, string> = {
+  attack: "text-primary",
+  hit: "text-emerald-400",
   nothit: "text-red-400",
+};
+
+const bgMap: Record<string, string> = {
+  attack: "bg-primary/5",
+  hit: "bg-emerald-400/5",
+  nothit: "bg-red-400/5",
 };
 </script>
 
 <template>
-  <Card>
-    <CardHeader class="pb-3">
+  <Card class="border-border/60 bg-card">
+    <CardHeader class="px-4 py-3">
       <div class="flex items-center justify-between">
-        <CardTitle class="text-sm font-medium">Combat Log</CardTitle>
-        <div class="flex gap-2">
-          <Badge variant="secondary">
-            Target {{ wars.targetIndex + 1 }}/{{ wars.targets.length }}
+        <CardTitle class="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+          <Radio class="h-3.5 w-3.5 text-emerald-400" />
+          Combat Log
+        </CardTitle>
+        <div class="flex gap-1.5">
+          <Badge variant="secondary" class="h-5 rounded px-1.5 text-[10px] font-mono bg-secondary/80 text-muted-foreground border-0">
+            T {{ wars.targetIndex + 1 }}/{{ wars.targets.length }}
           </Badge>
-          <Badge variant="secondary">
-            Guild {{ wars.activeGuildIndex + 1 }}/{{ wars.warlist.length }}
+          <Badge variant="secondary" class="h-5 rounded px-1.5 text-[10px] font-mono bg-secondary/80 text-muted-foreground border-0">
+            G {{ wars.activeGuildIndex + 1 }}/{{ wars.warlist.length }}
           </Badge>
-          <Badge variant="secondary" :class="process.apiLimitReached ? 'text-red-400' : ''">
-            <Activity class="mr-1 h-3 w-3" />
+          <Badge
+            variant="secondary"
+            class="h-5 rounded px-1.5 text-[10px] font-mono border-0"
+            :class="process.apiLimitReached ? 'bg-red-500/10 text-red-400' : 'bg-secondary/80 text-muted-foreground'"
+          >
+            <Activity class="mr-1 h-2.5 w-2.5" />
             {{ process.apiRemaining }}/40
           </Badge>
         </div>
       </div>
     </CardHeader>
-    <CardContent>
+    <CardContent class="px-4 pb-4">
       <ScrollArea class="h-[50vh]">
-        <div class="space-y-1">
+        <div class="space-y-0.5">
           <div
             v-for="(event, i) in recentEvents"
             :key="i"
-            class="flex items-center gap-2 rounded px-2 py-1 text-sm hover:bg-muted/50"
+            class="flex items-center gap-2 rounded-md px-2 py-1.5 text-sm transition-colors animate-fade-in"
+            :class="bgMap[event.type]"
           >
             <component
               :is="iconMap[event.type]"
-              class="h-4 w-4 shrink-0"
+              class="h-3.5 w-3.5 shrink-0"
               :class="colorMap[event.type]"
             />
-            <span class="truncate">{{ event.text }}</span>
+            <span class="truncate text-xs">{{ event.text }}</span>
           </div>
-          <p v-if="events.events.length === 0" class="py-4 text-center text-muted-foreground">
-            Waiting for combat actions...
-          </p>
+          <div v-if="events.events.length === 0" class="flex flex-col items-center justify-center py-12 text-muted-foreground">
+            <Swords class="mb-2 h-6 w-6 opacity-20" />
+            <p class="text-xs">Waiting for combat actions...</p>
+          </div>
         </div>
       </ScrollArea>
     </CardContent>

@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
 import { Separator } from "@/components/ui/separator";
-import { Swords, Save } from "lucide-vue-next";
+import { Swords, Save, Keyboard, LogOut, Loader2 } from "lucide-vue-next";
 import { toast } from "vue-sonner";
 import WarlistTable from "./WarlistTable.vue";
 import EventLog from "./EventLog.vue";
@@ -230,53 +230,78 @@ async function exitCombat() {
 </script>
 
 <template>
-  <div class="space-y-4">
-    <Card>
-      <CardHeader class="pb-3">
-        <CardTitle class="text-sm font-medium">Combat Setup</CardTitle>
+  <div class="space-y-3">
+    <Card class="border-border/60 bg-card">
+      <CardHeader class="px-4 py-3">
+        <CardTitle class="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+          <Swords class="h-3.5 w-3.5 text-primary" />
+          Combat Setup
+        </CardTitle>
       </CardHeader>
-      <CardContent class="space-y-4">
-        <div class="flex items-end gap-3">
+      <CardContent class="space-y-3 px-4 pb-4">
+        <div class="flex items-end gap-2">
           <div class="flex-1">
-            <label class="mb-1 block text-xs text-muted-foreground">Min Level</label>
-            <Input v-model.number="minLevel" type="number" placeholder="0" />
+            <label class="mb-1 block text-[11px] font-medium text-muted-foreground tracking-wide uppercase">Min Level</label>
+            <Input
+              v-model.number="minLevel"
+              type="number"
+              placeholder="0"
+              class="h-8 bg-secondary/50 border-border/60 text-sm font-mono"
+            />
           </div>
           <div class="flex-1">
-            <label class="mb-1 block text-xs text-muted-foreground">Max Level</label>
-            <Input v-model.number="maxLevel" type="number" placeholder="Max target level" />
+            <label class="mb-1 block text-[11px] font-medium text-muted-foreground tracking-wide uppercase">Max Level</label>
+            <Input
+              v-model.number="maxLevel"
+              type="number"
+              placeholder="Max"
+              class="h-8 bg-secondary/50 border-border/60 text-sm font-mono"
+            />
           </div>
-          <Button variant="outline" size="sm" :disabled="!maxLevel" @click="saveLevels">
-            <Save class="mr-2 h-3 w-3" /> Save
+          <Button
+            variant="outline"
+            size="sm"
+            :disabled="!maxLevel"
+            class="h-8 border-border/60 text-xs hover:bg-secondary transition-colors"
+            @click="saveLevels"
+          >
+            <Save class="mr-1.5 h-3 w-3" /> Save
           </Button>
         </div>
 
-        <Separator />
+        <Separator class="bg-border/40" />
 
         <div class="flex items-center justify-between">
-          <div class="flex items-center gap-3">
+          <div class="flex items-center gap-2.5">
             <Switch
               v-model:checked="keybindsActive"
               :disabled="!process.inCombat"
             />
-            <span class="text-sm">Keybinds</span>
+            <div class="flex items-center gap-1.5">
+              <Keyboard class="h-3.5 w-3.5 text-muted-foreground" />
+              <span class="text-xs font-medium">Keybinds</span>
+            </div>
           </div>
 
-          <div class="flex gap-2">
+          <div class="flex gap-1.5">
             <Button
               v-if="process.inCombat"
               variant="outline"
               size="sm"
+              class="h-7 text-xs border-border/60 text-muted-foreground hover:text-foreground hover:bg-secondary transition-all"
               @click="exitCombat"
             >
-              Exit Combat
+              <LogOut class="mr-1.5 h-3 w-3" />
+              Exit
             </Button>
             <Button
-              variant="destructive"
               size="sm"
               :disabled="!maxLevel || !settings.apiKey || wars.warlist.length === 0 || process.inCombat || initiatingCombat"
+              class="h-7 text-xs bg-primary text-primary-foreground hover:bg-primary/90 glow-purple transition-all disabled:opacity-40"
               @click="enterCombat"
             >
-              <Swords class="mr-2 h-3 w-3" />
+              <Loader2 v-if="initiatingCombat" class="mr-1.5 h-3 w-3 animate-spin" />
+              <Swords v-else class="mr-1.5 h-3 w-3" />
               {{ initiatingCombat ? "Loading..." : "Enter Combat" }}
             </Button>
           </div>
@@ -284,7 +309,7 @@ async function exitCombat() {
       </CardContent>
     </Card>
 
-    <EventLog v-if="process.inCombat" />
-    <WarlistTable v-else />
+    <EventLog v-if="process.inCombat" class="animate-slide-up" />
+    <WarlistTable v-else class="animate-in" />
   </div>
 </template>
