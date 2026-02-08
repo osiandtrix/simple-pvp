@@ -121,7 +121,7 @@ async function enterCombatForGuild(war: War) {
 }
 
 async function fetchTargets() {
-  while (!wars.currentTarget) {
+  while (wars.targets.length - wars.targetIndex < 5) {
     process.checkApiReset();
     if (process.apiLimitReached) {
       const resetIn = process.resetInSeconds;
@@ -145,6 +145,7 @@ async function fetchTargets() {
     if (batch.size === 0) break;
 
     // Fire all requests in parallel
+    const before = wars.targets.length;
     const guildIds = [...batch];
     const results = await Promise.allSettled(
       guildIds.map((guildId) => {
@@ -155,6 +156,9 @@ async function fetchTargets() {
 
     // If all failed, break to avoid infinite loop
     if (results.every((r) => r.status === "rejected")) break;
+
+    // No new targets added despite successful fetches — guilds exhausted
+    if (wars.targets.length === before) break;
   }
 }
 
@@ -215,13 +219,23 @@ async function handleSpaceBar() {
       return;
     }
 
+    // If at the last loaded target, wait for more before advancing
+    if (!singleGuildMode.value && isLastTarget) {
+      await fetchTargets();
+    }
+
     wars.nextTarget();
 
     // Navigate to the NEXT target so the user always sees a fresh target
     if (wars.currentTarget) {
       await openCombatWindow(wars.currentTarget.user_id);
+    } else if (!singleGuildMode.value) {
+      toast.success("No more targets available");
+      exitCombat();
+      return;
     }
 
+    // Prefetch when running low
     if (!singleGuildMode.value && wars.targets.length - wars.targetIndex < 5) {
       fetchTargets();
     }

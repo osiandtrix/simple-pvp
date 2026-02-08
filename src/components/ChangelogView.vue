@@ -15,6 +15,14 @@ interface ChangelogEntry {
 
 const changelog: ChangelogEntry[] = [
   {
+    version: "1.2.3",
+    date: "2026-02-08",
+    changes: [
+      { type: "fixed", text: "Getting stuck on the last loaded target - prefetch now properly loads more targets as you approach the end" },
+      { type: "added", text: "Graceful exit when all guild targets have been exhausted" },
+    ],
+  },
+  {
     version: "1.2.2",
     date: "2026-02-08",
     changes: [
