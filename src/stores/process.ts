@@ -1,19 +1,16 @@
 import { defineStore } from "pinia";
+import { invoke } from "@tauri-apps/api/core";
 import { listen } from "@tauri-apps/api/event";
 
 export const useProcessStore = defineStore("process", {
   state: () => ({
     inCombat: false,
     apiRemaining: 40,
-    apiResetAt: null as number | null,
+    apiResetIn: 0,
   }),
 
   getters: {
     apiLimitReached: (state) => state.apiRemaining <= 0,
-    resetInSeconds: (state) => {
-      if (!state.apiResetAt) return 0;
-      return Math.max(0, Math.ceil((state.apiResetAt - Date.now()) / 1000));
-    },
   },
 
   actions: {
@@ -23,17 +20,13 @@ export const useProcessStore = defineStore("process", {
       });
     },
 
-    trackApiCall() {
-      this.apiRemaining = Math.max(0, this.apiRemaining - 1);
-      if (this.apiRemaining === 0 && !this.apiResetAt) {
-        this.apiResetAt = Date.now() + 60_000;
-      }
-    },
-
-    checkApiReset() {
-      if (this.apiResetAt && Date.now() >= this.apiResetAt) {
-        this.apiRemaining = 40;
-        this.apiResetAt = null;
+    async pollRateLimit() {
+      try {
+        const [remaining, resetSecs] = await invoke<[number, number]>("get_rate_limit");
+        this.apiRemaining = remaining;
+        this.apiResetIn = resetSecs;
+      } catch {
+        // Ignore errors
       }
     },
 

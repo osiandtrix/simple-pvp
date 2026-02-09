@@ -1,5 +1,10 @@
 use serde::{Deserialize, Serialize};
 
+#[tauri::command]
+pub fn get_rate_limit() -> (u32, u64) {
+    crate::api::client::get_rate_limit_info()
+}
+
 #[derive(Debug, Serialize, Deserialize)]
 pub struct PlayerMeResponse {
     pub id: i64,

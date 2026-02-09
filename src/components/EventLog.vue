@@ -53,7 +53,7 @@ const bgMap: Record<string, string> = {
           >
             <Gauge class="mr-1 h-2.5 w-2.5" :class="process.apiLimitReached ? 'text-red-400' : 'text-sky-400'" />
             <span :class="process.apiLimitReached ? 'text-red-400' : 'text-sky-400'">
-              {{ process.apiLimitReached ? `${process.resetInSeconds}s` : `${process.apiRemaining}/40` }}
+              {{ process.apiLimitReached ? `${process.apiResetIn}s` : `${process.apiRemaining}/40` }}
             </span>
           </Badge>
         </div>

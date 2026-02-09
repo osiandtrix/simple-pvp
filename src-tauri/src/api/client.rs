@@ -21,6 +21,19 @@ struct RateLimit {
     reset_at: Option<std::time::Instant>,
 }
 
+pub fn get_rate_limit_info() -> (u32, u64) {
+    let limit = RATE_LIMIT.lock().unwrap();
+    let reset_secs = limit.reset_at.map_or(0, |reset_at| {
+        let now = std::time::Instant::now();
+        if reset_at > now {
+            (reset_at - now).as_secs()
+        } else {
+            0
+        }
+    });
+    (limit.remaining, reset_secs)
+}
+
 pub async fn post(url: &str, api_key: &str) -> Result<reqwest::Response, reqwest::Error> {
     // Check rate limit - extract wait duration while holding lock, then release before await
     let wait_duration = {

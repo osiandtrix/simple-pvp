@@ -83,6 +83,7 @@ pub fn run() {
             commands::api_client::validate_api_key,
             commands::api_client::fetch_guild_wars,
             commands::api_client::fetch_guild_members,
+            commands::api_client::get_rate_limit,
             commands::version::fetch_version,
             commands::version::run_migrations,
             commands::blocklist::fetch_blocked_guilds,

@@ -50,7 +50,7 @@ onMounted(async () => {
     await listen("Space", handleSpaceBar),
   );
 
-  const interval = setInterval(() => process.checkApiReset(), 100);
+  const interval = setInterval(() => process.pollRateLimit(), 1000);
   unlisteners.push(() => clearInterval(interval));
 });
 
@@ -153,13 +153,6 @@ async function enterCombatForGuild(war: War) {
     war.attacker_id === user.guildId ? war.defender_id : war.attacker_id;
 
   try {
-    process.checkApiReset();
-    if (process.apiLimitReached) {
-      toast.warning("API limit reached. Try again later.");
-      return;
-    }
-
-    process.trackApiCall();
     wars.targets = [];
     wars.targetIndex = 0;
     await wars.fetchTargets(guildId, settings.apiKey, settings.minLevel, settings.maxLevel);
@@ -184,15 +177,7 @@ async function enterCombatForGuild(war: War) {
 async function fetchTargets() {
   let guildsFetched = 0;
 
-  while (wars.targets.length - wars.targetIndex < 3) {
-    process.checkApiReset();
-    if (process.apiLimitReached) {
-      const resetIn = process.resetInSeconds;
-      toast.warning(`API limit reached. Retrying in ${resetIn}s`);
-      await sleep(resetIn * 1000);
-      continue;
-    }
-
+  while (wars.targets.length - wars.targetIndex < 5) {
     // Find next non-blocked guild
     let guildId: number | null = null;
     let attempts = 0;
@@ -211,9 +196,9 @@ async function fetchTargets() {
     if (guildId === null) break;
 
     guildsFetched++;
-    process.trackApiCall();
 
     try {
+      // Rust handles rate limiting automatically — waits if needed
       await wars.fetchTargets(guildId, settings.apiKey!, settings.minLevel, settings.maxLevel);
     } catch {
       // Guild fetch failed, continue to next
