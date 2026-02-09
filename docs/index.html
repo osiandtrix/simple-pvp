@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Simple PvP Companion</title>
+  <meta name="description" content="A desktop companion app for SimpleMMO guild wars. Manage wars, cycle targets, and dominate PvP.">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #0a0a0f;
+      --bg-card: #12121a;
+      --bg-card-hover: #1a1a26;
+      --border: #1e1e2e;
+      --text: #e4e4ef;
+      --text-muted: #8888a0;
+      --accent: #6d5dfc;
+      --accent-hover: #8577ff;
+      --accent-glow: rgba(109, 93, 252, 0.25);
+      --green: #34d399;
+      --red: #f87171;
+      --yellow: #fbbf24;
+      --blue: #60a5fa;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      overflow-x: hidden;
+    }
+
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { color: var(--accent-hover); }
+
+    /* Nav */
+    nav {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 100;
+      background: rgba(10, 10, 15, 0.85);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+      padding: 0 2rem;
+    }
+    .nav-inner {
+      max-width: 1100px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 60px;
+    }
+    .nav-brand {
+      font-weight: 700;
+      font-size: 1.1rem;
+      color: var(--text);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .nav-brand svg { width: 22px; height: 22px; }
+    .nav-links { display: flex; gap: 1.5rem; align-items: center; }
+    .nav-links a { color: var(--text-muted); font-size: 0.9rem; transition: color 0.2s; }
+    .nav-links a:hover { color: var(--text); }
+
+    /* Hero */
+    .hero {
+      padding: 10rem 2rem 5rem;
+      text-align: center;
+      position: relative;
+    }
+    .hero h1 {
+      font-size: 3.2rem;
+      font-weight: 800;
+      line-height: 1.15;
+      margin-bottom: 1rem;
+      position: relative;
+    }
+    .hero h1 span { color: var(--accent); }
+    .hero p {
+      font-size: 1.15rem;
+      color: var(--text-muted);
+      max-width: 520px;
+      margin: 0 auto 2rem;
+      position: relative;
+    }
+    .hero-actions {
+      display: flex;
+      gap: 1rem;
+      justify-content: center;
+      align-items: center;
+      flex-wrap: wrap;
+      position: relative;
+    }
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.75rem 1.75rem;
+      border-radius: 8px;
+      font-weight: 600;
+      font-size: 0.95rem;
+      transition: all 0.2s;
+      border: none;
+      cursor: pointer;
+    }
+    .btn-primary, .btn-primary:hover {
+      background: var(--accent);
+      color: #fff;
+      box-shadow: 0 4px 20px var(--accent-glow);
+    }
+    .btn-primary:hover {
+      background: var(--accent-hover);
+      box-shadow: 0 4px 30px var(--accent-glow);
+      transform: translateY(-1px);
+    }
+    .btn-outline {
+      background: transparent;
+      color: var(--text);
+      border: 1px solid var(--border);
+    }
+    .btn-outline:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+    .version-badge {
+      display: inline-block;
+      margin-top: 1.5rem;
+      padding: 0.3rem 0.8rem;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      position: relative;
+    }
+
+    /* Sections */
+    section {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 5rem 2rem;
+    }
+    .section-label {
+      text-transform: uppercase;
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      color: var(--accent);
+      margin-bottom: 0.5rem;
+    }
+    .section-title {
+      font-size: 2rem;
+      font-weight: 700;
+      margin-bottom: 1rem;
+    }
+    .section-desc {
+      color: var(--text-muted);
+      max-width: 600px;
+      margin-bottom: 3rem;
+    }
+
+    /* Features grid */
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 1.25rem;
+    }
+    .feature-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.75rem;
+      transition: all 0.25s;
+    }
+    .feature-card:hover {
+      background: var(--bg-card-hover);
+      border-color: rgba(109, 93, 252, 0.3);
+      transform: translateY(-2px);
+    }
+    .feature-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 1rem;
+      font-size: 1.25rem;
+    }
+    .feature-icon.purple { background: rgba(109, 93, 252, 0.15); color: var(--accent); }
+    .feature-icon.green { background: rgba(52, 211, 153, 0.15); color: var(--green); }
+    .feature-icon.red { background: rgba(248, 113, 113, 0.15); color: var(--red); }
+    .feature-icon.yellow { background: rgba(251, 191, 36, 0.15); color: var(--yellow); }
+    .feature-icon.blue { background: rgba(96, 165, 250, 0.15); color: var(--blue); }
+    .feature-card h3 {
+      font-size: 1.05rem;
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+    }
+    .feature-card p {
+      font-size: 0.9rem;
+      color: var(--text-muted);
+      line-height: 1.5;
+    }
+
+    /* Changelog */
+    .changelog-list { display: flex; flex-direction: column; gap: 1.5rem; }
+    .changelog-entry {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.5rem;
+    }
+    .changelog-header {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      margin-bottom: 0.75rem;
+    }
+    .changelog-version {
+      font-weight: 700;
+      font-size: 1rem;
+    }
+    .changelog-date {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+    .changelog-changes { list-style: none; display: flex; flex-direction: column; gap: 0.4rem; }
+    .changelog-changes li {
+      font-size: 0.88rem;
+      color: var(--text-muted);
+      display: flex;
+      align-items: baseline;
+      gap: 0.5rem;
+    }
+    .change-tag {
+      font-size: 0.65rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      padding: 0.15rem 0.4rem;
+      border-radius: 4px;
+      flex-shrink: 0;
+    }
+    .change-tag.added { background: rgba(52, 211, 153, 0.15); color: var(--green); }
+    .change-tag.fixed { background: rgba(96, 165, 250, 0.15); color: var(--blue); }
+    .change-tag.changed { background: rgba(251, 191, 36, 0.15); color: var(--yellow); }
+    .change-tag.removed { background: rgba(248, 113, 113, 0.15); color: var(--red); }
+
+    /* Download section */
+    .download-section {
+      text-align: center;
+      padding: 5rem 2rem;
+      position: relative;
+    }
+    .download-section::before {
+      content: '';
+      position: absolute;
+      bottom: 0; left: 50%;
+      transform: translateX(-50%);
+      width: 500px; height: 400px;
+      background: radial-gradient(circle, var(--accent-glow) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    .download-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 3rem;
+      max-width: 500px;
+      margin: 0 auto;
+      position: relative;
+    }
+    .download-card h3 { font-size: 1.5rem; margin-bottom: 0.5rem; }
+    .download-card .subtitle { color: var(--text-muted); margin-bottom: 1.5rem; }
+    .download-info {
+      display: flex;
+      justify-content: center;
+      gap: 2rem;
+      margin-top: 1.5rem;
+      font-size: 0.85rem;
+      color: var(--text-muted);
+    }
+    .download-info span { display: flex; align-items: center; gap: 0.3rem; }
+
+    /* Footer */
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 2rem;
+      text-align: center;
+      font-size: 0.85rem;
+      color: var(--text-muted);
+    }
+    footer a { color: var(--text-muted); }
+    footer a:hover { color: var(--text); }
+    .footer-links { display: flex; justify-content: center; gap: 1.5rem; margin-bottom: 0.75rem; }
+
+    /* Responsive */
+    @media (max-width: 640px) {
+      .hero h1 { font-size: 2.2rem; }
+      .hero { padding: 8rem 1.5rem 3rem; }
+      section { padding: 3rem 1.5rem; }
+      .features-grid { grid-template-columns: 1fr; }
+      .nav-links { gap: 1rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <nav>
+    <div class="nav-inner">
+      <div class="nav-brand">
+        <img src="logo.png" alt="Logo" style="width: 28px; height: 28px;">
+        Simple PvP Companion
+      </div>
+      <div class="nav-links">
+        <a href="#features">Features</a>
+        <a href="#changelog">Changelog</a>
+        <a href="#download">Download</a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Hero -->
+  <div class="hero">
+    <img src="logo.png" alt="Simple PvP Companion" style="width: 96px; height: 96px; margin-bottom: 1.5rem; position: relative;">
+    <h1>Guild Wars,<br><span>Simplified.</span></h1>
+    <p>A desktop companion for SimpleMMO that automates war lists, cycles targets, and keeps you in the fight.</p>
+    <div class="hero-actions">
+      <a href="releases/latest.msi" class="btn btn-primary" id="download-btn">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        Download for Windows
+      </a>
+      <a href="#features" class="btn btn-outline">Learn more</a>
+    </div>
+    <div class="version-badge" id="version-badge">v1.3.4 - Windows</div>
+  </div>
+
+  <!-- Features -->
+  <section id="features">
+    <div class="section-label">Features</div>
+    <div class="section-title">Everything you need for guild PvP</div>
+    <p class="section-desc">Built specifically for SimpleMMO guild wars. No fluff, just the tools you need to cycle through targets efficiently.</p>
+
+    <div class="features-grid">
+      <div class="feature-card">
+        <div class="feature-icon purple">&#9876;</div>
+        <h3>Automated War Lists</h3>
+        <p>Fetches active guild wars and their members automatically. Jump into combat with one click.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon green">&#9654;</div>
+        <h3>Target Cycling</h3>
+        <p>Hit Space to skip to the next target. A floating overlay provides Back/Next controls when you need them.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon red">&#128683;</div>
+        <h3>Guild Blocklist</h3>
+        <p>Block specific guilds from your war list so their members are skipped during combat sessions.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon yellow">&#9881;</div>
+        <h3>Level Filtering</h3>
+        <p>Set minimum and maximum level thresholds to only target players within your preferred range.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon blue">&#128200;</div>
+        <h3>Combat Stats</h3>
+        <p>Live combat log with kills-per-hour tracking, attack history, and real-time API rate limit monitoring.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon purple">&#9889;</div>
+        <h3>Quick Navigation</h3>
+        <p>One-click buttons for Food, Healer, and Energy pages during combat. No need to leave the app.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Changelog -->
+  <section id="changelog">
+    <div class="section-label">Changelog</div>
+    <div class="section-title">What's new</div>
+    <p class="section-desc">Recent updates and improvements.</p>
+
+    <div class="changelog-list" id="changelog-list">
+      <!-- Populated by JS -->
+    </div>
+  </section>
+
+  <!-- Download -->
+  <section class="download-section" id="download">
+    <div class="download-card">
+      <h3>Ready to get started?</h3>
+      <p class="subtitle">Download the latest version for Windows.</p>
+      <a href="releases/latest.msi" class="btn btn-primary" id="download-btn-2">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        Download
+      </a>
+      <div class="download-info">
+        <span id="dl-version">v1.3.4</span>
+        <span>Windows 10+</span>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <p>&copy; 2026 Simple PvP Companion</p>
+  </footer>
+
+  <script>
+    // Changelog data - update this when you release new versions
+    const changelog = [
+      {
+        version: "1.3.4",
+        date: "2026-02-09",
+        changes: [
+          { type: "fixed", text: "Overlay Back button now correctly navigates to the previous target" },
+        ],
+      },
+      {
+        version: "1.3.3",
+        date: "2026-02-09",
+        changes: [
+          { type: "added", text: "Kills per hour stat displayed in the combat log during sessions" },
+          { type: "added", text: "API rate limit counter now shows a hover tooltip with reset countdown" },
+          { type: "changed", text: "Rate limiting now uses real API headers instead of a client-side counter" },
+        ],
+      },
+      {
+        version: "1.3.2",
+        date: "2026-02-08",
+        changes: [
+          { type: "removed", text: "Previous Target keybind removed - use the floating overlay Back button instead" },
+          { type: "changed", text: "Next Target keybind (Space) is now locked and cannot be remapped" },
+          { type: "changed", text: "Target fetching is now sequential to reduce API usage" },
+        ],
+      },
+      {
+        version: "1.3.0",
+        date: "2026-02-08",
+        changes: [
+          { type: "added", text: "Guild blocklist - block guilds so they are skipped during combat" },
+          { type: "added", text: "Clickable keybinds indicator to toggle keybinds on/off during combat" },
+          { type: "fixed", text: "Keybinds no longer fire on SimpleMMO login and direct message pages" },
+        ],
+      },
+    ];
+
+    // Render changelog
+    const list = document.getElementById("changelog-list");
+    changelog.forEach(entry => {
+      const el = document.createElement("div");
+      el.className = "changelog-entry";
+      el.innerHTML = `
+        <div class="changelog-header">
+          <span class="changelog-version">v${entry.version}</span>
+          <span class="changelog-date">${entry.date}</span>
+        </div>
+        <ul class="changelog-changes">
+          ${entry.changes.map(c => `
+            <li>
+              <span class="change-tag ${c.type}">${c.type}</span>
+              ${c.text}
+            </li>
+          `).join("")}
+        </ul>
+      `;
+      list.appendChild(el);
+    });
+
+    // Fetch latest version from manifest (updated by GitHub Action on each release)
+    fetch("releases/latest.json")
+      .then(r => r.ok ? r.json() : Promise.reject())
+      .then(info => {
+        document.getElementById("version-badge").textContent = `v${info.version} - Windows`;
+        document.getElementById("dl-version").textContent = `v${info.version}`;
+      })
+      .catch(() => {
+        // No release published yet - keep hardcoded values
+      });
+  </script>
+
+</body>
+</html>
