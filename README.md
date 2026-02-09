@@ -1,21 +1,24 @@
 # Simple PvP Companion
 
-A lightweight desktop companion app for [SimpleMMO](https://web.simple-mmo.com) guild wars. It loads your active wars, queues up enemy targets, and lets you cycle through attacks with keyboard shortcuts - so you can focus on fighting instead of clicking around.
+A lightweight desktop companion app for [SimpleMMO](https://web.simple-mmo.com) guild wars. Load your active wars, queue up enemy targets, and cycle through them with a single keypress.
 
 ![Windows](https://img.shields.io/badge/Windows-0078D4?style=flat&logo=windows&logoColor=white)
 
+## Download
+
+Get the latest version from the [website](https://osiandtrix.github.io/simple-pvp/) or the [Releases](../../releases) page.
+
 ---
 
-## What It Does
+## Features
 
-- Shows all your active guild wars in one place
-- Loads enemy guild members as targets automatically
-- Opens an attack window and lets you move through targets with a single keypress
-- Filters targets by level so you only fight who you want
-- Tracks your attacks in a live combat log
-- Block guilds from the war list so they're skipped during combat
-- Floating overlay with Back/Next buttons when keybinds are off
-- Handles API rate limits in the background so you don't have to worry about them
+- Automated war list fetching
+- Target cycling with Space or floating overlay
+- Guild blocklist to skip specific guilds
+- Level filtering for min/max targets
+- Live combat log with kills/hr tracking
+- Quick-nav to Food, Healer, and Energy pages
+- Automatic API rate limit handling
 
 ## Getting Started
 
@@ -25,7 +28,7 @@ You'll need a SimpleMMO API key. You can find this in your SimpleMMO account set
 
 ### 2. Install
 
-Download the latest installer from [Releases](../../releases) and run it.
+Download the latest installer from the [website](https://osiandtrix.github.io/simple-pvp/) and run it.
 
 ### 3. Set Up
 
