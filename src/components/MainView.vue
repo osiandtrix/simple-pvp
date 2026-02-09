@@ -309,9 +309,12 @@ async function advanceTarget() {
   }
 }
 
-function goBackTarget() {
+async function goBackTarget() {
   if (!process.inCombat) return;
   wars.previousTarget();
+  if (wars.currentTarget) {
+    await openCombatWindow(wars.currentTarget.user_id);
+  }
 }
 
 async function handleSpaceBar() {

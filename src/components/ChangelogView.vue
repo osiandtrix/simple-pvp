@@ -15,6 +15,13 @@ interface ChangelogEntry {
 
 const changelog: ChangelogEntry[] = [
   {
+    version: "1.3.4",
+    date: "2026-02-09",
+    changes: [
+      { type: "fixed", text: "Overlay Back button now correctly navigates to the previous target" },
+    ],
+  },
+  {
     version: "1.3.3",
     date: "2026-02-09",
     changes: [
