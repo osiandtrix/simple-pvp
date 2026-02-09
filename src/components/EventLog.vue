@@ -3,7 +3,8 @@ import { computed } from "vue";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Swords, Gauge, Radio } from "lucide-vue-next";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { Swords, Gauge, Radio, Flame } from "lucide-vue-next";
 import { useEventsStore } from "@/stores/events";
 import { useWarsStore } from "@/stores/wars";
 import { useProcessStore } from "@/stores/process";
@@ -46,15 +47,33 @@ const bgMap: Record<string, string> = {
             <span class="text-emerald-400 mr-1">Guilds</span>
             <span class="text-foreground">{{ wars.activeGuildIndex + 1 }}/{{ wars.warlist.length }}</span>
           </Badge>
+          <Badge v-if="events.killsPerHour > 0" variant="secondary" class="h-5 rounded px-1.5 text-[10px] font-mono bg-orange-500/10 border-0">
+            <Flame class="mr-1 h-2.5 w-2.5 text-orange-400" />
+            <span class="text-orange-400">{{ events.killsPerHour }}/hr</span>
+          </Badge>
+          <TooltipProvider v-if="process.apiLimitReached">
+            <Tooltip>
+              <TooltipTrigger as-child>
+                <Badge
+                  variant="secondary"
+                  class="h-5 rounded px-1.5 text-[10px] font-mono border-0 bg-red-500/10 cursor-help"
+                >
+                  <Gauge class="mr-1 h-2.5 w-2.5 text-red-400" />
+                  <span class="text-red-400">0/40</span>
+                </Badge>
+              </TooltipTrigger>
+              <TooltipContent side="bottom" class="text-xs">
+                Resets in {{ process.apiResetIn }}s
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
           <Badge
+            v-else
             variant="secondary"
-            class="h-5 rounded px-1.5 text-[10px] font-mono border-0"
-            :class="process.apiLimitReached ? 'bg-red-500/10' : 'bg-sky-500/10'"
+            class="h-5 rounded px-1.5 text-[10px] font-mono border-0 bg-sky-500/10"
           >
-            <Gauge class="mr-1 h-2.5 w-2.5" :class="process.apiLimitReached ? 'text-red-400' : 'text-sky-400'" />
-            <span :class="process.apiLimitReached ? 'text-red-400' : 'text-sky-400'">
-              {{ process.apiLimitReached ? `${process.apiResetIn}s` : `${process.apiRemaining}/40` }}
-            </span>
+            <Gauge class="mr-1 h-2.5 w-2.5 text-sky-400" />
+            <span class="text-sky-400">{{ process.apiRemaining }}/40</span>
           </Badge>
         </div>
       </div>

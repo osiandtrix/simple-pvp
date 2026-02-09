@@ -15,6 +15,15 @@ interface ChangelogEntry {
 
 const changelog: ChangelogEntry[] = [
   {
+    version: "1.3.3",
+    date: "2026-02-09",
+    changes: [
+      { type: "added", text: "Kills per hour stat displayed in the combat log during sessions" },
+      { type: "added", text: "API rate limit counter now shows a hover tooltip with reset countdown" },
+      { type: "changed", text: "Rate limiting now uses real API headers instead of a client-side counter for accurate tracking" },
+    ],
+  },
+  {
     version: "1.3.2",
     date: "2026-02-08",
     changes: [
