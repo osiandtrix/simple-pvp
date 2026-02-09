@@ -36,7 +36,7 @@ const bgMap: Record<string, string> = {
       <div class="flex items-center justify-between">
         <CardTitle class="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
           <Radio class="h-3.5 w-3.5 text-emerald-400" />
-          Combat Log
+          Log
         </CardTitle>
         <div class="flex gap-1.5">
           <Badge variant="secondary" class="h-5 rounded px-1.5 text-[10px] font-mono bg-primary/10 border-0">
