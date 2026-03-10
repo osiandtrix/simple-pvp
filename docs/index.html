@@ -332,13 +332,13 @@
     <h1>Guild Wars,<br><span>Simplified.</span></h1>
     <p>A desktop companion for SimpleMMO that automates war lists, cycles targets, and keeps you in the fight.</p>
     <div class="hero-actions">
-      <a href="releases/latest.exe" class="btn btn-primary" id="download-btn">
+      <a href="#download" class="btn btn-primary" id="download-btn">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-        Download for Windows
+        <span id="hero-dl-text">Download</span>
       </a>
       <a href="#features" class="btn btn-outline">Learn more</a>
     </div>
-    <div class="version-badge" id="version-badge">v1.3.4 - Windows</div>
+    <div class="version-badge" id="version-badge">v1.3.4</div>
   </div>
 
   <!-- Features -->
@@ -396,14 +396,16 @@
   <section class="download-section" id="download">
     <div class="download-card">
       <h3>Ready to get started?</h3>
-      <p class="subtitle">Download the latest version for Windows.</p>
-      <a href="releases/latest.exe" class="btn btn-primary" id="download-btn-2">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-        Download
-      </a>
+      <p class="subtitle" id="dl-subtitle">Download the latest version.</p>
+      <div id="download-buttons" style="display: flex; flex-direction: column; gap: 0.75rem; align-items: center;">
+        <a href="#" class="btn btn-primary download-link" id="dl-primary" style="display:none;">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          <span id="dl-primary-text">Download</span>
+        </a>
+        <div id="dl-other-platforms" style="display: flex; gap: 0.75rem; flex-wrap: wrap; justify-content: center; margin-top: 0.5rem;"></div>
+      </div>
       <div class="download-info">
         <span id="dl-version">v1.3.4</span>
-        <span>Windows 10+</span>
       </div>
     </div>
   </section>
@@ -473,15 +475,99 @@
       list.appendChild(el);
     });
 
-    // Fetch latest version from manifest (updated by GitHub Action on each release)
-    fetch("releases/latest.json")
+    // --- OS Detection ---
+    function detectOS() {
+      const ua = navigator.userAgent.toLowerCase();
+      if (ua.includes("win")) return "windows";
+      if (ua.includes("mac")) return "macos";
+      if (ua.includes("linux")) return "linux";
+      return "unknown";
+    }
+
+    const osLabels = { windows: "Windows", macos: "macOS", linux: "Linux" };
+    const userOS = detectOS();
+
+    // --- GitHub Releases Integration ---
+    const REPO = "AcierDev/simple-pvp";
+
+    function matchAsset(assets, os) {
+      return assets.find(a => {
+        const name = a.name.toLowerCase();
+        if (os === "windows") return name.endsWith(".exe") || name.endsWith(".msi");
+        if (os === "macos") return name.endsWith(".dmg");
+        if (os === "linux") return name.endsWith(".appimage") || name.endsWith(".deb");
+        return false;
+      });
+    }
+
+    function buildDownloadButton(asset, os, primary) {
+      const a = document.createElement("a");
+      a.href = asset.browser_download_url;
+      a.className = primary ? "btn btn-primary" : "btn btn-outline";
+      const ext = asset.name.split(".").pop().toUpperCase();
+      a.textContent = primary
+        ? `Download for ${osLabels[os]} (.${ext})`
+        : `${osLabels[os]} (.${ext})`;
+      return a;
+    }
+
+    fetch(`https://api.github.com/repos/${REPO}/releases/latest`)
       .then(r => r.ok ? r.json() : Promise.reject())
-      .then(info => {
-        document.getElementById("version-badge").textContent = `v${info.version} - Windows`;
-        document.getElementById("dl-version").textContent = `v${info.version}`;
+      .then(release => {
+        const version = release.tag_name.replace(/^v/, "");
+        document.getElementById("version-badge").textContent = `v${version}`;
+        document.getElementById("dl-version").textContent = `v${version}`;
+
+        const assets = release.assets || [];
+        const primary = matchAsset(assets, userOS);
+        const dlPrimary = document.getElementById("dl-primary");
+        const otherContainer = document.getElementById("dl-other-platforms");
+
+        // Primary download (detected OS)
+        if (primary) {
+          const ext = primary.name.split(".").pop().toUpperCase();
+          dlPrimary.href = primary.browser_download_url;
+          document.getElementById("dl-primary-text").textContent =
+            `Download for ${osLabels[userOS]} (.${ext})`;
+          dlPrimary.style.display = "inline-flex";
+
+          // Hero button
+          const heroBtn = document.getElementById("download-btn");
+          heroBtn.href = primary.browser_download_url;
+          document.getElementById("hero-dl-text").textContent =
+            `Download for ${osLabels[userOS]}`;
+        }
+
+        // Other platforms
+        const otherOSes = ["windows", "macos", "linux"].filter(os => os !== userOS);
+        otherOSes.forEach(os => {
+          const asset = matchAsset(assets, os);
+          if (asset) {
+            otherContainer.appendChild(buildDownloadButton(asset, os, false));
+          }
+        });
+
+        // If primary OS not found, show all as equal
+        if (!primary) {
+          dlPrimary.style.display = "none";
+          ["windows", "macos", "linux"].forEach(os => {
+            const asset = matchAsset(assets, os);
+            if (asset) {
+              otherContainer.appendChild(buildDownloadButton(asset, os, false));
+            }
+          });
+        }
       })
       .catch(() => {
-        // No release published yet - keep hardcoded values
+        // Fallback: link to releases page
+        const dlPrimary = document.getElementById("dl-primary");
+        dlPrimary.href = `https://github.com/${REPO}/releases/latest`;
+        document.getElementById("dl-primary-text").textContent = "View Releases";
+        dlPrimary.style.display = "inline-flex";
+
+        const heroBtn = document.getElementById("download-btn");
+        heroBtn.href = `https://github.com/${REPO}/releases/latest`;
+        document.getElementById("hero-dl-text").textContent = "Download";
       });
   </script>
 
