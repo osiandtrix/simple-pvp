@@ -15,6 +15,15 @@ interface ChangelogEntry {
 
 const changelog: ChangelogEntry[] = [
   {
+    version: "1.4.0",
+    date: "2026-03-10",
+    changes: [
+      { type: "added", text: "macOS and Linux support - app now builds for all desktop platforms" },
+      { type: "added", text: "Automated CI/CD releases via GitHub Actions" },
+      { type: "changed", text: "Download page now detects your OS and offers the correct installer" },
+    ],
+  },
+  {
     version: "1.3.4",
     date: "2026-02-09",
     changes: [
