@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
-import { Swords, Gauge, Radio, Flame } from "lucide-vue-next";
+import { Swords, Gauge, Radio, Flame, SkipForward } from "lucide-vue-next";
 import { useEventsStore } from "@/stores/events";
 import { useWarsStore } from "@/stores/wars";
 import { useProcessStore } from "@/stores/process";
@@ -19,14 +19,17 @@ const recentEvents = computed(() =>
 
 const iconMap = {
   attack: Swords,
+  skip: SkipForward,
 };
 
 const colorMap: Record<string, string> = {
   attack: "text-primary",
+  skip: "text-yellow-400",
 };
 
 const bgMap: Record<string, string> = {
   attack: "bg-primary/5",
+  skip: "bg-yellow-500/5",
 };
 </script>
 

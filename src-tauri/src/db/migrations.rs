@@ -46,7 +46,13 @@ pub fn run_all(conn: &Connection) -> Result<(), rusqlite::Error> {
         CREATE TABLE IF NOT EXISTS blocked_guilds (
             guild_id INTEGER PRIMARY KEY,
             guild_name TEXT NOT NULL
-        );"
+        );
+        CREATE TABLE IF NOT EXISTS player_kills (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            user_id INTEGER NOT NULL,
+            killed_at INTEGER NOT NULL
+        );
+        CREATE INDEX IF NOT EXISTS idx_player_kills_user ON player_kills (user_id, killed_at DESC);"
     )?;
 
     // Migration: add keybinds_enabled column if missing

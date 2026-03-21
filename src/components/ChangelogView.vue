@@ -15,6 +15,16 @@ interface ChangelogEntry {
 
 const changelog: ChangelogEntry[] = [
   {
+    version: "1.5.0",
+    date: "2026-03-21",
+    changes: [
+      { type: "added", text: "Auto-detect kill cooldown popups (3x/12h and 4x/24h) in the combat webview and auto-skip to the next target" },
+      { type: "added", text: "Per-kill timestamp tracking with sliding window cooldown logic matching the game's rules" },
+      { type: "changed", text: "Targets on cooldown are now automatically filtered out when fetching and reappear once cooldown expires" },
+      { type: "changed", text: "Combat event log now shows skipped targets with a yellow indicator" },
+    ],
+  },
+  {
     version: "1.4.0",
     date: "2026-03-10",
     changes: [

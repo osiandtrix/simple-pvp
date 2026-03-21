@@ -50,27 +50,12 @@ pub async fn fetch_targets(
         .await
         .map_err(|e| e.to_string())?;
 
-    // Get existing hit logs
+    // Get users on kill cooldown
     let user_ids: Vec<i64> = members.iter().map(|m| m.user_id).collect();
-    let logs = crate::db::with_conn(|conn| {
-        if user_ids.is_empty() {
-            return Ok(vec![]);
-        }
-        let placeholders: String = user_ids.iter().map(|_| "?").collect::<Vec<_>>().join(",");
-        let sql = format!("SELECT user_id, hits FROM player_logs WHERE user_id IN ({})", placeholders);
-        let mut stmt = conn.prepare(&sql)?;
-        let params: Vec<Box<dyn rusqlite::types::ToSql>> = user_ids
-            .iter()
-            .map(|id| Box::new(*id) as Box<dyn rusqlite::types::ToSql>)
-            .collect();
-        let refs: Vec<&dyn rusqlite::types::ToSql> = params.iter().map(|p| p.as_ref()).collect();
-        let logs = stmt.query_map(refs.as_slice(), |row| {
-            Ok((row.get::<_, i64>(0)?, row.get::<_, i64>(1)?))
-        })?.collect::<Result<Vec<_>, _>>()?;
-        Ok(logs)
+    let cooldown_users = crate::db::with_conn(|conn| {
+        crate::commands::combat::get_cooled_down_users(conn, &user_ids)
     })?;
 
-    let log_map: std::collections::HashMap<i64, i64> = logs.into_iter().collect();
     let now = chrono::Utc::now().timestamp();
 
     // Filter targets
@@ -84,7 +69,7 @@ pub async fn fetch_targets(
                 && (m.current_hp as f64 / m.max_hp as f64) >= 0.5
                 && min_level.map_or(true, |ml| m.level >= ml)
                 && max_level.map_or(true, |ml| m.level <= ml)
-                && log_map.get(&m.user_id).map_or(true, |hits| *hits < 3)
+                && !cooldown_users.contains(&m.user_id)
         })
         .map(|m| crate::db::models::Target {
             user_id: m.user_id,

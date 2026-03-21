@@ -35,6 +35,7 @@ let combatWindow: WebviewWindow | null = null;
 let overlayWindow: WebviewWindow | null = null;
 let attackInProgress = false;
 let lastAttackTime = 0;
+let threeXDetector: ReturnType<typeof setInterval> | null = null;
 
 const unlisteners: UnlistenFn[] = [];
 
@@ -66,6 +67,54 @@ watch(() => settings.minLevel, (val) => {
 watch(() => settings.maxLevel, (val) => {
   maxLevel.value = val ?? 0;
 });
+
+function startKillBlockDetector() {
+  stopKillBlockDetector();
+  threeXDetector = setInterval(async () => {
+    if (!process.inCombat || !wars.currentTarget) return;
+    try {
+      const blocked = await invoke<boolean>("check_kill_blocked");
+      if (blocked) {
+        const target = wars.currentTarget;
+        if (!target) return;
+
+        // Log the skip (don't record a kill — the attack failed)
+        events.push({
+          userId: target.user_id,
+          userName: target.name,
+          type: "skip",
+        });
+
+        // Auto-advance to next target
+        const isLast = wars.targetIndex >= wars.targets.length - 1;
+        if (singleGuildMode.value && isLast) {
+          toast.success("All targets done for this guild");
+          exitCombat();
+          return;
+        }
+        if (!singleGuildMode.value && isLast) {
+          await fetchTargets();
+        }
+        wars.nextTarget();
+        if (wars.currentTarget) {
+          await openCombatWindow(wars.currentTarget.user_id);
+        } else {
+          toast.success("No more targets available");
+          exitCombat();
+        }
+      }
+    } catch {
+      // Combat window may be closed
+    }
+  }, 1000);
+}
+
+function stopKillBlockDetector() {
+  if (threeXDetector) {
+    clearInterval(threeXDetector);
+    threeXDetector = null;
+  }
+}
 
 async function isOnBlockedPage(): Promise<boolean> {
   if (!combatWindow) return false;
@@ -137,6 +186,7 @@ async function enterCombat() {
     }
     await invoke("register_shortcuts");
     keybindsActive.value = true;
+    startKillBlockDetector();
   } catch (e) {
     toast.error("Failed to enter combat");
   } finally {
@@ -167,6 +217,7 @@ async function enterCombatForGuild(war: War) {
     await openCombatWindow(wars.currentTarget.user_id);
     await invoke("register_shortcuts");
     keybindsActive.value = true;
+    startKillBlockDetector();
   } catch (e) {
     toast.error("Failed to load targets");
   } finally {
@@ -268,8 +319,8 @@ async function advanceTarget() {
   try {
     const target = wars.currentTarget;
 
-    // Log the attack on the currently displayed target
-    await invoke("update_target_hit", { userId: target.user_id, hit: 1 });
+    // Record the kill timestamp for cooldown tracking
+    await invoke("record_kill", { userId: target.user_id });
     events.push({
       userId: target.user_id,
       userName: target.name,
@@ -328,6 +379,7 @@ function sleep(ms: number) {
 }
 
 async function exitCombat() {
+  stopKillBlockDetector();
   await hideOverlay();
   if (combatWindow) {
     try { await combatWindow.close(); } catch { /* already closed */ }
