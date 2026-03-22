@@ -36,6 +36,7 @@ let overlayWindow: WebviewWindow | null = null;
 let attackInProgress = false;
 let lastAttackTime = 0;
 let threeXDetector: ReturnType<typeof setInterval> | null = null;
+const emptyGuilds = new Set<number>(); // guilds that returned 0 targets this session
 
 const unlisteners: UnlistenFn[] = [];
 
@@ -178,12 +179,25 @@ async function enterCombat() {
   singleGuildMode.value = false;
 
   try {
+    // Check rate limit before trying to fetch
+    await process.pollRateLimit();
+    if (process.apiRemaining <= 2) {
+      toast.warning(`Rate limited — resets in ${process.apiResetIn}s`);
+      initiatingCombat.value = false;
+      return;
+    }
+
     await fetchTargets();
+
+    if (!wars.currentTarget) {
+      toast.warning("No targets found");
+      initiatingCombat.value = false;
+      return;
+    }
+
     process.setInCombat(true);
     events.clear();
-    if (wars.currentTarget) {
-      await openCombatWindow(wars.currentTarget.user_id);
-    }
+    await openCombatWindow(wars.currentTarget.user_id);
     await invoke("register_shortcuts");
     keybindsActive.value = true;
     startKillBlockDetector();
@@ -227,9 +241,18 @@ async function enterCombatForGuild(war: War) {
 
 async function fetchTargets() {
   let guildsFetched = 0;
+  const bufferGoal = 20;
 
-  while (wars.targets.length - wars.targetIndex < 5) {
-    // Find next non-blocked guild
+  while (wars.targets.length - wars.targetIndex < bufferGoal) {
+    // Check rate limit before each API call — bail if exhausted
+    await process.pollRateLimit();
+    if (process.apiRemaining <= 2) {
+      if (wars.targets.length > wars.targetIndex) break;
+      toast.warning(`Rate limited — resets in ${process.apiResetIn}s`);
+      break;
+    }
+
+    // Find next non-blocked, non-empty guild
     let guildId: number | null = null;
     let attempts = 0;
     while (attempts < wars.warlist.length) {
@@ -239,7 +262,7 @@ async function fetchTargets() {
         war.attacker_id === user.guildId ? war.defender_id : war.attacker_id;
       wars.nextGuild();
       attempts++;
-      if (blocklist.isBlocked(id)) continue;
+      if (blocklist.isBlocked(id) || emptyGuilds.has(id)) continue;
       guildId = id;
       break;
     }
@@ -249,13 +272,16 @@ async function fetchTargets() {
     guildsFetched++;
 
     try {
-      // Rust handles rate limiting automatically — waits if needed
+      const countBefore = wars.targets.length;
       await wars.fetchTargets(guildId, settings.apiKey!, settings.minLevel, settings.maxLevel);
+      if (wars.targets.length === countBefore) {
+        emptyGuilds.add(guildId);
+      }
     } catch {
       // Guild fetch failed, continue to next
     }
 
-    // Tried all guilds at least once — stop even if buffer isn't full
+    // Tried all non-empty guilds
     if (guildsFetched >= wars.warlist.length) break;
   }
 }
@@ -319,6 +345,22 @@ async function advanceTarget() {
   try {
     const target = wars.currentTarget;
 
+    // Check if current page shows a kill-block message before recording
+    try {
+      const blocked = await invoke<boolean>("check_kill_blocked");
+      if (blocked) {
+        // Don't record a kill — the attack failed
+        events.push({
+          userId: target.user_id,
+          userName: target.name,
+          type: "skip",
+        });
+        // Let the kill-block detector handle advancing
+        attackInProgress = false;
+        return;
+      }
+    } catch { /* combat window may be closed */ }
+
     // Record the kill timestamp for cooldown tracking
     await invoke("record_kill", { userId: target.user_id });
     events.push({
@@ -351,8 +393,8 @@ async function advanceTarget() {
       return;
     }
 
-    // Prefetch when running low
-    if (!singleGuildMode.value && wars.targets.length - wars.targetIndex < 3) {
+    // Prefetch when running low on buffered targets
+    if (!singleGuildMode.value && wars.targets.length - wars.targetIndex < 10) {
       fetchTargets();
     }
   } finally {
@@ -380,6 +422,7 @@ function sleep(ms: number) {
 
 async function exitCombat() {
   stopKillBlockDetector();
+  emptyGuilds.clear();
   await hideOverlay();
   if (combatWindow) {
     try { await combatWindow.close(); } catch { /* already closed */ }

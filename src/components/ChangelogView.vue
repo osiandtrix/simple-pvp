@@ -15,6 +15,20 @@ interface ChangelogEntry {
 
 const changelog: ChangelogEntry[] = [
   {
+    version: "1.6.0",
+    date: "2026-03-22",
+    changes: [
+      { type: "fixed", text: "4x kill cooldown now correctly identified as 4x instead of being misclassified as 3x" },
+      { type: "fixed", text: "Kill-blocked detection now checks the page before recording a kill, preventing false kill records when the attack actually failed" },
+      { type: "fixed", text: "Kill-blocked state now resets properly when navigating to a new target" },
+      { type: "fixed", text: "App no longer locks up when API rate limit is hit - fetching stops gracefully and shows a toast with reset countdown" },
+      { type: "changed", text: "Target buffer increased from 5 to 20 for deeper target queues and fewer mid-session pauses" },
+      { type: "changed", text: "Prefetch now triggers earlier (below 10 remaining targets instead of 3) to keep the queue full" },
+      { type: "added", text: "Empty guild memory - guilds with no attackable players are skipped for the rest of the session to conserve API calls" },
+      { type: "changed", text: "Rate limit is checked before each API call and before entering combat, preventing the UI from hanging" },
+    ],
+  },
+  {
     version: "1.5.0",
     date: "2026-03-21",
     changes: [

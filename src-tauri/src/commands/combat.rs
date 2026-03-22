@@ -50,12 +50,15 @@ pub fn record_kill(user_id: i64) -> Result<(), String> {
 #[tauri::command]
 pub fn check_kill_blocked(app: AppHandle) -> Result<bool, String> {
     if let Some(window) = app.get_webview_window("combat") {
-        // Detect both "killed them 3 times" (12h) and "killed them 4 times" (24h) popups
+        // Detect "killed them X times" popups — check fresh each time, set hash immediately
         window
             .eval(
-                r#"(function(){if(!window.__killBlocked && document.body && (document.body.innerText.includes('killed them 3 times') || document.body.innerText.includes('killed them 4 times'))){window.__killBlocked=true;window.location.hash='kill-blocked';}})();"#,
+                r#"(function(){var b=document.body&&(document.body.innerText.includes('killed them 3 times')||document.body.innerText.includes('killed them 4 times'));if(b){window.location.hash='kill-blocked';}else if(window.location.hash==='#kill-blocked'){window.location.hash='';}})();"#,
             )
             .map_err(|e| e.to_string())?;
+
+        // Small delay to let the eval execute before reading URL
+        std::thread::sleep(std::time::Duration::from_millis(50));
 
         let url = window.url().map_err(|e| e.to_string())?.to_string();
         Ok(url.contains("#kill-blocked"))
@@ -104,9 +107,10 @@ pub fn get_cooled_down_users(conn: &rusqlite::Connection, user_ids: &[i64]) -> R
     let mut blocked = std::collections::HashSet::new();
     for (uid, kills) in &kills_by_user {
         // Already sorted DESC from query
-        if kills.len() >= 3 && (now - kills[2]) < twelve_hours {
+        // Check 4x first — if both conditions are true, 4x takes priority
+        if kills.len() >= 4 && (now - kills[3]) < twenty_four_hours {
             blocked.insert(*uid);
-        } else if kills.len() >= 4 && (now - kills[3]) < twenty_four_hours {
+        } else if kills.len() >= 3 && (now - kills[2]) < twelve_hours {
             blocked.insert(*uid);
         }
     }
@@ -140,12 +144,13 @@ pub fn fetch_cooldowns() -> Result<Vec<crate::db::models::PlayerCooldown>, Strin
             let kill_count = kills.len() as i64;
 
             // Determine cooldown type and expiry
-            let (cooldown_type, expires_at) = if kills.len() >= 3 && (now - kills[2]) < twelve_hours {
-                // 3x blocked: expires when 3rd kill ages past 12h
-                ("3x", kills[2] + twelve_hours)
-            } else if kills.len() >= 4 && (now - kills[3]) < twenty_four_hours {
+            // Check 4x first — if both conditions are true, 4x takes priority
+            let (cooldown_type, expires_at) = if kills.len() >= 4 && (now - kills[3]) < twenty_four_hours {
                 // 4x blocked: expires when 4th kill ages past 24h
                 ("4x", kills[3] + twenty_four_hours)
+            } else if kills.len() >= 3 && (now - kills[2]) < twelve_hours {
+                // 3x blocked: expires when 3rd kill ages past 12h
+                ("3x", kills[2] + twelve_hours)
             } else {
                 // Not on cooldown, but has recent kills - show as trackable
                 continue;

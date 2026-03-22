@@ -338,7 +338,7 @@
       </a>
       <a href="#features" class="btn btn-outline">Learn more</a>
     </div>
-    <div class="version-badge" id="version-badge">v1.5.0</div>
+    <div class="version-badge" id="version-badge">v1.6.0</div>
   </div>
 
   <!-- Features -->
@@ -405,7 +405,7 @@
         <div id="dl-other-platforms" style="display: flex; gap: 0.75rem; flex-wrap: wrap; justify-content: center; margin-top: 0.5rem;"></div>
       </div>
       <div class="download-info">
-        <span id="dl-version">v1.5.0</span>
+        <span id="dl-version">v1.6.0</span>
       </div>
     </div>
   </section>
@@ -417,6 +417,17 @@
   <script>
     // Changelog data - update this when you release new versions
     const changelog = [
+      {
+        version: "1.6.0",
+        date: "2026-03-22",
+        changes: [
+          { type: "fixed", text: "4x kill cooldown correctly identified instead of being misclassified as 3x" },
+          { type: "fixed", text: "App no longer locks up when API rate limit is hit - stops gracefully with a countdown toast" },
+          { type: "fixed", text: "Kill-blocked detection now checks before recording kills, preventing false records" },
+          { type: "added", text: "Empty guild memory - guilds with no attackable players are skipped for the rest of the session" },
+          { type: "changed", text: "Target buffer increased from 5 to 20 with earlier prefetch for smoother sessions" },
+        ],
+      },
       {
         version: "1.5.0",
         date: "2026-03-21",
