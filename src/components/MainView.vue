@@ -377,9 +377,28 @@ async function advanceTarget() {
       return;
     }
 
-    // If at the last loaded target, wait for more before advancing
+    // If at the last loaded target, try to fetch more before advancing
     if (!singleGuildMode.value && isLastTarget) {
+      const countBefore = wars.targets.length;
       await fetchTargets();
+      if (wars.targets.length === countBefore) {
+        // No new unique targets — reset dedup and retry after cooldown
+        toast.info("Cycled all targets — waiting for rate limit reset to retry…");
+        await process.pollRateLimit();
+        const waitMs = Math.max(process.apiResetIn, 5) * 1000;
+        await new Promise((r) => setTimeout(r, waitMs));
+
+        // Trim target list to visited only — clears dedup so refetched users come through
+        wars.targets = wars.targets.slice(0, wars.targetIndex + 1);
+        emptyGuilds.clear();
+
+        await fetchTargets();
+        if (wars.targets.length === wars.targetIndex + 1) {
+          toast.success("No more targets available");
+          exitCombat();
+          return;
+        }
+      }
     }
 
     wars.nextTarget();

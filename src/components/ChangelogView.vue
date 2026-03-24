@@ -15,6 +15,15 @@ interface ChangelogEntry {
 
 const changelog: ChangelogEntry[] = [
   {
+    version: "1.6.1",
+    date: "2026-03-23",
+    changes: [
+      { type: "fixed", text: "Rate limit no longer gets stuck showing \"resets in 0s\" after re-entering combat, which blocked all API calls until app restart" },
+      { type: "fixed", text: "Combat no longer gets stuck on the last target when no new targets are available" },
+      { type: "changed", text: "When all targets are exhausted, the app now waits for the rate limit to reset and retries before exiting combat" },
+    ],
+  },
+  {
     version: "1.6.0",
     date: "2026-03-22",
     changes: [

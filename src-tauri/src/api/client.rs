@@ -22,16 +22,18 @@ struct RateLimit {
 }
 
 pub fn get_rate_limit_info() -> (u32, u64) {
-    let limit = RATE_LIMIT.lock().unwrap();
-    let reset_secs = limit.reset_at.map_or(0, |reset_at| {
+    let mut limit = RATE_LIMIT.lock().unwrap();
+    if let Some(reset_at) = limit.reset_at {
         let now = std::time::Instant::now();
-        if reset_at > now {
-            (reset_at - now).as_secs()
-        } else {
-            0
+        if now >= reset_at {
+            // Reset expired — restore remaining and clear timer
+            limit.remaining = 40;
+            limit.reset_at = None;
+            return (40, 0);
         }
-    });
-    (limit.remaining, reset_secs)
+        return (limit.remaining, (reset_at - now).as_secs());
+    }
+    (limit.remaining, 0)
 }
 
 pub async fn post(url: &str, api_key: &str) -> Result<reqwest::Response, reqwest::Error> {
