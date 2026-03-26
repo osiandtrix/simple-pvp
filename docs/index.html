@@ -338,7 +338,7 @@
       </a>
       <a href="#features" class="btn btn-outline">Learn more</a>
     </div>
-    <div class="version-badge" id="version-badge">v1.8.0</div>
+    <div class="version-badge" id="version-badge">v1.8.1</div>
   </div>
 
   <!-- Features -->
@@ -405,7 +405,7 @@
         <div id="dl-other-platforms" style="display: flex; gap: 0.75rem; flex-wrap: wrap; justify-content: center; margin-top: 0.5rem;"></div>
       </div>
       <div class="download-info">
-        <span id="dl-version">v1.8.0</span>
+        <span id="dl-version">v1.8.1</span>
       </div>
     </div>
   </section>
@@ -417,6 +417,13 @@
   <script>
     // Changelog data - update this when you release new versions
     const changelog = [
+      {
+        version: "1.8.1",
+        date: "2026-03-26",
+        changes: [
+          { type: "fixed", text: "Embedded combat toggle in settings now correctly saves and persists the selection" },
+        ],
+      },
       {
         version: "1.8.0",
         date: "2026-03-26",

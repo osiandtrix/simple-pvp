@@ -93,8 +93,8 @@ async function saveApiKey() {
             <p class="text-[11px] text-muted-foreground">Show the combat webview inside the main window instead of a separate window</p>
           </div>
           <Switch
-            :checked="settings.embeddedCombat"
-            @update:checked="settings.saveEmbeddedCombat($event)"
+            :model-value="settings.embeddedCombat"
+            @update:model-value="settings.saveEmbeddedCombat($event as boolean)"
           />
         </div>
       </CardContent>

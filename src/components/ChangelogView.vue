@@ -15,6 +15,13 @@ interface ChangelogEntry {
 
 const changelog: ChangelogEntry[] = [
   {
+    version: "1.8.1",
+    date: "2026-03-26",
+    changes: [
+      { type: "fixed", text: "Embedded combat toggle in settings now correctly saves and persists the selection" },
+    ],
+  },
+  {
     version: "1.8.0",
     date: "2026-03-26",
     changes: [
