@@ -63,15 +63,6 @@ pub struct Target {
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
-pub struct PlayerCooldown {
-    pub user_id: i64,
-    pub kill_count: i64,
-    pub cooldown_type: String,
-    pub expires_at: i64,
-    pub kill_timestamps: Vec<i64>,
-}
-
-#[derive(Debug, Serialize, Deserialize, Clone)]
 #[allow(dead_code)]
 pub struct BlockedGuild {
     pub guild_id: i64,

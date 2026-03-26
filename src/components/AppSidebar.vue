@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Swords, Settings, FileText, Ban, Timer } from "lucide-vue-next";
+import { Swords, Settings, FileText, Ban } from "lucide-vue-next";
 import {
   Sheet,
   SheetContent,
@@ -22,7 +22,6 @@ const navItems = [
   { id: "main", label: "Combat", icon: Swords, description: "Battle management" },
   { id: "settings", label: "Settings", icon: Settings, description: "API & preferences" },
   { id: "blocked", label: "Blocked", icon: Ban, description: "Blocked guilds" },
-  { id: "cooldowns", label: "Cooldowns", icon: Timer, description: "Kill cooldown timers" },
   { id: "changelog", label: "Changelog", icon: FileText, description: "Version history" },
 ];
 

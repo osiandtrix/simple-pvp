@@ -50,10 +50,12 @@ export const useWarsStore = defineStore("wars", {
     },
 
     shuffleWars() {
-      for (let i = this.warlist.length - 1; i > 0; i--) {
+      const arr = [...this.warlist];
+      for (let i = arr.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1));
-        [this.warlist[i], this.warlist[j]] = [this.warlist[j], this.warlist[i]];
+        [arr[i], arr[j]] = [arr[j], arr[i]];
       }
+      this.warlist = arr;
     },
 
     async fetchTargets(guildId: number, apiKey: string, minLevel: number | null, maxLevel: number | null) {

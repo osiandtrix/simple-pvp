@@ -4,7 +4,7 @@ export interface CombatEvent {
   text: string;
   userId: number;
   userName: string;
-  type: "attack" | "skip";
+  type: "attack";
 }
 
 export const useEventsStore = defineStore("events", {
@@ -25,10 +25,7 @@ export const useEventsStore = defineStore("events", {
   actions: {
     push(event: Omit<CombatEvent, "text">) {
       if (!this.sessionStart) this.sessionStart = Date.now();
-      const text =
-        event.type === "skip"
-          ? `[${event.userId}] ${event.userName} — 3x killed, skipped`
-          : `[${event.userId}] ${event.userName} attacked.`;
+      const text = `[${event.userId}] ${event.userName} attacked.`;
       this.events.push({ ...event, text });
     },
 

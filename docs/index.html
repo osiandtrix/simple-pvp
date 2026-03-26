@@ -338,7 +338,7 @@
       </a>
       <a href="#features" class="btn btn-outline">Learn more</a>
     </div>
-    <div class="version-badge" id="version-badge">v1.6.1</div>
+    <div class="version-badge" id="version-badge">v1.7.0</div>
   </div>
 
   <!-- Features -->
@@ -405,7 +405,7 @@
         <div id="dl-other-platforms" style="display: flex; gap: 0.75rem; flex-wrap: wrap; justify-content: center; margin-top: 0.5rem;"></div>
       </div>
       <div class="download-info">
-        <span id="dl-version">v1.6.1</span>
+        <span id="dl-version">v1.7.0</span>
       </div>
     </div>
   </section>
@@ -417,6 +417,15 @@
   <script>
     // Changelog data - update this when you release new versions
     const changelog = [
+      {
+        version: "1.7.0",
+        date: "2026-03-26",
+        changes: [
+          { type: "removed", text: "Removed the 3x/4x kill cooldown tracking system, cooldown timers page, and all related target filtering" },
+          { type: "fixed", text: "Combat webview no longer shows a grey/blank page when cycling targets quickly. Uses native webview navigation instead of JavaScript location changes." },
+          { type: "fixed", text: "War list shuffle now properly randomizes guild order instead of silently failing due to a reactivity issue." },
+        ],
+      },
       {
         version: "1.6.1",
         date: "2026-03-23",

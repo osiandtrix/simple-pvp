@@ -15,6 +15,15 @@ interface ChangelogEntry {
 
 const changelog: ChangelogEntry[] = [
   {
+    version: "1.7.0",
+    date: "2026-03-26",
+    changes: [
+      { type: "removed", text: "Removed the 3x/4x kill cooldown tracking system, cooldown timers page, and all related filtering. Targets are no longer skipped or blocked based on kill counts." },
+      { type: "fixed", text: "Combat webview no longer shows a grey/blank page when cycling targets quickly. Navigation now uses native Tauri webview routing instead of JavaScript location changes." },
+      { type: "fixed", text: "War list shuffle now properly randomizes guild order instead of silently failing due to a reactivity issue." },
+    ],
+  },
+  {
     version: "1.6.1",
     date: "2026-03-23",
     changes: [

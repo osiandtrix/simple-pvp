@@ -50,12 +50,6 @@ pub async fn fetch_targets(
         .await
         .map_err(|e| e.to_string())?;
 
-    // Get users on kill cooldown
-    let user_ids: Vec<i64> = members.iter().map(|m| m.user_id).collect();
-    let cooldown_users = crate::db::with_conn(|conn| {
-        crate::commands::combat::get_cooled_down_users(conn, &user_ids)
-    })?;
-
     let now = chrono::Utc::now().timestamp();
 
     // Filter targets
@@ -69,7 +63,6 @@ pub async fn fetch_targets(
                 && (m.current_hp as f64 / m.max_hp as f64) >= 0.5
                 && min_level.map_or(true, |ml| m.level >= ml)
                 && max_level.map_or(true, |ml| m.level <= ml)
-                && !cooldown_users.contains(&m.user_id)
         })
         .map(|m| crate::db::models::Target {
             user_id: m.user_id,

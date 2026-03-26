@@ -6,7 +6,6 @@ import MainView from "./components/MainView.vue";
 import SettingsView from "./components/SettingsView.vue";
 import ChangelogView from "./components/ChangelogView.vue";
 import BlockedView from "./components/BlockedView.vue";
-import CooldownsView from "./components/CooldownsView.vue";
 import { Toaster } from "vue-sonner";
 import { useUserStore } from "./stores/user";
 import { useSettingsStore } from "./stores/settings";
@@ -37,7 +36,6 @@ const pages: Record<string, any> = {
   main: MainView,
   settings: SettingsView,
   blocked: BlockedView,
-  cooldowns: CooldownsView,
   changelog: ChangelogView,
 };
 </script>
