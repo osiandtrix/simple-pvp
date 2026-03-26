@@ -1,10 +1,10 @@
 [package]
 name = "simple-companion-pvp"
-version = "1.7.0"
+version = "1.8.0"
 edition = "2021"
 
 [dependencies]
-tauri = { version = "2", features = ["tray-icon"] }
+tauri = { version = "2", features = ["tray-icon", "unstable"] }
 tauri-plugin-global-shortcut = "2"
 tauri-plugin-shell = "2"
 serde = { version = "1", features = ["derive"] }

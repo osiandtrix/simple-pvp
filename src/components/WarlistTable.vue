@@ -19,7 +19,7 @@ const emit = defineEmits<{
   targetGuild: [war: War];
 }>();
 
-type SortKey = "name" | "you" | "them";
+type SortKey = "name" | "you" | "them" | null;
 type SortDir = "asc" | "desc";
 
 const sortKey = ref<SortKey>("you");
@@ -43,26 +43,28 @@ const sortedWars = computed(() => {
       ...getOpponent(war),
     }));
 
-  mapped.sort((a, b) => {
-    let cmp = 0;
-    switch (sortKey.value) {
-      case "name":
-        cmp = a.name.localeCompare(b.name);
-        break;
-      case "you":
-        cmp = a.you - b.you;
-        break;
-      case "them":
-        cmp = a.them - b.them;
-        break;
-    }
-    return sortDir.value === "asc" ? cmp : -cmp;
-  });
+  if (sortKey.value) {
+    mapped.sort((a, b) => {
+      let cmp = 0;
+      switch (sortKey.value) {
+        case "name":
+          cmp = a.name.localeCompare(b.name);
+          break;
+        case "you":
+          cmp = a.you - b.you;
+          break;
+        case "them":
+          cmp = a.them - b.them;
+          break;
+      }
+      return sortDir.value === "asc" ? cmp : -cmp;
+    });
+  }
 
   return mapped;
 });
 
-function toggleSort(key: SortKey) {
+function toggleSort(key: NonNullable<SortKey>) {
   if (sortKey.value === key) {
     sortDir.value = sortDir.value === "asc" ? "desc" : "asc";
   } else {
@@ -85,6 +87,7 @@ async function updateWars() {
 }
 
 function shuffleWars() {
+  sortKey.value = null;
   wars.shuffleWars();
 }
 

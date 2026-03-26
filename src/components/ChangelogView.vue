@@ -15,6 +15,14 @@ interface ChangelogEntry {
 
 const changelog: ChangelogEntry[] = [
   {
+    version: "1.8.0",
+    date: "2026-03-26",
+    changes: [
+      { type: "added", text: "Embedded combat mode: toggle in Settings to show the combat webview inside the main window instead of a separate window" },
+      { type: "added", text: "Window auto-resizes when entering/exiting combat in embedded mode and adjusts both panels on manual resize" },
+    ],
+  },
+  {
     version: "1.7.0",
     date: "2026-03-26",
     changes: [

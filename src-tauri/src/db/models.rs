@@ -13,6 +13,7 @@ pub struct Settings {
     pub api_key: Option<String>,
     pub always_on_top: bool,
     pub keybinds_enabled: bool,
+    pub embedded_combat: bool,
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone)]

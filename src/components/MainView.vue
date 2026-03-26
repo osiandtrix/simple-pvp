@@ -3,6 +3,9 @@ import { ref, watch, onMounted, onUnmounted } from "vue";
 import { invoke } from "@tauri-apps/api/core";
 import { listen, type UnlistenFn } from "@tauri-apps/api/event";
 import { WebviewWindow } from "@tauri-apps/api/webviewWindow";
+import { Webview, getCurrentWebview } from "@tauri-apps/api/webview";
+import { getCurrentWindow } from "@tauri-apps/api/window";
+import { LogicalSize, LogicalPosition } from "@tauri-apps/api/dpi";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -26,15 +29,21 @@ const process = useProcessStore();
 const events = useEventsStore();
 const blocklist = useBlocklistStore();
 
+const CONTROLS_WIDTH = 500;
+const COMBAT_WIDTH = 500;
+
 const minLevel = ref(settings.minLevel ?? 0);
 const maxLevel = ref(settings.maxLevel ?? 0);
 const initiatingCombat = ref(false);
 const singleGuildMode = ref(false);
 const keybindsActive = ref(false);
 let combatWindow: WebviewWindow | null = null;
+let combatWebview: Webview | null = null;
 let overlayWindow: WebviewWindow | null = null;
 let attackInProgress = false;
 let lastAttackTime = 0;
+let resizeUnlisten: UnlistenFn | null = null;
+let savedWindowWidth: number | null = null;
 const emptyGuilds = new Set<number>(); // guilds that returned 0 targets this session
 
 const unlisteners: UnlistenFn[] = [];
@@ -68,8 +77,12 @@ watch(() => settings.maxLevel, (val) => {
   maxLevel.value = val ?? 0;
 });
 
+function hasCombatView(): boolean {
+  return combatWindow !== null || combatWebview !== null;
+}
+
 async function isOnBlockedPage(): Promise<boolean> {
-  if (!combatWindow) return false;
+  if (!hasCombatView()) return false;
   try {
     const url = await invoke<string>("get_combat_url");
     return url.includes("/login") || url.includes("/chat/private");
@@ -238,6 +251,77 @@ async function fetchTargets() {
 async function openCombatWindow(userId: number) {
   const url = `https://web.simple-mmo.com/user/attack/${userId}`;
 
+  if (settings.embeddedCombat) {
+    await openEmbeddedCombat(url);
+  } else {
+    await openExternalCombat(url);
+  }
+}
+
+async function openEmbeddedCombat(url: string) {
+  // If embedded webview exists, just navigate
+  if (combatWebview) {
+    try {
+      await invoke("navigate_combat", { url });
+      return;
+    } catch {
+      combatWebview = null;
+    }
+  }
+
+  // Clean up any stale webview
+  const existing = await Webview.getByLabel("combat");
+  if (existing) {
+    try { await existing.close(); } catch { /* already gone */ }
+    await sleep(200);
+  }
+
+  const mainWindow = getCurrentWindow();
+  const mainWebview = getCurrentWebview();
+
+  // Save original window width so we can restore it
+  const currentSize = await mainWindow.innerSize();
+  savedWindowWidth = currentSize.toLogical(await mainWindow.scaleFactor()).width;
+
+  // Expand window and shrink main webview to make room
+  const windowHeight = currentSize.toLogical(await mainWindow.scaleFactor()).height;
+  await mainWindow.setSize(new LogicalSize(CONTROLS_WIDTH + COMBAT_WIDTH, windowHeight));
+  await mainWebview.setSize(new LogicalSize(CONTROLS_WIDTH, windowHeight));
+  await mainWebview.setPosition(new LogicalPosition(0, 0));
+
+  // Create embedded combat webview
+  combatWebview = new Webview(mainWindow, "combat", {
+    url,
+    x: CONTROLS_WIDTH,
+    y: 0,
+    width: COMBAT_WIDTH,
+    height: windowHeight,
+  });
+
+  combatWebview.once("tauri://error", (e) => {
+    console.error("Combat webview error:", e);
+    combatWebview = null;
+  });
+
+  combatWebview.once("tauri://destroyed", () => {
+    combatWebview = null;
+    if (process.inCombat) {
+      exitCombat();
+    }
+  });
+
+  // Listen for window resize to adjust both webviews
+  resizeUnlisten = await mainWindow.onResized(async ({ payload: size }) => {
+    if (!combatWebview) return;
+    const scale = await mainWindow.scaleFactor();
+    const logical = size.toLogical(scale);
+    await mainWebview.setSize(new LogicalSize(CONTROLS_WIDTH, logical.height));
+    await combatWebview.setSize(new LogicalSize(Math.max(logical.width - CONTROLS_WIDTH, 200), logical.height));
+    await combatWebview.setPosition(new LogicalPosition(CONTROLS_WIDTH, 0));
+  });
+}
+
+async function openExternalCombat(url: string) {
   // If window reference exists, try to navigate; if it fails the window is dead
   if (combatWindow) {
     try {
@@ -277,11 +361,10 @@ async function openCombatWindow(userId: number) {
       exitCombat();
     }
   });
-
 }
 
 async function navigateCombat(url: string) {
-  if (!combatWindow) return;
+  if (!hasCombatView()) return;
   await invoke("navigate_combat", { url });
 }
 
@@ -373,10 +456,37 @@ function sleep(ms: number) {
 async function exitCombat() {
   emptyGuilds.clear();
   await hideOverlay();
+
+  // Stop resize listener
+  if (resizeUnlisten) {
+    resizeUnlisten();
+    resizeUnlisten = null;
+  }
+
+  if (combatWebview) {
+    try { await combatWebview.close(); } catch { /* already closed */ }
+    combatWebview = null;
+
+    // Restore main webview and window size
+    try {
+      const mainWindow = getCurrentWindow();
+      const mainWebview = getCurrentWebview();
+      const restoreWidth = savedWindowWidth ?? CONTROLS_WIDTH;
+      const currentSize = await mainWindow.innerSize();
+      const scale = await mainWindow.scaleFactor();
+      const logicalHeight = currentSize.toLogical(scale).height;
+      await mainWebview.setSize(new LogicalSize(restoreWidth, logicalHeight));
+      await mainWebview.setPosition(new LogicalPosition(0, 0));
+      await mainWindow.setSize(new LogicalSize(restoreWidth, logicalHeight));
+    } catch { /* best effort */ }
+    savedWindowWidth = null;
+  }
+
   if (combatWindow) {
     try { await combatWindow.close(); } catch { /* already closed */ }
     combatWindow = null;
   }
+
   await invoke("unregister_shortcuts");
   keybindsActive.value = false;
   process.setInCombat(false);

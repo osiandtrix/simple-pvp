@@ -71,6 +71,14 @@ pub fn run_all(conn: &Connection) -> Result<(), rusqlite::Error> {
         conn.execute_batch("ALTER TABLE settings ADD COLUMN min_level INTEGER DEFAULT 0")?;
     }
 
+    // Migration: add embedded_combat column if missing
+    let has_embedded_combat: bool = conn
+        .prepare("SELECT embedded_combat FROM settings LIMIT 1")
+        .is_ok();
+    if !has_embedded_combat {
+        conn.execute_batch("ALTER TABLE settings ADD COLUMN embedded_combat INTEGER DEFAULT 0")?;
+    }
+
     // Insert default settings row if not exists
     conn.execute(
         "INSERT OR IGNORE INTO settings (id, max_level, api_key, always_on_top, min_level) VALUES (1, NULL, NULL, 0, 0)",

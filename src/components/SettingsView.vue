@@ -5,7 +5,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
-import { Save, Check, Key, Loader2 } from "lucide-vue-next";
+import { Switch } from "@/components/ui/switch";
+import { Save, Check, Key, Loader2, Monitor } from "lucide-vue-next";
 import { toast } from "vue-sonner";
 import KeybindsList from "./KeybindsList.vue";
 import { useSettingsStore } from "@/stores/settings";
@@ -75,6 +76,27 @@ async function saveApiKey() {
         <p v-if="settings.apiKey" class="mt-2 flex items-center gap-1 text-[11px] text-emerald-400">
           <Check class="h-3 w-3" /> API key configured
         </p>
+      </CardContent>
+    </Card>
+
+    <Card class="border-border/60 bg-card">
+      <CardHeader class="px-4 py-3">
+        <CardTitle class="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+          <Monitor class="h-3.5 w-3.5 text-primary" />
+          Combat View
+        </CardTitle>
+      </CardHeader>
+      <CardContent class="px-4 pb-4">
+        <div class="flex items-center justify-between">
+          <div>
+            <p class="text-sm font-medium">Embedded combat</p>
+            <p class="text-[11px] text-muted-foreground">Show the combat webview inside the main window instead of a separate window</p>
+          </div>
+          <Switch
+            :checked="settings.embeddedCombat"
+            @update:checked="settings.saveEmbeddedCombat($event)"
+          />
+        </div>
       </CardContent>
     </Card>
 

@@ -1,24 +1,28 @@
 use crate::db;
-use tauri::{AppHandle, Manager};
+use tauri::{AppHandle, Manager, Wry};
+
+fn find_webview(app: &AppHandle, label: &str) -> Option<tauri::Webview<Wry>> {
+    <AppHandle as Manager<Wry>>::get_webview(app, label)
+}
 
 #[tauri::command]
 pub fn get_combat_url(app: AppHandle) -> Result<String, String> {
-    if let Some(window) = app.get_webview_window("combat") {
-        window.url().map(|u| u.to_string()).map_err(|e| e.to_string())
+    if let Some(webview) = find_webview(&app, "combat") {
+        webview.url().map(|u| u.to_string()).map_err(|e| e.to_string())
     } else {
-        Err("Combat window not found".into())
+        Err("Combat webview not found".into())
     }
 }
 
 #[tauri::command]
 pub fn combat_overlay_action(app: AppHandle, action: String) -> Result<(), String> {
-    if let Some(window) = app.get_webview_window("main") {
+    if let Some(webview) = find_webview(&app, "main") {
         let js = match action.as_str() {
             "next" => "window.__overlayNext && window.__overlayNext()",
             "back" => "window.__overlayBack && window.__overlayBack()",
             _ => return Err(format!("Unknown action: {}", action)),
         };
-        window.eval(js).map_err(|e| e.to_string())
+        webview.eval(js).map_err(|e| e.to_string())
     } else {
         Err("Main window not found".into())
     }
@@ -26,12 +30,10 @@ pub fn combat_overlay_action(app: AppHandle, action: String) -> Result<(), Strin
 
 #[tauri::command]
 pub fn navigate_combat(app: AppHandle, url: String) -> Result<(), String> {
-    if let Some(window) = app.get_webview_window("combat") {
+    if let Some(webview) = find_webview(&app, "combat") {
         let parsed = url::Url::parse(&url).map_err(|e| e.to_string())?;
-        window
-            .navigate(parsed)
-            .map_err(|e| e.to_string())?;
-        window.set_focus().map_err(|e| e.to_string())?;
+        webview.navigate(parsed).map_err(|e| e.to_string())?;
+        webview.set_focus().map_err(|e| e.to_string())?;
     }
     Ok(())
 }
