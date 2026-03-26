@@ -203,7 +203,7 @@ async function enterCombatForGuild(war: War) {
 
 async function fetchTargets() {
   let guildsFetched = 0;
-  const bufferGoal = 20;
+  const bufferGoal = 5;
 
   while (wars.targets.length - wars.targetIndex < bufferGoal) {
     // Check rate limit before each API call — bail if exhausted
@@ -427,7 +427,7 @@ async function advanceTarget() {
     }
 
     // Prefetch when running low on buffered targets
-    if (!singleGuildMode.value && wars.targets.length - wars.targetIndex < 10) {
+    if (!singleGuildMode.value && wars.targets.length - wars.targetIndex < 3) {
       fetchTargets();
     }
   } finally {

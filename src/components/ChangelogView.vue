@@ -15,6 +15,14 @@ interface ChangelogEntry {
 
 const changelog: ChangelogEntry[] = [
   {
+    version: "1.8.2",
+    date: "2026-03-26",
+    changes: [
+      { type: "changed", text: "Reverted target buffer from 20 back to 5 to conserve API calls" },
+      { type: "changed", text: "Reverted prefetch threshold from 10 back to 3 to reduce unnecessary API usage" },
+    ],
+  },
+  {
     version: "1.8.1",
     date: "2026-03-26",
     changes: [
